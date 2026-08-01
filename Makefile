@@ -1,10 +1,16 @@
-.PHONY: install solve-toy test lint format type-check check versions environment clean
+.PHONY: plot-time-space plot-physical install solve-toy test lint format type-check check versions environment clean
 
 install:
 	python -m pip install -e ".[dev]"
 
 solve-toy:
 	python -m barge_rerouting.models.toy_lp
+
+plot-physical:
+	python scripts/plot_physical_network.py
+
+plot-time-space:
+	python scripts/plot_time_space_network.py
 
 test:
 	pytest -q
