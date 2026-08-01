@@ -1,0 +1,14 @@
+python scripts/check_environment.py
+Barge rerouting reproduction environment
+==========================================
+Operating system:           Linux-7.0.0-28-generic-x86_64-with-glibc2.39
+Python:                     3.12.3
+Python path:                /home/student/projects/barge-rerouting-reproduction/.venv/bin/python
+CPLEX API/engine version:   22.2.0.0
+CPLEX package version:      22.2.0.1
+DOcplex:                    2.32.264
+NetworkX:                   3.6.1
+NumPy:                      2.5.1
+pandas:                     3.0.5
+matplotlib:                 3.11.1
+PyYAML:                     6.0.3

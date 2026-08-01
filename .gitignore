@@ -1,0 +1,49 @@
+# Python caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Editors and operating systems
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Generated data and solver outputs
+data/generated/*
+data/processed/*
+results/raw/*
+results/solutions/*
+results/solver_logs/*
+results/model_exports/*
+
+# Preserve empty output folders
+!data/generated/.gitkeep
+!data/processed/.gitkeep
+!results/raw/.gitkeep
+!results/solutions/.gitkeep
+!results/solver_logs/.gitkeep
+!results/model_exports/.gitkeep
+
+# Local secrets and settings
+.env
+.env.*
+*.key
+*.pem

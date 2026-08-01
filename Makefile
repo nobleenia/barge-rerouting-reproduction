@@ -1,0 +1,43 @@
+.PHONY: install solve-toy test lint format type-check check versions environment clean
+
+install:
+	python -m pip install -e ".[dev]"
+
+solve-toy:
+	python -m barge_rerouting.models.toy_lp
+
+test:
+	pytest -q
+
+lint:
+	ruff check .
+
+format:
+	ruff check --fix .
+	ruff format .
+
+type-check:
+	mypy src
+
+check:
+	ruff check .
+	ruff format --check .
+	mypy src
+	pytest -q
+
+environment:
+	python scripts/check_environment.py
+
+versions:
+	python --version
+	python -m pip --version
+	python -c "import cplex; print('CPLEX:', cplex.__version__)"
+	python -c "import docplex; print('DOcplex:', docplex.__version__)"
+	python -c "import networkx; print('NetworkX:', networkx.__version__)"
+	python -c "import numpy; print('NumPy:', numpy.__version__)"
+	python -c "import pandas; print('pandas:', pandas.__version__)"
+	git --version
+
+clean:
+	rm -rf .pytest_cache .mypy_cache .ruff_cache htmlcov
+	find . -type d -name __pycache__ -prune -exec rm -rf {} +
