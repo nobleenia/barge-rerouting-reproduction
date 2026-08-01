@@ -611,3 +611,34 @@ represented by selecting no positive level?
 
 **Code impact:**  
 Future-selector construction, solution uniqueness, and model size.
+
+---
+
+## A017 — Parallel scheduled transport arcs
+
+**Status:** Derived implementation requirement
+
+**Paper evidence:**  
+The transportation system contains multiple scheduled services and service
+legs.
+
+**Implementation issue:**  
+Different services may connect the same departure and arrival terminal-time
+nodes. A simple directed graph would overwrite one service arc with another.
+
+**Baseline implementation:**  
+Represent the time-space network using a directed multigraph:
+
+\[
+G=(N^{IT},A)
+\]
+
+where parallel arcs are allowed and every arc has a unique identifier.
+
+**Reason:**  
+Service identity, capacity, direction, and schedule must remain distinct even
+when two services share the same tail and head nodes.
+
+**Code impact:**  
+Time-space builder, arc indexing, plotting, CPLEX flow variables, and capacity
+constraints.
