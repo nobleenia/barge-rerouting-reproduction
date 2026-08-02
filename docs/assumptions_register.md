@@ -642,3 +642,36 @@ when two services share the same tail and head nodes.
 **Code impact:**  
 Time-space builder, arc indexing, plotting, CPLEX flow variables, and capacity
 constraints.
+
+---
+
+## A018 — Interpretation of future-demand value
+
+**Status:** Baseline plus sensitivity analysis
+
+**Paper evidence:**  
+The printed revenue-management expression contains:
+
+\[
+\sum_{x=0}^{j}xP_k(x).
+\]
+
+**Ambiguity:**  
+This differs from the commonly expected protected-volume expression:
+
+\[
+E[\min(X_k,j)].
+\]
+
+For outcomes above \(j\), the printed expression contributes zero, whereas the
+capped expectation contributes \(j\).
+
+**Baseline implementation:**  
+Use the printed prefix expression in the strict reproduction model.
+
+**Sensitivity implementation:**  
+Run a separate experiment using the capped expectation.
+
+**Reporting requirement:**  
+Do not silently replace one expression with the other. Report the objective
+and allocation effects of both formulations.
