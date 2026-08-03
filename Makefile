@@ -1,4 +1,4 @@
-.PHONY: generate-toy-demands plot-time-space plot-physical install solve-toy test lint format type-check check versions environment clean
+.PHONY: inspect-toy-instance generate-toy-demands plot-time-space plot-physical install solve-toy test lint format type-check check versions environment clean
 
 install:
 	python -m pip install -e ".[dev]"
@@ -50,3 +50,7 @@ clean:
 
 generate-toy-demands:
 	python scripts/generate_demands.py configs/toy_experiment.yaml --output data/generated/toy_demands.csv
+
+inspect-toy-instance:
+	python scripts/inspect_experiment_instance.py configs/toy_experiment.yaml
+

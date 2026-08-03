@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import yaml
+
 from barge_rerouting.config.model import (
     CustomerMix,
     DemandGenerationConfig,
@@ -12,7 +13,6 @@ from barge_rerouting.config.model import (
     NetworkConfig,
     SolverConfig,
 )
-
 from barge_rerouting.domain import ScheduledTransportLeg
 
 
