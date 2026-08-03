@@ -1,4 +1,4 @@
-.PHONY: inspect-booking-timeline solve-toy-dca solve-tiny-dca inspect-toy-instance generate-toy-demands plot-time-space plot-physical install solve-toy test lint format type-check check versions environment clean
+.PHONY: inspect-booking-commitments inspect-booking-timeline solve-toy-dca solve-tiny-dca inspect-toy-instance generate-toy-demands plot-time-space plot-physical install solve-toy test lint format type-check check versions environment clean
 
 install:
 	python -m pip install -e ".[dev]"
@@ -62,4 +62,7 @@ solve-toy-dca:
 
 inspect-booking-timeline:
 	python scripts/inspect_booking_timeline.py
+
+inspect-booking-commitments:
+	python scripts/inspect_booking_commitments.py
 

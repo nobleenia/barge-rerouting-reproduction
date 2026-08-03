@@ -75,3 +75,47 @@ Later rolling-horizon checkpoints will add:
 - remaining demand fragments;
 - residual arc capacity;
 - modifiable rerouting decisions.
+
+## 6. Persistent demand commitment
+
+A positive booking decision creates a `DemandCommitment`.
+
+It records:
+
+- the booking-event sequence and time;
+- original demand;
+- acceptance fraction;
+- accepted volume;
+- positive planned arc flows.
+
+A rejected request creates no commitment.
+
+## 7. Planned versus executed flow
+
+A planned arc flow reserves capacity for future movement.
+
+It does not mean the cargo has already traversed the arc.
+
+Several booking decisions may occur at the same reservation time without any
+physical execution between them.
+
+Execution is introduced only when network time advances.
+
+## 8. Residual capacity before execution
+
+Before any rerouting or execution, residual transport capacity is:
+
+\[
+C_a^{residual}
+=
+C_a
+-
+\sum_{k\in K^{accepted}}v_{ka}^{planned}.
+\]
+
+This ensures that later bookings cannot reuse capacity already promised to
+earlier accepted demands.
+
+When execution and rerouting are introduced, executed and modifiable planned
+flows will be separated explicitly to prevent capacity from being
+double-subtracted.
