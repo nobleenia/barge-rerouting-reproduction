@@ -1,4 +1,4 @@
-.PHONY: solve-tiny-dca inspect-toy-instance generate-toy-demands plot-time-space plot-physical install solve-toy test lint format type-check check versions environment clean
+.PHONY: solve-toy-dca solve-tiny-dca inspect-toy-instance generate-toy-demands plot-time-space plot-physical install solve-toy test lint format type-check check versions environment clean
 
 install:
 	python -m pip install -e ".[dev]"
@@ -56,4 +56,7 @@ inspect-toy-instance:
 
 solve-tiny-dca:
 	python scripts/solve_tiny_dca.py
+
+solve-toy-dca:
+	python scripts/solve_toy_dca.py
 

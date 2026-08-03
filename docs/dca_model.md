@@ -139,3 +139,37 @@ The resulting objective is:
 \[
 4(10)+6(20)=160.
 \]
+
+## 10. Independent solution validation
+
+A solver status alone is not treated as sufficient evidence of correctness.
+
+After extraction, the DCA solution is independently checked for:
+
+- customer-category acceptance domains;
+- flow nonnegativity;
+- source and intermediate-node conservation;
+- auxiliary-sink delivery balance;
+- scheduled transport capacity;
+- objective reconstruction.
+
+The validation layer uses the assembled instance and extracted numerical
+solution rather than relying on DOcplex constraint objects.
+
+This provides an independent check of both model construction and solution
+extraction.
+
+## 11. Model export
+
+The canonical DCA model is exported in LP format.
+
+The LP file provides a human-readable record of:
+
+- objective coefficients;
+- variable domains;
+- flow-balance equations;
+- sink equations;
+- capacity constraints.
+
+It can be inspected directly during model debugging and included in the
+technical reproduction archive.
