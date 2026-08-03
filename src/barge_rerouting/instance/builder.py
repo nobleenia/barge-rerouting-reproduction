@@ -16,6 +16,10 @@ from barge_rerouting.generation import (
     demand_fingerprint,
     generate_demands,
 )
+from barge_rerouting.instance.delivery import (
+    auxiliary_sink_id_for,
+    build_auxiliary_sink_arcs,
+)
 from barge_rerouting.instance.model import (
     DemandNetworkIndex,
     ExperimentInstance,
@@ -152,11 +156,18 @@ def assemble_experiment_instance(
                 f"Demand {demand.demand_id} contains arcs outside the global time-space network."
             )
 
+        sink_arcs = build_auxiliary_sink_arcs(
+            demand_id=demand.demand_id,
+            destination_nodes=feasible_result.destination_nodes,
+        )
+
         demand_network_indexes.append(
             DemandNetworkIndex(
                 demand=demand,
                 source=feasible_result.source,
                 destination_nodes=feasible_result.destination_nodes,
+                auxiliary_sink_id=auxiliary_sink_id_for(demand.demand_id),
+                sink_arcs=sink_arcs,
                 feasible_arc_ids=feasible_arc_ids,
                 node_flow_indexes=_build_node_flow_indexes(feasible_result.graph),
                 original_node_count=feasible_result.original_node_count,

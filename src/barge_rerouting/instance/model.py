@@ -13,6 +13,7 @@ from barge_rerouting.domain import (
     TimeSpaceNode,
     validate_time_space_node,
 )
+from barge_rerouting.instance.delivery import AuxiliarySinkArc
 
 
 def _normalise_arc_ids(
@@ -98,6 +99,8 @@ class DemandNetworkIndex:
     demand: Demand
     source: TimeSpaceNode
     destination_nodes: tuple[TimeSpaceNode, ...]
+    auxiliary_sink_id: str
+    sink_arcs: tuple[AuxiliarySinkArc, ...]
     feasible_arc_ids: tuple[str, ...]
     node_flow_indexes: tuple[NodeFlowIndex, ...]
     original_node_count: int
@@ -158,6 +161,52 @@ class DemandNetworkIndex:
 
             if destination_node[1] > self.demand.due_time:
                 raise ValueError("A destination node cannot occur after the demand due time.")
+
+        if not isinstance(self.auxiliary_sink_id, str):
+            raise TypeError("auxiliary_sink_id must be a string.")
+
+        auxiliary_sink_id = self.auxiliary_sink_id.strip()
+
+        if not auxiliary_sink_id:
+            raise ValueError("auxiliary_sink_id must be non-empty.")
+
+        expected_sink_id = f"sink::{self.demand.demand_id}"
+
+        if auxiliary_sink_id != expected_sink_id:
+            raise ValueError("auxiliary_sink_id must match the indexed demand identifier.")
+
+        if not isinstance(self.sink_arcs, tuple):
+            raise TypeError("sink_arcs must be a tuple.")
+
+        sink_arcs = tuple(self.sink_arcs)
+
+        if not sink_arcs:
+            raise ValueError("A feasible demand network requires auxiliary sink arcs.")
+
+        for sink_arc in sink_arcs:
+            if not isinstance(sink_arc, AuxiliarySinkArc):
+                raise TypeError("Every sink arc must be an AuxiliarySinkArc object.")
+
+            if sink_arc.demand_id != self.demand.demand_id:
+                raise ValueError("Every sink arc must reference the indexed demand.")
+
+            if sink_arc.sink_id != auxiliary_sink_id:
+                raise ValueError("Every sink arc must terminate at the indexed sink.")
+
+        sink_arc_ids = [sink_arc.arc_id for sink_arc in sink_arcs]
+
+        if len(set(sink_arc_ids)) != len(sink_arc_ids):
+            raise ValueError("Auxiliary sink arc identifiers must be unique.")
+
+        sink_arc_tails = [sink_arc.tail for sink_arc in sink_arcs]
+
+        if len(set(sink_arc_tails)) != len(sink_arc_tails):
+            raise ValueError("Each destination node must have exactly one sink arc.")
+
+        if set(sink_arc_tails) != set(destination_nodes):
+            raise ValueError(
+                "Auxiliary sink arcs must cover every eligible destination-time node exactly once."
+            )
 
         feasible_arc_ids = _normalise_arc_ids(
             self.feasible_arc_ids,
@@ -238,6 +287,21 @@ class DemandNetworkIndex:
         )
         object.__setattr__(
             self,
+            "auxiliary_sink_id",
+            auxiliary_sink_id,
+        )
+        object.__setattr__(
+            self,
+            "sink_arcs",
+            tuple(
+                sorted(
+                    sink_arcs,
+                    key=lambda sink_arc: sink_arc.arc_id,
+                )
+            ),
+        )
+        object.__setattr__(
+            self,
             "feasible_arc_ids",
             feasible_arc_ids,
         )
@@ -295,6 +359,73 @@ class DemandNetworkIndex:
                 return node_index
 
         raise KeyError(f"Node {validated_node} is not feasible for demand {self.demand_id}.")
+
+    @property
+    def sink_arc_ids(self) -> tuple[str, ...]:
+        """Return all demand-specific auxiliary delivery arc IDs."""
+        return tuple(sink_arc.arc_id for sink_arc in self.sink_arcs)
+
+    @property
+    def all_flow_arc_ids(self) -> tuple[str, ...]:
+        """Return physical, holding, and auxiliary delivery arc IDs."""
+        return tuple(
+            sorted(
+                (
+                    *self.feasible_arc_ids,
+                    *self.sink_arc_ids,
+                )
+            )
+        )
+
+    def incoming_flow_arc_ids(
+        self,
+        node: TimeSpaceNode,
+    ) -> tuple[str, ...]:
+        """Return physical arcs entering one time-space node."""
+        return self.flow_index_for(node).incoming_arc_ids
+
+    def outgoing_flow_arc_ids(
+        self,
+        node: TimeSpaceNode,
+    ) -> tuple[str, ...]:
+        """Return physical and delivery arcs leaving one time-space node."""
+        validated_node = validate_time_space_node(
+            node,
+            field_name="node",
+        )
+
+        physical_outgoing = self.flow_index_for(validated_node).outgoing_arc_ids
+
+        delivery_outgoing = tuple(
+            sink_arc.arc_id for sink_arc in self.sink_arcs if sink_arc.tail == validated_node
+        )
+
+        return tuple(
+            sorted(
+                (
+                    *physical_outgoing,
+                    *delivery_outgoing,
+                )
+            )
+        )
+
+    def sink_arc_for_destination(
+        self,
+        destination_node: TimeSpaceNode,
+    ) -> AuxiliarySinkArc:
+        """Return the delivery arc for one eligible arrival node."""
+        validated_node = validate_time_space_node(
+            destination_node,
+            field_name="destination_node",
+        )
+
+        for sink_arc in self.sink_arcs:
+            if sink_arc.tail == validated_node:
+                return sink_arc
+
+        raise KeyError(
+            f"Node {validated_node} is not an eligible destination for demand {self.demand_id}."
+        )
 
 
 @dataclass(frozen=True, slots=True)

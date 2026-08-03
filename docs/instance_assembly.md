@@ -106,3 +106,62 @@ The current assembly layer retains all eligible destination-time nodes.
 Before the first CPLEX model is built, these nodes will be connected to a
 demand-specific auxiliary sink so that delivery can occur at any eligible
 arrival time without duplicating demand volume.
+
+## 9. Auxiliary destination sink
+
+A physical destination may be reachable at several acceptable times.
+
+For demand \(k\), eligible destination-time nodes may include:
+
+\[
+(d_k,2),\quad(d_k,3),\quad(d_k,4).
+\]
+
+The assembly layer creates one logical auxiliary sink:
+
+\[
+sink_k,
+\]
+
+and one artificial delivery arc from every eligible arrival node:
+
+\[
+(d_k,t)\rightarrow sink_k.
+\]
+
+The auxiliary sink is demand-specific and is not a physical terminal.
+
+## 10. Delivery-flow accounting
+
+At an eligible destination-time node, a delivery arc behaves as an additional
+outgoing flow option.
+
+At the logical sink, the model will require:
+
+\[
+\sum_{a\in\delta^-(sink_k)}v_{ka}
+=
+q_k\xi_k.
+\]
+
+This permits accepted cargo to arrive at any eligible time while requiring the
+total delivered volume to equal the accepted volume.
+
+## 11. Why auxiliary sinks are not inserted into the shared graph
+
+The shared NetworkX graph represents physical terminal-time states and
+scheduled or holding movements.
+
+Auxiliary sinks are:
+
+- artificial;
+- demand-specific;
+- zero-cost;
+- uncapacitated;
+- used only for flow accounting.
+
+Adding every demand sink to the shared graph would mix physical network
+structure with demand-specific optimisation structure.
+
+The project therefore stores auxiliary delivery arcs beside each
+`DemandNetworkIndex` rather than modifying the frozen global graph.

@@ -74,15 +74,18 @@ def main() -> None:
     print(
         "Feasible dimensions: "
         f"{network_index.feasible_node_count} nodes, "
-        f"{network_index.feasible_arc_count} arcs"
+        f"{network_index.feasible_arc_count} physical/holding arcs"
     )
+    print(f"Auxiliary sink:      {network_index.auxiliary_sink_id}")
+    print(f"Delivery arcs:       {network_index.sink_arc_ids}")
+    print(f"All flow arcs:      {len(network_index.all_flow_arc_ids)}")
     print("Node flow indexes:")
 
     for node_index in network_index.node_flow_indexes:
         print(
             f"  {node_index.node}: "
-            f"in={node_index.incoming_arc_ids}, "
-            f"out={node_index.outgoing_arc_ids}"
+            f"in={network_index.incoming_flow_arc_ids(node_index.node)}, "
+            f"out={network_index.outgoing_flow_arc_ids(node_index.node)}"
         )
 
 
