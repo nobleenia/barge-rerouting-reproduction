@@ -3,41 +3,11 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from dataclasses import dataclass
 
 import networkx as nx
 
-TimeSpaceNode = tuple[str, int]
-
-
-@dataclass(frozen=True, slots=True)
-class ScheduledTransportLeg:
-    """One scheduled movement in the time-space network."""
-
-    service_id: str
-    origin: str
-    destination: str
-    departure_time: int
-    arrival_time: int
-    capacity: float
-    direction: str = "unspecified"
-
-    def __post_init__(self) -> None:
-        """Validate the scheduled leg."""
-        if not self.service_id.strip():
-            raise ValueError("service_id must be a non-empty string.")
-        if not self.origin.strip():
-            raise ValueError("origin must be a non-empty string.")
-        if not self.destination.strip():
-            raise ValueError("destination must be a non-empty string.")
-        if self.origin == self.destination:
-            raise ValueError("A transport leg must connect different terminals.")
-        if self.departure_time < 0:
-            raise ValueError("departure_time must be non-negative.")
-        if self.arrival_time <= self.departure_time:
-            raise ValueError("arrival_time must be strictly greater than departure_time.")
-        if self.capacity < 0:
-            raise ValueError("capacity must be non-negative.")
+from barge_rerouting.domain.network import ArcType, TimeSpaceNode
+from barge_rerouting.domain.service import ScheduledTransportLeg
 
 
 def build_time_space_network(
@@ -63,7 +33,7 @@ def build_time_space_network(
             Whether to add waiting arcs between consecutive listed periods.
 
     Returns:
-        A directed NetworkX multigraph whose nodes are (terminal, time) pairs.
+        A directed NetworkX multigraph whose nodes are terminal-time pairs.
 
     Raises:
         ValueError:
@@ -117,10 +87,11 @@ def build_time_space_network(
                     (terminal, arrival_time),
                     key=edge_key,
                     arc_id=edge_key,
-                    arc_type="holding",
+                    arc_type=ArcType.HOLDING.value,
                     duration=arrival_time - departure_time,
-                    capacity=float("inf"),
+                    capacity=None,
                     service_id=None,
+                    direction=None,
                 )
 
     for leg_index, leg in enumerate(scheduled_legs):
@@ -133,17 +104,15 @@ def build_time_space_network(
         if leg.arrival_time not in time_set:
             raise ValueError(f"Unknown arrival time: {leg.arrival_time}")
 
-        tail: TimeSpaceNode = (leg.origin, leg.departure_time)
-        head: TimeSpaceNode = (leg.destination, leg.arrival_time)
         edge_key = f"transport::{leg_index}::{leg.service_id}"
 
         graph.add_edge(
-            tail,
-            head,
+            leg.tail,
+            leg.head,
             key=edge_key,
             arc_id=edge_key,
-            arc_type="transport",
-            duration=leg.arrival_time - leg.departure_time,
+            arc_type=ArcType.TRANSPORT.value,
+            duration=leg.duration,
             capacity=leg.capacity,
             service_id=leg.service_id,
             direction=leg.direction,

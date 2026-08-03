@@ -1,0 +1,97 @@
+experiment:
+  name: toy-baseline
+  random_seed: 20260802
+
+network:
+  terminals:
+    - A
+    - B
+    - C
+
+  time_periods:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+
+  add_holding_arcs: true
+
+  transport_legs:
+    - service_id: S1
+      origin: A
+      destination: B
+      departure_time: 0
+      arrival_time: 1
+      capacity: 10
+      direction: forward
+
+    - service_id: S2
+      origin: B
+      destination: C
+      departure_time: 1
+      arrival_time: 2
+      capacity: 10
+      direction: forward
+
+    - service_id: S3
+      origin: A
+      destination: B
+      departure_time: 2
+      arrival_time: 3
+      capacity: 10
+      direction: forward
+
+    - service_id: S4
+      origin: B
+      destination: C
+      departure_time: 3
+      arrival_time: 4
+      capacity: 10
+      direction: forward
+
+    - service_id: S5
+      origin: C
+      destination: B
+      departure_time: 0
+      arrival_time: 1
+      capacity: 10
+      direction: reverse
+
+    - service_id: S6
+      origin: B
+      destination: A
+      departure_time: 1
+      arrival_time: 2
+      capacity: 10
+      direction: reverse
+
+demand_generation:
+  number_of_demands: 20
+
+  minimum_volume: 1
+  maximum_volume: 8
+
+  minimum_fare_per_teu: 20
+  maximum_fare_per_teu: 60
+
+  minimum_reservation_time: 0
+  maximum_reservation_time: 1
+
+  minimum_availability_lag: 0
+  maximum_availability_lag: 1
+
+  minimum_due_slack: 1
+  maximum_due_slack: 3
+
+  customer_mix:
+    R: 0.30
+    P: 0.40
+    F: 0.30
+
+solver:
+  time_limit_seconds: 60
+  relative_mip_gap: 0.0
+  log_output: true
