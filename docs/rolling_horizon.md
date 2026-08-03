@@ -119,3 +119,47 @@ earlier accepted demands.
 When execution and rerouting are introduced, executed and modifiable planned
 flows will be separated explicitly to prevent capacity from being
 double-subtracted.
+
+## 9. Sequential DCA decision
+
+At booking event \(e\), only the current arriving demand is optimised.
+
+Prior accepted commitments remain fixed.
+
+For transport arc \(a\), the current model receives residual capacity:
+
+\[
+C_{a,e}^{residual}
+=
+C_a
+-
+\sum_{k\in K_e^{accepted}}v_{ka}^{planned}.
+\]
+
+The current demand flow therefore satisfies:
+
+\[
+v_{k_ea}
+\leq
+C_{a,e}^{residual}.
+\]
+
+The event objective is:
+
+\[
+\max f_{k_e}q_{k_e}\xi_{k_e}.
+\]
+
+This is a myopic DCA decision: realised future demands are not considered.
+
+## 10. Sequential versus static optimisation
+
+Static optimisation can compare all demands simultaneously and select the
+globally strongest combination.
+
+Sequential DCA cannot revise earlier accepted commitments.
+
+Consequently, an early accepted request may consume capacity that would later
+have been more valuable.
+
+This distinction is necessary for evaluating future-demand revenue management.
