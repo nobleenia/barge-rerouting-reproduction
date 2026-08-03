@@ -675,3 +675,38 @@ Run a separate experiment using the capped expectation.
 **Reporting requirement:**  
 Do not silently replace one expression with the other. Report the objective
 and allocation effects of both formulations.
+
+---
+
+## A019 — Ordering of simultaneous booking requests
+
+**Status:** Baseline implementation assumption
+
+**Paper evidence:**  
+The demand-allocation mechanism is dynamic and requests are processed as they
+become known.
+
+**Missing information:**  
+The exact request-arrival sequence is not available for demands sharing the
+same recorded reservation time.
+
+**Baseline implementation:**  
+Process requests sequentially using deterministic order:
+
+\[
+(t_k^{res},k).
+\]
+
+That is, reservation time is primary and demand identifier is the tie-breaker.
+
+**Reason:**  
+Sequential allocation requires a complete order. Deterministic ordering makes
+the experiment reproducible.
+
+**Sensitivity requirement:**  
+Later experiments may randomise the order within equal-time groups while
+preserving the same demand instance.
+
+**Reporting requirement:**  
+Do not describe the demand-ID tie-breaker as an empirically observed arrival
+order.
