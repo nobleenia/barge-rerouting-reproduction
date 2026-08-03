@@ -8,6 +8,12 @@ from barge_rerouting.rolling_horizon.commitment import (
     commitment_from_dca_solution,
     validate_commitment_against_instance,
 )
+from barge_rerouting.rolling_horizon.run import (
+    ArcCapacityTransition,
+    SequentialDcaRun,
+    SequentialEventResult,
+    run_sequential_dca,
+)
 from barge_rerouting.rolling_horizon.sequential import (
     SequentialArcFlowResult,
     SequentialBookingModelArtifacts,
@@ -35,7 +41,10 @@ __all__ = [
     "CommitmentValidationReport",
     "DemandCommitment",
     "PlannedArcFlow",
+    "ArcCapacityTransition",
     "RollingBookingState",
+    "SequentialDcaRun",
+    "SequentialEventResult",
     "SequentialArcFlowResult",
     "SequentialBookingModelArtifacts",
     "SequentialBookingSolution",
@@ -44,6 +53,7 @@ __all__ = [
     "build_sequential_booking_model",
     "commitment_from_dca_solution",
     "commitment_from_sequential_solution",
+    "run_sequential_dca",
     "solve_sequential_booking_model",
     "validate_commitment_against_instance",
 ]
