@@ -15,6 +15,11 @@ from barge_rerouting.rerouting.eligibility import (
     ReroutingExclusionReason,
     detect_reroutable_demands,
 )
+from barge_rerouting.rerouting.in_transit import (
+    ReroutingDecisionSnapshot,
+    ReroutingFragmentDecisionState,
+    build_rerouting_decision_snapshot,
+)
 
 __all__ = [
     "REROUTING_CAPACITY_TOLERANCE",
@@ -23,9 +28,12 @@ __all__ = [
     "ReroutableDemandState",
     "ReroutableFragmentState",
     "ReroutingCapacitySnapshot",
+    "ReroutingDecisionSnapshot",
     "ReroutingEligibilitySnapshot",
     "ReroutingExclusion",
     "ReroutingExclusionReason",
+    "ReroutingFragmentDecisionState",
     "build_rerouting_capacity_snapshot",
+    "build_rerouting_decision_snapshot",
     "detect_reroutable_demands",
 ]
