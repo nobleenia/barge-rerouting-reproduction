@@ -710,3 +710,40 @@ preserving the same demand instance.
 **Reporting requirement:**  
 Do not describe the demand-ID tie-breaker as an empirically observed arrival
 order.
+
+---
+
+## A003 Phase 7 operationalisation
+
+Phase 7 applies A003 as a primary reproduction assumption.
+
+The publication's displayed past-demand flow equation uses the original demand
+origin and complete accepted quantity. Its surrounding rerouting description,
+however, concerns accepted cargo that has not yet reached its destination.
+
+The implementation resolves this by reconstructing physical execution state at
+every decision epoch.
+
+For each accepted demand:
+
+\[
+acceptedVolume
+=
+deliveredVolume
++
+unfinishedFragmentVolume.
+\]
+
+Only unfinished fragments are reoptimised.
+
+Each fragment begins at its actual current terminal-time node. Its executed arc
+history remains fixed, while only future unexecuted reservations may be
+released and replaced.
+
+This is not presented as a verbatim transcription of the displayed equation.
+It is the documented implementation interpretation required to prevent
+already transported cargo from restarting at the original source.
+
+A literal original-source interpretation may later be implemented as a
+diagnostic sensitivity, but it is not the primary rolling-horizon rerouting
+mechanism.

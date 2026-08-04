@@ -153,3 +153,39 @@ Whenever a new module or modelling decision is introduced:
 3. add at least one validation mechanism;
 4. identify the result or output affected;
 5. record whether the component reproduces the paper or extends it.
+
+---
+
+## 6. Phase 7 resolved rerouting mapping
+
+The initial matrix used planned module names. The implemented and planned
+Phase 7 locations are refined below.
+
+| Phase 7 concept | Reproduction interpretation | Code location | Validation | Assumptions |
+|---|---|---|---|---|
+| Accepted-demand execution state | Delivered and unfinished accepted volume reconstructed at decision time | `rolling_horizon/execution.py` | Execution snapshot and volume-accounting tests | A003 |
+| Demand fragment | Fixed remaining volume at its actual terminal-time node | `domain/fragment.py` | Fragment movement and accounting tests | A003 |
+| Executed arc history | Historical movement that cannot be changed | `domain/fragment.py`, `rolling_horizon/execution.py` | Executed-history immutability tests | A003 |
+| Rerouting eligibility | Accepted, unfinished, temporally feasible commitments selected at an event | `rerouting/eligibility.py` | Inclusion and exclusion tests | A003 |
+| Old unexecuted reservation | Planned future volume belonging to a reroutable fragment | `rerouting/capacity.py` | Reservation decomposition tests | A003 |
+| Released rerouting capacity | Capacity after removing only fixed outside allocations | `rerouting/capacity.py` | No-double-counting tests | A003, A009 |
+| Fragment feasible network | Future network beginning at the fragment's current node | `rerouting/network.py` | Reachability and deadline tests | A002, A003 |
+| DCA-Reroute model | Current demand plus fixed-volume unfinished fragments | `rerouting/model.py` | Flow, capacity, and fixed-volume tests | A003, A006 |
+| Rerouting state transition | Preserve history and replace only unexecuted plans | `rerouting/transition.py` | Commitment-replacement tests | A003 |
+| Full-Reroute | Trigger rerouting for every incoming booking request | `rerouting/run.py` | Trigger-count and chronological-state tests | A003 |
+| DCA comparison | Compare sequential DCA and Full-Reroute on identical inputs | `experiments/rerouting.py` | Common-instance and indicator tests | A010, A013 |
+
+### Phase 7 interpretation rule
+
+The printed formulation is treated as a compressed aggregate representation.
+
+The implementation follows the publication's operational description of
+previously accepted but unfinished cargo by:
+
+- preserving completed movement;
+- starting unfinished fragments at their actual current nodes;
+- fixing accepted quantities;
+- recalculating only future itinerary flows.
+
+This interpretation is governed by Assumption A003 and must be disclosed in
+all reproduction reporting.
