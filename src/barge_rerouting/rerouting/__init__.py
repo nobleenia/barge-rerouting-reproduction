@@ -20,8 +20,16 @@ from barge_rerouting.rerouting.in_transit import (
     ReroutingFragmentDecisionState,
     build_rerouting_decision_snapshot,
 )
+from barge_rerouting.rerouting.network import (
+    FragmentNetworkIndex,
+    FragmentNetworkSnapshot,
+    build_fragment_network_index,
+    build_fragment_network_snapshot,
+)
 
 __all__ = [
+    "FragmentNetworkIndex",
+    "FragmentNetworkSnapshot",
     "REROUTING_CAPACITY_TOLERANCE",
     "REROUTING_ELIGIBILITY_TOLERANCE",
     "ReleasedTransportArcCapacity",
@@ -33,6 +41,8 @@ __all__ = [
     "ReroutingExclusion",
     "ReroutingExclusionReason",
     "ReroutingFragmentDecisionState",
+    "build_fragment_network_index",
+    "build_fragment_network_snapshot",
     "build_rerouting_capacity_snapshot",
     "build_rerouting_decision_snapshot",
     "detect_reroutable_demands",
