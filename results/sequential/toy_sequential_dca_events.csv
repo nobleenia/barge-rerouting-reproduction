@@ -1,0 +1,10 @@
+sequence,decision_time,demand_id,category,requested_volume,solved,solve_status,acceptance_fraction,accepted_volume,event_revenue,capacity_transitions
+1,0,K0001,P,1.0,True,optimal,1.0,1.0,27.92,transport::5::S6:10.000000->9.000000
+2,0,K0003,P,6.0,True,optimal,1.0,6.0,144.18,transport::4::S5:10.000000->4.000000;transport::5::S6:9.000000->3.000000
+3,0,K0004,F,3.0,True,integer optimal solution,1.0,3.0,118.08,transport::0::S1:10.000000->7.000000
+4,0,K0005,P,8.0,True,optimal,0.375,3.0,89.07000000000001,transport::4::S5:4.000000->1.000000;transport::5::S6:3.000000->0.000000
+5,0,K0006,P,5.0,True,optimal,1.0,5.0,109.75,transport::0::S1:7.000000->2.000000;transport::1::S2:10.000000->5.000000
+6,0,K0007,R,3.0,True,optimal,1.0,3.0,140.91,transport::1::S2:5.000000->2.000000;transport::2::S3:10.000000->10.000000;transport::3::S4:10.000000->10.000000;transport::5::S6:0.000000->0.000000
+7,0,K0009,R,3.0,True,optimal,1.0,3.0,126.14999999999999,transport::2::S3:10.000000->7.000000;transport::3::S4:10.000000->7.000000
+8,0,K0010,F,2.0,True,integer optimal solution,1.0,2.0,67.84,transport::1::S2:2.000000->0.000000
+9,0,K0011,R,2.0,False,infeasible,,0.0,,transport::0::S1:2.000000->2.000000;transport::1::S2:0.000000->0.000000
