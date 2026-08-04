@@ -1,0 +1,21 @@
+sequence_number,event_id,decision_time,demand_id,category,requested_volume,ordinary_acceptance,full_reroute_acceptance,ordinary_revenue,full_reroute_revenue,rerouted_prior_demands,released_services,ordinary_solve_status,full_reroute_solve_status
+1,booking::0001::K0001,0,K0001,P,1,1,1,27.92,27.92,,,optimal,optimal
+2,booking::0002::K0003,0,K0003,P,6,1,1,144.18,144.18,K0001,S6,optimal,optimal
+3,booking::0003::K0004,0,K0004,F,3,1,1,118.08,118.08,K0001;K0003,S5;S6,integer optimal solution,integer optimal solution
+4,booking::0004::K0005,0,K0005,P,8,0.375,0.375,89.07,89.07,K0001;K0003;K0004,S1;S5;S6,optimal,optimal
+5,booking::0005::K0006,0,K0006,P,5,1,1,109.75,109.75,K0001;K0003;K0004;K0005,S1;S5;S6,optimal,optimal
+6,booking::0006::K0007,0,K0007,R,3,1,1,140.91,140.91,K0001;K0003;K0004;K0005;K0006,S1;S2;S5;S6,optimal,optimal
+7,booking::0007::K0009,0,K0009,R,3,1,1,126.15,126.15,K0001;K0003;K0004;K0005;K0006;K0007,S1;S2;S5;S6,optimal,optimal
+8,booking::0008::K0010,0,K0010,F,2,1,1,67.84,67.84,K0001;K0003;K0004;K0005;K0006;K0007;K0009,S1;S2;S3;S4;S5;S6,integer optimal solution,integer optimal solution
+9,booking::0009::K0011,0,K0011,R,2,,1,,67.42,K0001;K0003;K0004;K0005;K0006;K0007;K0009;K0010,S1;S2;S3;S4;S5;S6,infeasible,optimal
+10,booking::0010::K0012,0,K0012,P,4,,0.25,,42.19,K0001;K0003;K0004;K0005;K0006;K0007;K0009;K0010;K0011,S1;S2;S3;S4;S5;S6,not-run,optimal
+11,booking::0011::K0016,0,K0016,P,2,,1,,45.4,K0001;K0003;K0004;K0005;K0006;K0007;K0009;K0010;K0011;K0012,S1;S2;S3;S4;S5;S6,not-run,optimal
+12,booking::0012::K0017,0,K0017,R,6,,,,,,S1;S2;S3;S4;S5;S6,not-run,infeasible
+13,booking::0013::K0019,0,K0019,F,5,,,,,,,not-run,not-run
+14,booking::0014::K0002,1,K0002,P,5,,,,,,,not-run,not-run
+15,booking::0015::K0008,1,K0008,F,8,,,,,,,not-run,not-run
+16,booking::0016::K0013,1,K0013,R,5,,,,,,,not-run,not-run
+17,booking::0017::K0014,1,K0014,F,4,,,,,,,not-run,not-run
+18,booking::0018::K0015,1,K0015,F,1,,,,,,,not-run,not-run
+19,booking::0019::K0018,1,K0018,F,7,,,,,,,not-run,not-run
+20,booking::0020::K0020,1,K0020,R,1,,,,,,,not-run,not-run

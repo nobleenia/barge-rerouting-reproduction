@@ -106,38 +106,92 @@ Demand-feasible subgraphs, super-sink construction, flow conservation.
 
 ## A003 — State of partially executed demands
 
-**Status:** Assumed
+**Status:** Assumed operational interpretation
 
 **Paper evidence:**  
 Previously accepted but undelivered demands may have their itineraries
-modified during rerouting.
+modified during rerouting. Accepted quantities remain commitments while their
+future barge itineraries may be reoptimised.
 
 **Ambiguity:**  
-The displayed formulation does not fully explain how cargo that has already
-travelled through part of its itinerary is represented during reoptimisation.
+The printed formulation does not explicitly encode a fragment-specific
+terminal-time source for cargo that has already completed part of its route.
+Its balance structure may therefore be read as restarting the accepted demand
+from its original source, even when part of the itinerary has already been
+executed.
+
+The paper also does not fully specify how an accepted demand should be divided
+when part of its volume is:
+
+- already delivered;
+- travelling on an in-transit service;
+- waiting at an intermediate terminal;
+- still assigned to future services.
 
 **Baseline implementation:**  
-At each decision epoch, every accepted demand will be separated into:
+At each booking decision epoch, every accepted commitment is reconstructed from
+its persisted path flows and separated into delivered and unfinished demand
+fragments.
 
-- delivered volume;
-- currently transported or executed volume;
-- remaining undelivered volume;
-- current terminal-time location of each unfinished fragment;
-- fixed executed arcs;
-- modifiable future arcs.
+For every unfinished fragment, the implementation records:
 
-Executed movements are irreversible. Only future unexecuted movements may be
-rerouted.
+- its fixed accepted volume;
+- its execution-aware terminal-time position;
+- completed physical arcs;
+- any currently in-transit physical arc;
+- future unexecuted physical and holding arcs;
+- the original persisted commitment and delivery deadline.
+
+Completed movement is irreversible.
+
+An in-transit service is also immutable. Because the persisted fragment record
+may remain at the service's tail until the service arrival time, the rerouting
+decision layer explicitly locks the in-transit arc and uses its head
+terminal-time node as the effective rerouting source.
+
+Only future transport reservations that remain bookable at the current decision
+time are released into rerouting capacity. Capacity used by completed,
+in-transit, delivered, excluded, or otherwise fixed commitments is not released.
+
+The joint DCA-Reroute model then:
+
+1. keeps each unfinished fragment's accepted volume fixed;
+2. preserves completed and in-transit movements;
+3. reoptimises only future itinerary flows;
+4. jointly routes the current demand and eligible unfinished fragments;
+5. rebuilds prior commitments while preserving their original booking
+   metadata;
+6. appends the current booking event exactly once.
+
+**Reporting rule:**  
+This is an execution-aware operational interpretation under Assumption A003.
+It must not be presented as a verbatim implementation of printed Equation (5).
+
+A prior commitment listed in evaluation output was included in joint
+reoptimisation and rebuilt in persistent state. This does not by itself prove
+that its physical route changed.
 
 **Question for authors:**  
-During rerouting, are executed arcs fixed while each unfinished demand fragment
-is restarted from its current terminal-time node?
+During rerouting:
+
+1. are completed and in-transit arcs fixed;
+2. is each unfinished fragment restarted from its execution-aware
+   terminal-time position; and
+3. does the published implementation use fragment-specific source-balance
+   constraints not displayed in the printed formulation?
 
 **Code impact:**  
-Rolling-horizon state, demand fragments, rerouting model, capacity accounting.
 
----
-
+- `src/barge_rerouting/domain/fragment.py`
+- `src/barge_rerouting/rolling_horizon/execution.py`
+- `src/barge_rerouting/rerouting/eligibility.py`
+- `src/barge_rerouting/rerouting/in_transit.py`
+- `src/barge_rerouting/rerouting/capacity.py`
+- `src/barge_rerouting/rerouting/network.py`
+- `src/barge_rerouting/rerouting/optimization.py`
+- `src/barge_rerouting/rerouting/transition.py`
+- `src/barge_rerouting/rerouting/orchestration.py`
+- `src/barge_rerouting/rerouting/run.py`
 ## A004 — Construction of the future-demand set
 
 **Status:** Unresolved

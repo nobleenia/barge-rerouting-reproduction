@@ -15,6 +15,14 @@ from barge_rerouting.rerouting.eligibility import (
     ReroutingExclusionReason,
     detect_reroutable_demands,
 )
+from barge_rerouting.rerouting.evaluation import (
+    CanonicalComparisonSummary,
+    CanonicalEventComparison,
+    Phase7CanonicalEvaluation,
+    Phase7EvaluationPaths,
+    evaluate_full_reroute_against_sequential,
+    write_phase7_evaluation,
+)
 from barge_rerouting.rerouting.in_transit import (
     ReroutingDecisionSnapshot,
     ReroutingFragmentDecisionState,
@@ -49,6 +57,10 @@ from barge_rerouting.rerouting.transition import (
 )
 
 __all__ = [
+    "CanonicalComparisonSummary",
+    "CanonicalEventComparison",
+    "Phase7CanonicalEvaluation",
+    "Phase7EvaluationPaths",
     "FULL_REROUTE_RUN_TOLERANCE",
     "FullRerouteRun",
     "FullRerouteEventResult",
@@ -80,4 +92,6 @@ __all__ = [
     "apply_dca_reroute_solution",
     "run_full_reroute_event",
     "run_full_reroute",
+    "evaluate_full_reroute_against_sequential",
+    "write_phase7_evaluation",
 ]

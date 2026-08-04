@@ -156,36 +156,88 @@ Whenever a new module or modelling decision is introduced:
 
 ---
 
-## 6. Phase 7 resolved rerouting mapping
+## 6. Phase 7 implemented rerouting mapping
 
-The initial matrix used planned module names. The implemented and planned
-Phase 7 locations are refined below.
+The initial matrix above contains planned package names. The following table is
+the authoritative mapping for the implemented Phase 7 baseline.
 
-| Phase 7 concept | Reproduction interpretation | Code location | Validation | Assumptions |
+| Phase 7 concept | Operational role | Implemented code location | Validation and output | Assumptions |
 |---|---|---|---|---|
-| Accepted-demand execution state | Delivered and unfinished accepted volume reconstructed at decision time | `rolling_horizon/execution.py` | Execution snapshot and volume-accounting tests | A003 |
-| Demand fragment | Fixed remaining volume at its actual terminal-time node | `domain/fragment.py` | Fragment movement and accounting tests | A003 |
-| Executed arc history | Historical movement that cannot be changed | `domain/fragment.py`, `rolling_horizon/execution.py` | Executed-history immutability tests | A003 |
-| Rerouting eligibility | Accepted, unfinished, temporally feasible commitments selected at an event | `rerouting/eligibility.py` | Inclusion and exclusion tests | A003 |
-| Old unexecuted reservation | Planned future volume belonging to a reroutable fragment | `rerouting/capacity.py` | Reservation decomposition tests | A003 |
-| Released rerouting capacity | Capacity after removing only fixed outside allocations | `rerouting/capacity.py` | No-double-counting tests | A003, A009 |
-| Fragment feasible network | Future network beginning at the fragment's current node | `rerouting/network.py` | Reachability and deadline tests | A002, A003 |
-| DCA-Reroute model | Current demand plus fixed-volume unfinished fragments | `rerouting/model.py` | Flow, capacity, and fixed-volume tests | A003, A006 |
-| Rerouting state transition | Preserve history and replace only unexecuted plans | `rerouting/transition.py` | Commitment-replacement tests | A003 |
-| Full-Reroute | Trigger rerouting for every incoming booking request | `rerouting/run.py` | Trigger-count and chronological-state tests | A003 |
-| DCA comparison | Compare sequential DCA and Full-Reroute on identical inputs | `experiments/rerouting.py` | Common-instance and indicator tests | A010, A013 |
+| Accepted-demand execution state | Reconstructs delivered, completed, in-transit, and future planned volume at a decision time | `src/barge_rerouting/rolling_horizon/execution.py` | Execution snapshots, path decomposition, volume-accounting tests | A003 |
+| Demand fragment | Represents fixed remaining accepted volume associated with one unfinished path fragment | `src/barge_rerouting/domain/fragment.py` | Fragment identity, volume, and state validation | A003 |
+| Rerouting eligibility | Selects accepted, unfinished, temporally feasible prior commitments | `src/barge_rerouting/rerouting/eligibility.py` | Inclusion and exclusion-reason tests | A003 |
+| In-transit locking | Keeps a currently travelling service immutable and moves the effective rerouting source to its arrival node | `src/barge_rerouting/rerouting/in_transit.py` | Long-leg representation-gap fixture and lock tests | A003 |
+| Released rerouting capacity | Releases only future bookable reservations belonging to eligible fragments | `src/barge_rerouting/rerouting/capacity.py` | Capacity identities and no-double-counting tests | A003, A009 |
+| Fragment-specific future network | Builds and prunes a feasible future graph from the effective fragment source to eligible destination-time nodes | `src/barge_rerouting/rerouting/network.py` | Forward/backward reachability, deadline, auxiliary-sink tests | A002, A003 |
+| Joint DCA-Reroute optimisation | Jointly routes the current request and fixed-volume unfinished fragments under shared capacity | `src/barge_rerouting/rerouting/optimization.py` | Ordinary-rejection/reroute-acceptance route-switching experiment | A003, A006 |
+| Persistent rerouting transition | Preserves historical arcs, replaces future path flows, maps fragment sinks to original demand sinks, and appends the current event once | `src/barge_rerouting/rerouting/transition.py` | Metadata preservation, execution reconstruction, capacity and determinism tests | A003 |
+| Single-event Full-Reroute orchestration | Builds execution, ordinary capacity, eligibility, released capacity, fragment networks, joint model, solution, and transition for one booking event | `src/barge_rerouting/rerouting/orchestration.py` | End-to-end controlled event diagnostic and tests | A003 |
+| Complete Full-Reroute run | Invokes Full-Reroute at every incoming booking request and carries the revised state forward | `src/barge_rerouting/rerouting/run.py` | Complete-timeline, state-chain, failure-stop, and determinism tests | A003 |
+| Canonical DCA comparison | Runs time-aware sequential DCA and Full-Reroute on the same seeded instance and timeline | `src/barge_rerouting/rerouting/evaluation.py` | Event CSV, structured JSON, Markdown report, deterministic rerun test | A003, A010, A013 |
+| Canonical evaluation command | Reproduces and exports the Phase 7 canonical comparison | `scripts/evaluate_phase7_canonical.py` | `make evaluate-phase7-canonical` | A003, A010, A013 |
+| Canonical raw results | Stores event-level comparison and structured summary data | `results/phase7/canonical_event_comparison.csv`, `results/phase7/canonical_evaluation.json` | Instance fingerprint and deterministic regeneration | A003, A013 |
+| Canonical interpretation report | Records aggregate, common-prefix, continuation, and failure-point results | `docs/phase7_canonical_results.md` | Generated directly from evaluation results | A003, A013 |
 
-### Phase 7 interpretation rule
+### 6.1 Operational interpretation boundary
 
-The printed formulation is treated as a compressed aggregate representation.
+The fragment source is the cargo's execution-aware terminal-time position.
 
-The implementation follows the publication's operational description of
-previously accepted but unfinished cargo by:
+- Completed physical movement remains immutable.
+- A currently in-transit service remains immutable.
+- Only future bookable reservations may be released.
+- Accepted prior volume remains mandatory.
+- Prior booking sequence, decision time, acceptance, and demand metadata are
+  preserved during commitment reconstruction.
 
-- preserving completed movement;
-- starting unfinished fragments at their actual current nodes;
-- fixing accepted quantities;
-- recalculating only future itinerary flows.
+This is the disclosed implementation governed by Assumption A003. It should
+not be described as a verbatim transcription of printed Equation (5).
 
-This interpretation is governed by Assumption A003 and must be disclosed in
-all reproduction reporting.
+### 6.2 Meaning of a reoptimised prior commitment
+
+Evaluation output lists prior commitments included in the joint model and
+rebuilt in persistent state.
+
+That list demonstrates participation in reoptimisation. It does not establish
+that every listed commitment changed its physical itinerary. A physical route
+change must be established by comparing the commitment's before-and-after
+physical arc sequence.
+
+### 6.3 Canonical Phase 7 result interpretation
+
+On the canonical seeded instance:
+
+- both mechanisms produce identical acceptance, accepted volume, and revenue
+  over their common solved prefix of eight events;
+- ordinary sequential DCA becomes infeasible at
+  `booking::0009::K0011`;
+- Full-Reroute recovers that event and processes three additional events;
+- Full-Reroute becomes infeasible at `booking::0012::K0017`;
+- the failure point therefore shifts forward by three booking events;
+- the reported `+5.00` TEU and `+155.01` revenue are continuation gains after
+  ordinary DCA terminates;
+- they are not paired improvements across all twenty booking events.
+
+The canonical Phase 7 results are synthetic implementation-validation results.
+They are not claimed to reproduce a numerical table from the paper.
+
+### 6.4 Phase 7 scope boundary
+
+Phase 7 implements:
+
+- operational DCA-Reroute;
+- Full-Reroute at every incoming request;
+- persistent execution-aware state transitions;
+- canonical comparison with time-aware sequential DCA.
+
+Phase 7 does **not** yet implement:
+
+- future-demand capacity protection;
+- the printed future expected-revenue term;
+- DCA-RM;
+- DCA-RRM;
+- Partial-Reroute forecast-interval triggering;
+- truck recourse and truck penalties;
+- the paper's complete static or dynamic experiment matrix.
+
+Those components belong to subsequent phases and must not be implied by the
+Phase 7 results.
