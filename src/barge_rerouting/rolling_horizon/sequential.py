@@ -11,6 +11,9 @@ from docplex.mp.model import Model
 
 from barge_rerouting.domain import CustomerCategory
 from barge_rerouting.instance import ExperimentInstance
+from barge_rerouting.rolling_horizon.capacity import (
+    TransportCapacitySnapshot,
+)
 from barge_rerouting.rolling_horizon.commitment import (
     COMMITMENT_TOLERANCE,
     DemandCommitment,
@@ -131,6 +134,8 @@ def build_sequential_booking_model(
     instance: ExperimentInstance,
     state: RollingBookingState,
     event: BookingDecisionEvent,
+    *,
+    capacity_snapshot: TransportCapacitySnapshot | None = None,
 ) -> SequentialBookingModelArtifacts:
     """Build one myopic booking model using residual transport capacity."""
     if not isinstance(instance, ExperimentInstance):
@@ -147,6 +152,19 @@ def build_sequential_booking_model(
 
     if event.sequence_number != state.next_sequence_number:
         raise ValueError("The booking event must be the next unprocessed event.")
+
+    if capacity_snapshot is not None:
+        if not isinstance(
+            capacity_snapshot,
+            TransportCapacitySnapshot,
+        ):
+            raise TypeError("capacity_snapshot must be a TransportCapacitySnapshot or None.")
+
+        if capacity_snapshot.instance_fingerprint != instance.demand_fingerprint:
+            raise ValueError("The capacity snapshot belongs to another instance.")
+
+        if capacity_snapshot.physical_time != event.decision_time:
+            raise ValueError("The capacity snapshot time must equal the booking decision time.")
 
     demand = instance.demand_by_id(event.demand_id)
 
@@ -232,12 +250,15 @@ def build_sequential_booking_model(
         if not arc.is_transport:
             continue
 
-        residual_capacity = float(
-            state.residual_transport_capacity(
-                instance,
-                arc_id,
+        if capacity_snapshot is None:
+            residual_capacity = float(
+                state.residual_transport_capacity(
+                    instance,
+                    arc_id,
+                )
             )
-        )
+        else:
+            residual_capacity = float(capacity_snapshot.bookable_capacity_for(arc_id))
 
         residual_capacities[arc_id] = residual_capacity
 

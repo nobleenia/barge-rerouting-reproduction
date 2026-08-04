@@ -385,3 +385,39 @@ time.
 
 This prevents an accepted commitment from being counted once as historical
 execution and again as a future reservation.
+
+## 23. Time-aware event orchestration
+
+Booking events are grouped by decision time.
+
+For each physical time \(\tau\), the run performs:
+
+1. reconstruct execution at \(\tau\);
+2. construct time-aware transport capacities;
+3. process all booking events at \(\tau\) sequentially;
+4. rebuild reservation state after every accepted event;
+5. advance to the next distinct decision time.
+
+## 24. Same-time event semantics
+
+The execution snapshot remains at the same physical time throughout an
+equal-time event group.
+
+New commitments immediately reduce future bookable capacity, but their
+transport arcs do not execute merely because another booking request is
+processed.
+
+## 25. Capacity supplied to the booking model
+
+The event-specific model receives:
+
+\[
+C_{a,\tau}^{bookable}
+\]
+
+from the time-aware capacity snapshot.
+
+Past and in-transit services receive zero bookable capacity.
+
+Future services receive nominal capacity minus all commitments currently
+reserved on the service.

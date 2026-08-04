@@ -46,6 +46,11 @@ from barge_rerouting.rolling_horizon.state import (
     BookingDecisionRecord,
     RollingBookingState,
 )
+from barge_rerouting.rolling_horizon.time_aware_run import (
+    TimeAwareEpochResult,
+    TimeAwareSequentialDcaRun,
+    run_time_aware_sequential_dca,
+)
 from barge_rerouting.rolling_horizon.timeline import (
     BookingDecisionEvent,
     BookingTimeline,
@@ -69,6 +74,8 @@ __all__ = [
     "PlannedDemandPath",
     "RollingBookingState",
     "TransportArcCapacityState",
+    "TimeAwareEpochResult",
+    "TimeAwareSequentialDcaRun",
     "TransportCapacitySnapshot",
     "SequentialArcFlowResult",
     "SequentialBookingModelArtifacts",
@@ -86,6 +93,7 @@ __all__ = [
     "decompose_commitment_paths",
     "diagnose_booking_feasibility",
     "run_sequential_dca",
+    "run_time_aware_sequential_dca",
     "solve_sequential_booking_model",
     "validate_commitment_against_instance",
 ]

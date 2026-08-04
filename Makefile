@@ -1,4 +1,4 @@
-.PHONY: inspect-time-aware-capacity inspect-physical-execution solve-toy-sequential-dca solve-sequential-dca inspect-booking-commitments inspect-booking-timeline solve-toy-dca solve-tiny-dca inspect-toy-instance generate-toy-demands plot-time-space plot-physical install solve-toy test lint format type-check check versions environment clean
+.PHONY: solve-time-aware-sequential-dca inspect-time-aware-capacity inspect-physical-execution solve-toy-sequential-dca solve-sequential-dca inspect-booking-commitments inspect-booking-timeline solve-toy-dca solve-tiny-dca inspect-toy-instance generate-toy-demands plot-time-space plot-physical install solve-toy test lint format type-check check versions environment clean
 
 install:
 	python -m pip install -e ".[dev]"
@@ -77,4 +77,7 @@ inspect-physical-execution:
 
 inspect-time-aware-capacity:
 	python scripts/inspect_time_aware_capacity.py
+
+solve-time-aware-sequential-dca:
+	python scripts/solve_time_aware_sequential_dca.py
 
