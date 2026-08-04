@@ -12,7 +12,10 @@ from barge_rerouting.optimization import (
     build_dca_model,
     solve_dca_model,
 )
-from barge_rerouting.rolling_horizon import run_sequential_dca
+from barge_rerouting.rolling_horizon import (
+    diagnose_booking_feasibility,
+    run_sequential_dca,
+)
 
 
 def main() -> None:
@@ -152,6 +155,25 @@ def main() -> None:
             print(
                 "Interpretation:      prior commitments left no feasible "
                 "capacity for a mandatory regular request"
+            )
+
+        diagnostic = diagnose_booking_feasibility(
+            instance,
+            sequential_run.final_state,
+            failure.event,
+        )
+
+        print(f"Required volume:      {diagnostic.required_volume:.2f}")
+        print(f"Maximum routable:     {diagnostic.maximum_routable_volume:.2f}")
+        print(f"Volume shortfall:     {diagnostic.volume_shortfall:.2f}")
+        print("Minimum-cut bottlenecks:")
+
+        for bottleneck in diagnostic.bottleneck_arcs:
+            print(
+                f"  {bottleneck.arc_id} "
+                f"| service={bottleneck.service_id} "
+                f"| residual={bottleneck.residual_capacity:.2f} "
+                f"| nominal={bottleneck.nominal_capacity:.2f}"
             )
 
     print()

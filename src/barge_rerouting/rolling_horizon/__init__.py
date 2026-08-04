@@ -8,6 +8,12 @@ from barge_rerouting.rolling_horizon.commitment import (
     commitment_from_dca_solution,
     validate_commitment_against_instance,
 )
+from barge_rerouting.rolling_horizon.diagnostics import (
+    DIAGNOSTIC_TOLERANCE,
+    BookingFeasibilityDiagnostic,
+    BottleneckArcDiagnostic,
+    diagnose_booking_feasibility,
+)
 from barge_rerouting.rolling_horizon.run import (
     ArcCapacityTransition,
     SequentialDcaRun,
@@ -35,6 +41,9 @@ from barge_rerouting.rolling_horizon.timeline import (
 
 __all__ = [
     "COMMITMENT_TOLERANCE",
+    "DIAGNOSTIC_TOLERANCE",
+    "BookingFeasibilityDiagnostic",
+    "BottleneckArcDiagnostic",
     "BookingDecisionEvent",
     "BookingDecisionRecord",
     "BookingTimeline",
@@ -52,6 +61,7 @@ __all__ = [
     "build_booking_timeline",
     "build_sequential_booking_model",
     "commitment_from_dca_solution",
+    "diagnose_booking_feasibility",
     "commitment_from_sequential_solution",
     "run_sequential_dca",
     "solve_sequential_booking_model",

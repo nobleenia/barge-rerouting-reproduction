@@ -207,3 +207,40 @@ earlier accepted demands.
 When execution and rerouting are introduced, executed and modifiable planned
 flows will be separated explicitly to prevent capacity from being
 double-subtracted.
+
+## 14. Residual-capacity bottleneck diagnosis
+
+When a mandatory request is infeasible, the implementation constructs a
+single-demand residual-capacity flow network.
+
+The diagnostic computes:
+
+\[
+Q_k^{max},
+\]
+
+the maximum demand volume routable through the remaining transport capacity.
+
+The unmet volume is:
+
+\[
+shortfall_k
+=
+q_k-Q_k^{max}.
+\]
+
+A minimum source-to-sink cut identifies the scheduled transport arcs that
+prevent additional flow.
+
+This is stronger than merely listing every saturated arc because the reported
+cut separates the demand source from its logical delivery sink.
+
+For the canonical baseline failure, the expected diagnosis is:
+
+\[
+q_{K0011}=2,\qquad
+Q_{K0011}^{max}=0,\qquad
+shortfall=2.
+\]
+
+The expected minimum-cut transport arc is service S2.
