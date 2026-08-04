@@ -244,3 +244,71 @@ shortfall=2.
 \]
 
 The expected minimum-cut transport arc is service S2.
+
+## 15. Physical-time execution
+
+Accepted commitments initially contain planned arc flows.
+
+A planned physical arc is considered executed at time \(\tau\) when:
+
+\[
+headTime(a)\leq\tau.
+\]
+
+Execution is therefore based on arrival time.
+
+At physical time zero, a service arriving at time one remains unexecuted.
+
+At physical time one, that service is completed and its cargo fragment is
+located at the service head node.
+
+## 16. Flow-path decomposition
+
+A committed demand flow may be split across several feasible routes.
+
+Before reconstructing execution, the positive source-to-sink flow is
+decomposed deterministically into `PlannedDemandPath` objects.
+
+Each path records:
+
+- path volume;
+- ordered physical and holding arcs;
+- one final auxiliary delivery arc.
+
+One unfinished fragment is maintained per decomposed path.
+
+## 17. Fragment execution
+
+For an unfinished path, the fragment location at time \(\tau\) is:
+
+- the demand source when no physical arc has arrived;
+- the head of the latest executed physical arc otherwise.
+
+Executed physical arc identifiers are preserved in the fragment history.
+
+When the path's eligible destination time has been reached, its volume moves
+from unfinished fragments to `delivered_barge_volume`.
+
+## 18. Execution accounting identity
+
+At every physical time:
+
+\[
+acceptedVolume_k
+=
+remainingVolume_k
++
+deliveredBargeVolume_k
++
+deliveredTruckVolume_k.
+\]
+
+The `AcceptedDemandState` domain object validates this identity.
+
+## 19. Equal-time booking decisions
+
+No physical execution occurs merely because another request is processed at
+the same reservation time.
+
+Physical advancement occurs only when the rolling process moves to a later
+time value.

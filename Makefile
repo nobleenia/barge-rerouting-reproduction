@@ -1,4 +1,4 @@
-.PHONY: solve-toy-sequential-dca solve-sequential-dca inspect-booking-commitments inspect-booking-timeline solve-toy-dca solve-tiny-dca inspect-toy-instance generate-toy-demands plot-time-space plot-physical install solve-toy test lint format type-check check versions environment clean
+.PHONY: inspect-physical-execution solve-toy-sequential-dca solve-sequential-dca inspect-booking-commitments inspect-booking-timeline solve-toy-dca solve-tiny-dca inspect-toy-instance generate-toy-demands plot-time-space plot-physical install solve-toy test lint format type-check check versions environment clean
 
 install:
 	python -m pip install -e ".[dev]"
@@ -71,4 +71,7 @@ solve-sequential-dca:
 
 solve-toy-sequential-dca:
 	python scripts/solve_toy_sequential_dca.py
+
+inspect-physical-execution:
+	python scripts/inspect_physical_execution.py
 
