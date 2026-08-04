@@ -38,12 +38,19 @@ from barge_rerouting.rerouting.orchestration import (
     FullRerouteEventResult,
     run_full_reroute_event,
 )
+from barge_rerouting.rerouting.run import (
+    FULL_REROUTE_RUN_TOLERANCE,
+    FullRerouteRun,
+    run_full_reroute,
+)
 from barge_rerouting.rerouting.transition import (
     DcaRerouteTransitionResult,
     apply_dca_reroute_solution,
 )
 
 __all__ = [
+    "FULL_REROUTE_RUN_TOLERANCE",
+    "FullRerouteRun",
     "FullRerouteEventResult",
     "DcaRerouteTransitionResult",
     "FragmentFlowResult",
@@ -72,4 +79,5 @@ __all__ = [
     "solve_dca_reroute_model",
     "apply_dca_reroute_solution",
     "run_full_reroute_event",
+    "run_full_reroute",
 ]
