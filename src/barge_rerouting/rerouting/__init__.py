@@ -26,8 +26,20 @@ from barge_rerouting.rerouting.network import (
     build_fragment_network_index,
     build_fragment_network_snapshot,
 )
+from barge_rerouting.rerouting.optimization import (
+    CurrentDemandFlowResult,
+    DcaRerouteModelArtifacts,
+    DcaRerouteSolution,
+    FragmentFlowResult,
+    build_dca_reroute_model,
+    solve_dca_reroute_model,
+)
 
 __all__ = [
+    "FragmentFlowResult",
+    "DcaRerouteSolution",
+    "DcaRerouteModelArtifacts",
+    "CurrentDemandFlowResult",
     "FragmentNetworkIndex",
     "FragmentNetworkSnapshot",
     "REROUTING_CAPACITY_TOLERANCE",
@@ -46,4 +58,6 @@ __all__ = [
     "build_rerouting_capacity_snapshot",
     "build_rerouting_decision_snapshot",
     "detect_reroutable_demands",
+    "build_dca_reroute_model",
+    "solve_dca_reroute_model",
 ]

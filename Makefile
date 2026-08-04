@@ -1,4 +1,4 @@
-.PHONY: inspect-rerouting-network inspect-rerouting-in-transit inspect-rerouting-capacity inspect-rerouting-eligibility solve-time-aware-sequential-dca inspect-time-aware-capacity inspect-physical-execution solve-toy-sequential-dca solve-sequential-dca inspect-booking-commitments inspect-booking-timeline solve-toy-dca solve-tiny-dca inspect-toy-instance generate-toy-demands plot-time-space plot-physical install solve-toy test lint format type-check check versions environment clean
+.PHONY: inspect-dca-reroute-model inspect-rerouting-network inspect-rerouting-in-transit inspect-rerouting-capacity inspect-rerouting-eligibility solve-time-aware-sequential-dca inspect-time-aware-capacity inspect-physical-execution solve-toy-sequential-dca solve-sequential-dca inspect-booking-commitments inspect-booking-timeline solve-toy-dca solve-tiny-dca inspect-toy-instance generate-toy-demands plot-time-space plot-physical install solve-toy test lint format type-check check versions environment clean
 
 install:
 	python -m pip install -e ".[dev]"
@@ -92,4 +92,7 @@ inspect-rerouting-in-transit:
 
 inspect-rerouting-network:
 	python scripts/inspect_rerouting_network.py
+
+inspect-dca-reroute-model:
+	python scripts/inspect_dca_reroute_model.py
 

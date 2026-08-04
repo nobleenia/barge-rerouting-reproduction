@@ -1,0 +1,79 @@
+experiment:
+  name: rerouting-switch-test
+  random_seed: 20260804
+
+network:
+  terminals:
+    - A
+    - B
+    - C
+    - D
+
+  time_periods:
+    - 0
+    - 1
+    - 2
+    - 3
+
+  add_holding_arcs: true
+
+  transport_legs:
+    - service_id: S_PREFIX
+      origin: A
+      destination: B
+      departure_time: 0
+      arrival_time: 1
+      capacity: 4
+      direction: forward
+
+    - service_id: S_BOTTLENECK
+      origin: B
+      destination: C
+      departure_time: 1
+      arrival_time: 2
+      capacity: 4
+      direction: forward
+
+    - service_id: S_ALT1
+      origin: B
+      destination: D
+      departure_time: 1
+      arrival_time: 2
+      capacity: 4
+      direction: alternative
+
+    - service_id: S_ALT2
+      origin: D
+      destination: C
+      departure_time: 2
+      arrival_time: 3
+      capacity: 4
+      direction: alternative
+
+demand_generation:
+  number_of_demands: 2
+
+  minimum_volume: 1
+  maximum_volume: 4
+
+  minimum_fare_per_teu: 10
+  maximum_fare_per_teu: 100
+
+  minimum_reservation_time: 0
+  maximum_reservation_time: 1
+
+  minimum_availability_lag: 0
+  maximum_availability_lag: 0
+
+  minimum_due_slack: 1
+  maximum_due_slack: 2
+
+  customer_mix:
+    R: 0.50
+    P: 0.00
+    F: 0.50
+
+solver:
+  time_limit_seconds: 60
+  relative_mip_gap: 0.0
+  log_output: false
