@@ -1,5 +1,10 @@
 """Rolling-horizon booking, execution, and state-transition utilities."""
 
+from barge_rerouting.rolling_horizon.capacity import (
+    TransportArcCapacityState,
+    TransportCapacitySnapshot,
+    build_transport_capacity_snapshot,
+)
 from barge_rerouting.rolling_horizon.commitment import (
     COMMITMENT_TOLERANCE,
     CommitmentValidationReport,
@@ -63,6 +68,8 @@ __all__ = [
     "PlannedArcFlow",
     "PlannedDemandPath",
     "RollingBookingState",
+    "TransportArcCapacityState",
+    "TransportCapacitySnapshot",
     "SequentialArcFlowResult",
     "SequentialBookingModelArtifacts",
     "SequentialBookingSolution",
@@ -72,6 +79,7 @@ __all__ = [
     "apply_sequential_booking_solution",
     "build_booking_timeline",
     "build_execution_snapshot",
+    "build_transport_capacity_snapshot",
     "build_sequential_booking_model",
     "commitment_from_dca_solution",
     "commitment_from_sequential_solution",

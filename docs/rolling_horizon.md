@@ -312,3 +312,76 @@ the same reservation time.
 
 Physical advancement occurs only when the rolling process moves to a later
 time value.
+
+## 20. Time-aware capacity categories
+
+For transport arc:
+
+\[
+a:(i,t_i)\rightarrow(j,t_j),
+\]
+
+committed volume is assigned to exactly one category at physical time
+\(\tau\).
+
+Completed volume:
+
+\[
+t_j\leq\tau.
+\]
+
+In-transit volume:
+
+\[
+t_i<\tau<t_j.
+\]
+
+Future-reserved volume:
+
+\[
+t_i\geq\tau.
+\]
+
+The three categories form a partition:
+
+\[
+committed_a
+=
+completed_a
++
+inTransit_a
++
+futureReserved_a.
+\]
+
+## 21. Bookable residual capacity
+
+Only services that have not departed remain bookable.
+
+For \(t_i\geq\tau\):
+
+\[
+C_{a,\tau}^{bookable}
+=
+C_a-futureReserved_{a,\tau}.
+\]
+
+For \(t_i<\tau\):
+
+\[
+C_{a,\tau}^{bookable}=0.
+\]
+
+Unused capacity on a departed service is historical unused capacity. It cannot
+be assigned to a later request.
+
+## 22. No double subtraction
+
+Executed cargo and future reserved cargo are not both subtracted from the same
+service capacity.
+
+A fixed transport arc belongs to only one timing state at a given physical
+time.
+
+This prevents an accepted commitment from being counted once as historical
+execution and again as a future reservation.
