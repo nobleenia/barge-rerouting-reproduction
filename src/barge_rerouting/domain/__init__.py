@@ -8,6 +8,8 @@ from barge_rerouting.domain.demand import (
 from barge_rerouting.domain.forecast import (
     PROBABILITY_TOLERANCE,
     FutureDemandForecast,
+    FutureProtectionValue,
+    FutureValueInterpretation,
     VolumeProbability,
 )
 from barge_rerouting.domain.fragment import (
@@ -24,6 +26,8 @@ from barge_rerouting.domain.network import (
 from barge_rerouting.domain.service import ScheduledTransportLeg
 
 __all__ = [
+    "FutureProtectionValue",
+    "FutureValueInterpretation",
     "PROBABILITY_TOLERANCE",
     "VOLUME_TOLERANCE",
     "AcceptanceVariableType",

@@ -1,4 +1,4 @@
-.PHONY: evaluate-phase7-canonical inspect-full-reroute-run inspect-full-reroute-event inspect-dca-reroute-transition inspect-dca-reroute-model inspect-rerouting-network inspect-rerouting-in-transit inspect-rerouting-capacity inspect-rerouting-eligibility solve-time-aware-sequential-dca inspect-time-aware-capacity inspect-physical-execution solve-toy-sequential-dca solve-sequential-dca inspect-booking-commitments inspect-booking-timeline solve-toy-dca solve-tiny-dca inspect-toy-instance generate-toy-demands plot-time-space plot-physical install solve-toy test lint format type-check check versions environment clean
+.PHONY: inspect-future-value evaluate-phase7-canonical inspect-full-reroute-run inspect-full-reroute-event inspect-dca-reroute-transition inspect-dca-reroute-model inspect-rerouting-network inspect-rerouting-in-transit inspect-rerouting-capacity inspect-rerouting-eligibility solve-time-aware-sequential-dca inspect-time-aware-capacity inspect-physical-execution solve-toy-sequential-dca solve-sequential-dca inspect-booking-commitments inspect-booking-timeline solve-toy-dca solve-tiny-dca inspect-toy-instance generate-toy-demands plot-time-space plot-physical install solve-toy test lint format type-check check versions environment clean
 
 install:
 	python -m pip install -e ".[dev]"
@@ -107,4 +107,7 @@ inspect-full-reroute-run:
 
 evaluate-phase7-canonical:
 	python scripts/evaluate_phase7_canonical.py
+
+inspect-future-value:
+	python scripts/inspect_future_value.py
 
