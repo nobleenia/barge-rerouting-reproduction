@@ -1405,3 +1405,32 @@ optimised jointly with mandatory unfinished fragments.
 
 This is an observed property of the canonical instance, not a proof that
 DCA-RM and DCA-RRM are generally equivalent.
+
+## 24.12 Phase 9 truck-disabled scope
+
+The implemented Phase 9 combined objective is conditional on:
+
+\[
+q_k^{truck}=0
+\qquad
+\forall k.
+\]
+
+Consequently, the truck-penalty component mentioned in the paper's general
+objective vanishes.
+
+The Phase 9 model should therefore be interpreted as the stable-capacity,
+truck-disabled DCA-RRM core. It is not yet the complete disruption-recovery
+formulation.
+
+Phase 10 introduces explicit truck recourse:
+
+\[
+q_k^{truck}\geq 0,
+\]
+
+together with actual water-adjusted capacities and a penalty proportional to
+the trucked volume.
+
+This separation prevents an unreported truck formulation from being hidden
+inside the Phase 9 model.

@@ -32,15 +32,15 @@ Each entry contains:
 
 **Status:** Unresolved
 
-**Paper evidence:**  
+**Paper evidence:**
 Services have fixed routes, schedules, capacities, and periodic operation.
 Two service families are used in the experiments.
 
-**Ambiguity:**  
+**Ambiguity:**
 The complete departure and arrival schedule for every service leg is not
 reported sufficiently to reconstruct the experimental networks exactly.
 
-**Baseline implementation:**  
+**Baseline implementation:**
 Create documented synthetic service schedules that preserve:
 
 - five consecutive terminals;
@@ -53,14 +53,14 @@ Create documented synthetic service schedules that preserve:
 All schedules will be stored in configuration files rather than embedded in
 Python code.
 
-**Sensitivity:**  
+**Sensitivity:**
 Test alternative departure offsets and service frequencies.
 
-**Question for authors:**  
+**Question for authors:**
 Can the exact schedules or original service configuration files for both
 service families be provided?
 
-**Code impact:**  
+**Code impact:**
 `configs/`, network builder, experiment configurations.
 
 ---
@@ -69,17 +69,17 @@ service families be provided?
 
 **Status:** Assumed
 
-**Paper evidence:**  
+**Paper evidence:**
 Each demand has a physical destination \(d(k)\) and a due time
 \(t^{due}(k)\). Flow conservation is defined over terminal-time nodes.
 
-**Ambiguity:**  
+**Ambiguity:**
 It is not fully clear whether delivery must occur:
 
 1. exactly at terminal-time node \((d(k), t^{due}(k))\); or
 2. at any destination-time node no later than \(t^{due}(k)\).
 
-**Baseline implementation:**  
+**Baseline implementation:**
 Permit arrival at any destination-time node satisfying:
 
 \[
@@ -88,18 +88,18 @@ t^{arrival}(k) \leq t^{due}(k).
 
 Connect all eligible destination-time nodes to a demand-specific super-sink.
 
-**Reason:**  
+**Reason:**
 A due time is interpreted as a latest permissible delivery time rather than a
 mandatory exact arrival time.
 
-**Sensitivity:**  
+**Sensitivity:**
 Compare with exact-due-time delivery on selected toy instances.
 
-**Question for authors:**  
+**Question for authors:**
 Does the implementation permit delivery at any time before the deadline, or
 only at the destination node corresponding exactly to the due time?
 
-**Code impact:**  
+**Code impact:**
 Demand-feasible subgraphs, super-sink construction, flow conservation.
 
 ---
@@ -108,12 +108,12 @@ Demand-feasible subgraphs, super-sink construction, flow conservation.
 
 **Status:** Assumed operational interpretation
 
-**Paper evidence:**  
+**Paper evidence:**
 Previously accepted but undelivered demands may have their itineraries
 modified during rerouting. Accepted quantities remain commitments while their
 future barge itineraries may be reoptimised.
 
-**Ambiguity:**  
+**Ambiguity:**
 The printed formulation does not explicitly encode a fragment-specific
 terminal-time source for cargo that has already completed part of its route.
 Its balance structure may therefore be read as restarting the accepted demand
@@ -128,7 +128,7 @@ when part of its volume is:
 - waiting at an intermediate terminal;
 - still assigned to future services.
 
-**Baseline implementation:**  
+**Baseline implementation:**
 At each booking decision epoch, every accepted commitment is reconstructed from
 its persisted path flows and separated into delivered and unfinished demand
 fragments.
@@ -163,7 +163,7 @@ The joint DCA-Reroute model then:
    metadata;
 6. appends the current booking event exactly once.
 
-**Reporting rule:**  
+**Reporting rule:**
 This is an execution-aware operational interpretation under Assumption A003.
 It must not be presented as a verbatim implementation of printed Equation (5).
 
@@ -171,7 +171,7 @@ A prior commitment listed in evaluation output was included in joint
 reoptimisation and rebuilt in persistent state. This does not by itself prove
 that its physical route changed.
 
-**Question for authors:**  
+**Question for authors:**
 During rerouting:
 
 1. are completed and in-transit arcs fixed;
@@ -180,7 +180,7 @@ During rerouting:
 3. does the published implementation use fragment-specific source-balance
    constraints not displayed in the printed formulation?
 
-**Code impact:**  
+**Code impact:**
 
 - `src/barge_rerouting/domain/fragment.py`
 - `src/barge_rerouting/rolling_horizon/execution.py`
@@ -196,11 +196,11 @@ During rerouting:
 
 **Status:** Unresolved
 
-**Paper evidence:**  
+**Paper evidence:**
 \(K(\tilde{k})\) contains potential future demands having direct possible
 interactions in time with the current demand.
 
-**Ambiguity:**  
+**Ambiguity:**
 The exact operational rule used to decide whether a future demand belongs to
 \(K(\tilde{k})\) is not provided.
 
@@ -229,7 +229,7 @@ DCA-RRM model in Phase 9.
 This is a disclosed operational interpretation and not a verbatim rule supplied
 by the paper.
 
-**Sensitivity:**  
+**Sensitivity:**
 Compare:
 
 - time-window overlap only;
@@ -237,11 +237,11 @@ Compare:
 - shared-feasible-arc overlap;
 - fixed-number future-demand look-ahead.
 
-**Question for authors:**  
+**Question for authors:**
 How was “direct possible interaction in time” operationally evaluated when
 constructing \(K(\tilde{k})\)?
 
-**Code impact:**  
+**Code impact:**
 Forecast generation, policy input construction, model size.
 
 ---
@@ -250,14 +250,14 @@ Forecast generation, policy input construction, model size.
 
 **Status:** Explicit baseline with sensitivity alternative
 
-**Paper evidence:**  
+**Paper evidence:**
 For protected level \(j\), the printed future-demand contribution uses:
 
 \[
 \sum_{x=0}^{j} xP_k(x).
 \]
 
-**Ambiguity:**  
+**Ambiguity:**
 This expression does not credit probability outcomes for which \(x>j\). It is
 therefore not generally equal to:
 
@@ -265,7 +265,7 @@ therefore not generally equal to:
 E[\min(X_k,j)].
 \]
 
-**Baseline implementation:**  
+**Baseline implementation:**
 Implement the expression exactly as printed:
 
 \[
@@ -274,7 +274,7 @@ R^{printed}_k(j)
 f(k)\sum_{x=0}^{j}xP_k(x).
 \]
 
-**Sensitivity implementation:**  
+**Sensitivity implementation:**
 Also implement:
 
 \[
@@ -286,11 +286,11 @@ f(k)E[\min(X_k,j)].
 The baseline results will use the printed expression. The capped version will
 be reported separately and clearly labelled as a sensitivity analysis.
 
-**Question for authors:**  
+**Question for authors:**
 When realised future volume exceeds protected level \(j\), is the request
 assumed to be rejected entirely, or was a capped expectation intended?
 
-**Code impact:**  
+**Code impact:**
 Future-demand value tables, objective coefficients, sensitivity experiments.
 
 ---
@@ -299,25 +299,25 @@ Future-demand value tables, objective coefficients, sensitivity experiments.
 
 **Status:** Derived
 
-**Paper evidence:**  
+**Paper evidence:**
 Demand arc-flow variables are continuous.
 
-**Interpretation:**  
+**Interpretation:**
 A demand may be divided across more than one feasible itinerary unless
 additional binary path-use restrictions are imposed.
 
-**Baseline implementation:**  
+**Baseline implementation:**
 Treat demand as aggregated TEU flow that may be split across itineraries.
 
-**Sensitivity:**  
+**Sensitivity:**
 An unsplittable path-based or binary arc-use formulation may be tested on small
 instances, but it is not part of the initial core reproduction.
 
-**Question for authors:**  
+**Question for authors:**
 Were demand flows intentionally divisible, or were additional implementation
 restrictions used to keep each request on a single itinerary?
 
-**Code impact:**  
+**Code impact:**
 Variable domains, path interpretation, model size.
 
 ---
@@ -326,13 +326,13 @@ Variable domains, path interpretation, model size.
 
 **Status:** Assumed
 
-**Paper evidence:**  
+**Paper evidence:**
 Holding arcs allow cargo to wait at origins or intermediate terminals.
 
-**Ambiguity:**  
+**Ambiguity:**
 No terminal-storage capacities or holding costs are clearly specified.
 
-**Baseline implementation:**  
+**Baseline implementation:**
 Holding arcs will have:
 
 - no binding capacity;
@@ -340,14 +340,14 @@ Holding arcs will have:
 - availability only between consecutive time periods;
 - no movement revenue.
 
-**Sensitivity:**  
+**Sensitivity:**
 Terminal-storage limits or waiting costs may be added as an extension, not as
 part of the baseline reproduction.
 
-**Question for authors:**  
+**Question for authors:**
 Were holding arcs treated as unlimited and costless in the experiments?
 
-**Code impact:**  
+**Code impact:**
 Network parameters and objective function.
 
 ---
@@ -356,11 +356,11 @@ Network parameters and objective function.
 
 **Status:** Assumed
 
-**Paper evidence:**  
+**Paper evidence:**
 Truck transport is available as an alternative mode and penalties are incurred
 when accepted barge volume is shifted to truck.
 
-**Ambiguity:**  
+**Ambiguity:**
 The displayed mathematical formulation does not completely specify:
 
 - truck decision variables;
@@ -369,7 +369,7 @@ The displayed mathematical formulation does not completely specify:
 - exact penalty calculation;
 - which demand categories may be transferred.
 
-**Baseline implementation:**  
+**Baseline implementation:**
 For each accepted unfinished demand, define:
 
 \[
@@ -389,14 +389,14 @@ q_k^{truck}.
 Assume truck capacity is available when recourse is activated. Apply a
 configurable penalty per TEU transferred to truck.
 
-**Sensitivity:**  
+**Sensitivity:**
 Test different truck penalties and, if needed, limited truck capacity.
 
-**Question for authors:**  
+**Question for authors:**
 How were truck-transfer volumes, availability, and penalty costs represented
 in the implementation?
 
-**Code impact:**  
+**Code impact:**
 Disruption model, recourse variables, objective, performance indicators.
 
 ---
@@ -405,7 +405,7 @@ Disruption model, recourse variables, objective, performance indicators.
 
 **Status:** Explicit scenario rule with modelling simplification
 
-**Paper evidence:**  
+**Paper evidence:**
 Actual service capacity is reduced under lower water levels using scenario
 factors such as:
 
@@ -413,7 +413,7 @@ factors such as:
 \lambda \in \{1.0,0.9,0.8,0.7\}.
 \]
 
-**Baseline implementation:**  
+**Baseline implementation:**
 
 \[
 C_a^{actual}
@@ -424,18 +424,18 @@ C_a^{actual}
 The multiplier may vary by service leg and update time, although the initial
 reproduction will use scenario-wide factors where appropriate.
 
-**Limitation:**  
+**Limitation:**
 The proportional relationship is treated as a scenario abstraction rather than
 a physically calibrated vessel-draught model.
 
-**Sensitivity:**  
+**Sensitivity:**
 Test leg-specific and time-specific capacity factors.
 
-**Question for authors:**  
+**Question for authors:**
 Was the proportional capacity transformation empirically calibrated or used
 only as a controlled experimental scenario?
 
-**Code impact:**  
+**Code impact:**
 Capacity-update events, dynamic scenarios, AFR and NFR calculations.
 
 ---
@@ -444,7 +444,7 @@ Capacity-update events, dynamic scenarios, AFR and NFR calculations.
 
 **Status:** Partly explicit, partly unresolved
 
-**Paper evidence:**  
+**Paper evidence:**
 The experiments use synthetic demands with attributes including volume,
 origin, destination, booking time, availability time, deadline, customer
 category, and fare.
@@ -460,19 +460,19 @@ category, and fare.
 - fare multipliers;
 - scenario-specific demand counts.
 
-**Baseline implementation:**  
+**Baseline implementation:**
 Place all generation parameters in YAML configuration files. Use explicit,
 fixed random seeds and save generated instances before optimisation.
 
-**Scientific rule:**  
+**Scientific rule:**
 Synthetic parameters will not be tuned merely to force the reported percentage
 improvements.
 
-**Question for authors:**  
+**Question for authors:**
 Can the original demand-generation parameters, seeds, or generated instances
 be provided?
 
-**Code impact:**  
+**Code impact:**
 Demand generator, configurations, reproducibility metadata.
 
 ---
@@ -481,13 +481,13 @@ Demand generator, configurations, reproducibility metadata.
 
 **Status:** Explicit
 
-**Paper evidence:**  
+**Paper evidence:**
 
 - Regular customers \(R\): all demand must be accepted.
 - Partially-spot customers \(P\): demand may be partially accepted.
 - Fully-spot customers \(F\): demand must be fully accepted or rejected.
 
-**Baseline implementation:**  
+**Baseline implementation:**
 
 For a current request:
 
@@ -509,7 +509,7 @@ For a current request:
 Previously accepted demand retains its committed accepted volume during
 rerouting.
 
-**Code impact:**  
+**Code impact:**
 Decision-variable domains and policy-equivalence tests.
 
 ---
@@ -518,25 +518,25 @@ Decision-variable domains and policy-equivalence tests.
 
 **Status:** Unresolved
 
-**Paper evidence:**  
+**Paper evidence:**
 The experiments report AFR, NFR, VTR, VFB, VOB, VOA, TR, and ST.
 
-**Ambiguity:**  
+**Ambiguity:**
 The exact denominators for several volume-rate indicators are not fully clear
 from the abbreviated definitions.
 
-**Baseline implementation:**  
+**Baseline implementation:**
 Every indicator will be implemented with an explicit mathematical definition
 stored in the reporting documentation.
 
 No indicator will be reported until its numerator, denominator, time horizon,
 and unit are documented.
 
-**Question for authors:**  
+**Question for authors:**
 What are the precise numerator and denominator definitions for VTR, VFB, VOB,
 and VOA?
 
-**Code impact:**  
+**Code impact:**
 Result aggregation and comparison with Tables 5–7.
 
 ---
@@ -554,17 +554,17 @@ Result aggregation and comparison with Tables 5–7.
 - Demand-density and total-demand descriptions may refer to different
   experimental constructions.
 
-**Baseline implementation:**  
+**Baseline implementation:**
 Do not silently modify the published values.
 
 Report them as printed and, separately, identify the mathematically plausible
 interpretation.
 
-**Question for authors:**  
+**Question for authors:**
 Can the apparent AFR and NFR entries and the demand-count construction be
 confirmed?
 
-**Code impact:**  
+**Code impact:**
 Validation report and result-comparison tables.
 
 ---
@@ -573,11 +573,11 @@ Validation report and result-comparison tables.
 
 **Status:** Explicit limitation
 
-**Paper evidence:**  
+**Paper evidence:**
 The research is motivated partly by the environmental advantages of inland
 waterway transport.
 
-**Limitation:**  
+**Limitation:**
 The displayed objective maximises expected revenue and applies recourse
 penalties. It does not explicitly optimise:
 
@@ -587,19 +587,19 @@ penalties. It does not explicitly optimise:
 - environmental externalities;
 - modal-shift sustainability.
 
-**Baseline implementation:**  
+**Baseline implementation:**
 Do not claim that a higher-revenue solution with greater truck use is
 environmentally superior.
 
-**Extension:**  
+**Extension:**
 Add emissions or multimodal external costs only as a clearly labelled research
 extension after reproducing the baseline model.
 
-**Question for authors:**  
+**Question for authors:**
 Is explicit environmental-cost integration envisaged in future versions of the
 model?
 
-**Code impact:**  
+**Code impact:**
 Interpretation of disruption results and future research section.
 
 ---
@@ -620,13 +620,13 @@ Interpretation of disruption results and future research section.
 - CPLEX Python package 22.2.0.1;
 - DOcplex 2.32.264.
 
-**Baseline implementation:**  
+**Baseline implementation:**
 Record all software versions and solver parameters with every experiment.
 
 Do not directly compare solving times without acknowledging hardware, software,
 presolve, and solver-version differences.
 
-**Code impact:**  
+**Code impact:**
 Environment metadata and computational-results reporting.
 
 ---
@@ -650,18 +650,18 @@ is scientifically consequential.
 
 **Status:** Assumed to remove degeneracy
 
-**Paper evidence:**  
+**Paper evidence:**
 The linking and exclusivity constraints sum over positive levels
 \(1,\ldots,VMAX_k\), while the variable-domain statement appears to permit
 \(j=0\).
 
-**Ambiguity:**  
+**Ambiguity:**
 It is unclear whether an explicit binary variable \(y_{k0}\) was created.
 
 If \(y_{k0}\) exists but is absent from the linking equation and objective, it
 can create equivalent zero-volume solutions without changing the decision.
 
-**Baseline implementation:**  
+**Baseline implementation:**
 Create selectors only for:
 
 \[
@@ -676,11 +676,11 @@ y_{kj}=0
 \forall j.
 \]
 
-**Question for authors:**  
+**Question for authors:**
 Was an explicit \(y_{k0}\) variable used, or was zero protected volume
 represented by selecting no positive level?
 
-**Code impact:**  
+**Code impact:**
 Future-selector construction, solution uniqueness, and model size.
 
 ---
@@ -689,15 +689,15 @@ Future-selector construction, solution uniqueness, and model size.
 
 **Status:** Derived implementation requirement
 
-**Paper evidence:**  
+**Paper evidence:**
 The transportation system contains multiple scheduled services and service
 legs.
 
-**Implementation issue:**  
+**Implementation issue:**
 Different services may connect the same departure and arrival terminal-time
 nodes. A simple directed graph would overwrite one service arc with another.
 
-**Baseline implementation:**  
+**Baseline implementation:**
 Represent the time-space network using a directed multigraph:
 
 \[
@@ -706,11 +706,11 @@ G=(N^{IT},A)
 
 where parallel arcs are allowed and every arc has a unique identifier.
 
-**Reason:**  
+**Reason:**
 Service identity, capacity, direction, and schedule must remain distinct even
 when two services share the same tail and head nodes.
 
-**Code impact:**  
+**Code impact:**
 Time-space builder, arc indexing, plotting, CPLEX flow variables, and capacity
 constraints.
 
@@ -720,14 +720,14 @@ constraints.
 
 **Status:** Baseline plus sensitivity analysis
 
-**Paper evidence:**  
+**Paper evidence:**
 The printed revenue-management expression contains:
 
 \[
 \sum_{x=0}^{j}xP_k(x).
 \]
 
-**Ambiguity:**  
+**Ambiguity:**
 This differs from the commonly expected protected-volume expression:
 
 \[
@@ -737,13 +737,13 @@ E[\min(X_k,j)].
 For outcomes above \(j\), the printed expression contributes zero, whereas the
 capped expectation contributes \(j\).
 
-**Baseline implementation:**  
+**Baseline implementation:**
 Use the printed prefix expression in the strict reproduction model.
 
-**Sensitivity implementation:**  
+**Sensitivity implementation:**
 Run a separate experiment using the capped expectation.
 
-**Reporting requirement:**  
+**Reporting requirement:**
 Do not silently replace one expression with the other. Report the objective
 and allocation effects of both formulations.
 
@@ -753,15 +753,15 @@ and allocation effects of both formulations.
 
 **Status:** Baseline implementation assumption
 
-**Paper evidence:**  
+**Paper evidence:**
 The demand-allocation mechanism is dynamic and requests are processed as they
 become known.
 
-**Missing information:**  
+**Missing information:**
 The exact request-arrival sequence is not available for demands sharing the
 same recorded reservation time.
 
-**Baseline implementation:**  
+**Baseline implementation:**
 Process requests sequentially using deterministic order:
 
 \[
@@ -770,15 +770,15 @@ Process requests sequentially using deterministic order:
 
 That is, reservation time is primary and demand identifier is the tie-breaker.
 
-**Reason:**  
+**Reason:**
 Sequential allocation requires a complete order. Deterministic ordering makes
 the experiment reproducible.
 
-**Sensitivity requirement:**  
+**Sensitivity requirement:**
 Later experiments may randomise the order within equal-time groups while
 preserving the same demand instance.
 
-**Reporting requirement:**  
+**Reporting requirement:**
 Do not describe the demand-ID tie-breaker as an empirically observed arrival
 order.
 
@@ -824,11 +824,11 @@ mechanism.
 
 **Status:** Baseline implementation assumption
 
-**Paper evidence:**  
+**Paper evidence:**
 The combined DCA-RRM formulation includes accepted unfinished demand,
 the current request, and a future-demand set \(K(\tilde{k})\).
 
-**Missing information:**  
+**Missing information:**
 The paper does not fully specify whether a forecast should enter
 \(K(\tilde{k})\) because it interacts with:
 
@@ -836,7 +836,7 @@ The paper does not fully specify whether a forecast should enter
 2. an unfinished accepted fragment;
 3. either of the above.
 
-**Baseline implementation:**  
+**Baseline implementation:**
 Phase 9 preserves the Phase 8 A004 selection rule.
 
 A future forecast enters the combined DCA-RRM model when its feasible
@@ -846,20 +846,20 @@ network of the **current request**.
 A forecast that interacts only with a prior unfinished fragment is not
 selected by the baseline rule.
 
-**Reason:**  
+**Reason:**
 Keeping the same future-set construction in DCA-RM and DCA-RRM makes
 their forecast inputs directly comparable and avoids silently expanding
 the information set in the combined mechanism.
 
-**Sensitivity requirement:**  
+**Sensitivity requirement:**
 A fragment-expanded future-set rule may later be evaluated as a separate,
 explicitly labelled sensitivity.
 
-**Reporting requirement:**  
+**Reporting requirement:**
 Do not claim that the current-request shared-arc rule is the paper's
 uniquely established construction of \(K(\tilde{k})\).
 
-**Code impact:**  
+**Code impact:**
 `revenue_management/future_set.py`,
 `revenue_management/rrm_orchestration.py`, canonical policy comparison,
 and future Phase 10 sensitivity experiments.
@@ -870,7 +870,7 @@ and future Phase 10 sensitivity experiments.
 
 **Status:** Derived implementation requirement
 
-**Implementation issue:**  
+**Implementation issue:**
 The original rolling-horizon capacity-transition diagnostic was designed
 for myopic booking decisions. Under that mechanism, one event cannot
 increase residual bookable transport capacity.
@@ -880,7 +880,7 @@ reconstructing accepted unfinished cargo. Residual capacity on an
 individual arc may therefore increase legitimately between the pre-event
 and post-event states.
 
-**Baseline implementation:**  
+**Baseline implementation:**
 Keep the original myopic `ArcCapacityTransition` invariant unchanged.
 
 Use a separate DCA-RRM transition diagnostic that permits:
@@ -907,16 +907,65 @@ Therefore:
 - \(\Delta R_a<0\) means capacity was released;
 - \(\Delta R_a=0\) means no net reservation change.
 
-**Validation requirement:**  
+**Validation requirement:**
 Residual capacities must remain finite and non-negative within numerical
 tolerance. Allowing a release does not relax the combined transport-capacity
 constraint in the optimisation model.
 
-**Reporting requirement:**  
+**Reporting requirement:**
 A capacity release does not by itself prove that a complete physical route
 changed. Route change requires comparison of before-and-after physical arc
 sequences.
 
-**Code impact:**  
+**Code impact:**
 `revenue_management/rrm_orchestration.py`, capacity-transition diagnostics,
 and DCA-RRM run tests.
+
+---
+
+## A022 — Phase 9 stable-capacity and truck-disabled boundary
+
+**Status:** Explicit experimental scope plus implementation boundary
+
+**Paper evidence:**
+The stable-capacity experiment applies Full-Reroute without allowing demand
+volume to move to an alternative transportation mode.
+
+The general printed objective nevertheless mentions penalties incurred when
+volumes are shifted from barge to truck.
+
+**Phase 9 implementation:**
+Phase 9 implements DCA-RRM under:
+
+\[
+C_{a,\tau}^{actual}=C_a^{nominal}
+\]
+
+and:
+
+\[
+q_k^{truck}=0.
+\]
+
+It therefore contains no truck-flow variable and no truck-penalty term.
+
+This corresponds to the stable-capacity, truck-disabled mechanism evaluated
+before service-status changes and truck recourse are introduced.
+
+**Boundary:**
+Phase 9 must not be described as implementing the paper's complete
+service-disruption and alternative-mode formulation.
+
+**Phase 10 responsibility:**
+Phase 10 introduces:
+
+- actual capacities;
+- water-level status changes;
+- explicit truck volumes;
+- truck penalties;
+- Partial-Reroute;
+- disruption-aware Full-Reroute.
+
+**Reporting requirement:**
+Phase 9 canonical results are mechanism-validation results for the
+stable-capacity, truck-disabled core.
