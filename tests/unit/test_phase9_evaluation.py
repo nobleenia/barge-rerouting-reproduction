@@ -329,3 +329,27 @@ def test_phase9_report_discloses_boundaries(tmp_path) -> None:
     assert "Assumption A004" in report
     assert "current request's feasible transport arcs" in report
     assert "does not prove that every listed physical route changed" in report
+
+
+def test_phase9_report_declares_truck_disabled_scope(
+    tmp_path,
+) -> None:
+    """The generated report must delimit the Phase 9 model."""
+    from barge_rerouting.revenue_management.rrm_evaluation import (
+        write_phase9_evaluation,
+    )
+
+    evaluation = evaluate_controlled()
+
+    paths = write_phase9_evaluation(
+        evaluation,
+        output_directory=tmp_path / "results",
+        report_path=tmp_path / "report.md",
+    )
+
+    report = paths.report_markdown.read_text(encoding="utf-8")
+
+    assert "stable service capacities" in report
+    assert "truck recourse disabled" in report
+    assert "truck-penalty term is zero by construction" in report
+    assert "Service-status changes and explicit truck recourse belong" in report

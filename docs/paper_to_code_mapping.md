@@ -476,3 +476,25 @@ Phase 9 does not yet implement:
 - exact numerical reproduction of unreported paper inputs.
 
 Those components belong to later experimental phases.
+
+### 8.8 Stable-capacity and truck-disabled boundary
+
+Phase 9 implements the combined DCA-RRM mechanism with:
+
+- unchanged nominal service capacities;
+- no forecast-driven service-status events;
+- no truck-flow variable;
+- no truck transfer;
+- no truck penalty.
+
+This is consistent with the paper's stable-capacity experiment in which
+Full-Reroute is applied without shifting demand volume to another transport
+mode.
+
+The general printed objective refers to truck penalties, but the publication
+does not define the corresponding truck decision variables or flow
+constraints. These missing operational details are not guessed inside the
+Phase 9 model.
+
+Explicit truck recourse, actual capacity, water-level updates, PR triggers and
+disruption-aware FR are assigned to Phase 10 under Assumption A022.

@@ -1049,6 +1049,14 @@ def _phase9_markdown_report(
         ),
         "",
         (
+            "Phase 9 evaluates stable service capacities with truck "
+            "recourse disabled. No truck-flow variable is available, "
+            "so the paper's truck-penalty term is zero by construction. "
+            "Service-status changes and explicit truck recourse belong "
+            "to Phase 10."
+        ),
+        "",
+        (
             "Realised revenue is the primary financial result. "
             "Optimisation-objective sums and expected-future "
             "contributions are diagnostic quantities and must not "
