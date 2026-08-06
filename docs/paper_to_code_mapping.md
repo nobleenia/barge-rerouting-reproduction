@@ -241,3 +241,97 @@ Phase 7 does **not** yet implement:
 
 Those components belong to subsequent phases and must not be implied by the
 Phase 7 results.
+
+---
+
+## 7. Phase 8 implemented revenue-management mapping
+
+The initial matrix contains planned package names. The following table is the
+authoritative mapping for the implemented Phase 8 architecture.
+
+| Phase 8 concept | Operational role | Implemented code location | Validation and output | Assumptions |
+|---|---|---|---|---|
+| Future-volume probability distribution | Represents discrete uncertain future volume over \(0,\ldots,VMAX\) | `src/barge_rerouting/domain/forecast.py` | Probability validation, expected-volume and value-table tests | A005, A010 |
+| Printed future value | Implements \(f_k\sum_{x=0}^{j}xP_k(x)\) | `src/barge_rerouting/domain/forecast.py` | Hand-calculated value tests and opportunity-cost gate | A005 |
+| Capped future-value sensitivity | Implements \(f_kE[\min(X_k,j)]\) | `src/barge_rerouting/domain/forecast.py` | Printed-versus-capped decision test | A005 |
+| Future set \(K(\tilde{k})\) | Selects feasible future forecasts explicitly or through shared transport-arc interaction | `src/barge_rerouting/revenue_management/future_set.py` | Explicit and A004 membership diagnostics | A004 |
+| Future selector \(y_{kj}\) | Selects at most one positive protected-volume level | `src/barge_rerouting/optimization/dca_rm.py` | Binary-domain and exclusivity tests | A005, A016 |
+| `maxvol(k)` | Links the selected level to tentatively routable future volume | `src/barge_rerouting/optimization/dca_rm.py` | Linking-constraint and protected-flow tests | A005, A016 |
+| Tentative future flow | Routes selected protected future volume through shared capacity | `src/barge_rerouting/optimization/dca_rm.py` | Flow-conservation and bottleneck-capacity tests | A004, A005 |
+| DCA-RM objective | Combines current realised revenue with expected future contribution | `src/barge_rerouting/optimization/dca_rm.py` | Independent objective validation and probability-reversal gate | A005 |
+| DCA-RM state transition | Persists only the realised current acceptance and current route | `src/barge_rerouting/revenue_management/transition.py` | No-persistence tests for selectors and tentative future flows | A004, A005 |
+| Time-aware sequential DCA-RM | Rebuilds forecasts and protection decisions at every booking event | `src/barge_rerouting/revenue_management/run.py` | Complete two-event opportunity-cost experiment and determinism tests | A004, A005 |
+| Canonical synthetic sensitivity evaluation | Compares DCA with printed and capped DCA-RM under low, central, and high occurrence probabilities | `src/barge_rerouting/revenue_management/evaluation.py` | Summary CSV, event CSV, JSON, Markdown and deterministic rerun | A004, A005, A010, A016 |
+| Canonical evaluation command | Generates all Phase 8 canonical outputs | `scripts/evaluate_phase8_canonical.py` | `make evaluate-phase8-canonical` | A004, A005, A010, A016 |
+| Canonical raw outputs | Stores policy summaries and event-level decisions | `results/phase8/` | Deterministic instance fingerprint and regeneration | A004, A005, A010 |
+| Canonical interpretation report | Separates realised revenue from forecast-based objective contributions | `docs/phase8_canonical_results.md` | Generated directly from evaluation data | A004, A005, A010, A016 |
+
+### 7.1 Phase 8 evaluation boundary
+
+The canonical Phase 8 forecast regime is attribute-conditioned:
+
+- future origin;
+- future destination;
+- future availability time;
+- future deadline;
+- future customer category;
+- future fare;
+
+are used as diagnostic forecast attributes.
+
+The realised future request volume is not used. It is replaced by a configured
+zero-inflated discrete probability distribution over
+\(0,\ldots,VMAX\).
+
+Because the paper does not report its complete forecast distributions,
+generation parameters, random seeds, or exact operational construction of
+\(K(\tilde{k})\), Phase 8 results are synthetic mechanism and sensitivity
+results. They are not claimed to reproduce a numerical table from the paper.
+
+### 7.2 Revenue-accounting boundary
+
+For each DCA-RM event:
+
+\[
+\text{optimisation objective}
+=
+\text{current realised revenue}
++
+\text{expected future contribution}.
+\]
+
+Only current realised revenue is accumulated as earned revenue.
+
+Expected future contribution may overlap with revenue earned when later demand
+actually arrives and therefore must not be added to realised revenue.
+
+### 7.3 Persistent-state boundary
+
+After every decision, the implementation persists:
+
+- the current acceptance or rejection;
+- the accepted current volume;
+- the realised current route.
+
+It discards:
+
+- \(y_{kj}\);
+- `maxvol(k)`;
+- tentative future flows.
+
+Future protection is reconstructed at the next event from the new state and
+the current forecast information.
+
+### 7.4 Phase 8 scope boundary
+
+Phase 8 implements DCA-RM without rerouting accepted unfinished demand.
+
+It does not yet implement the combined DCA-RRM model. Integration of:
+
+- accepted unfinished fragments;
+- rerouting;
+- future selectors;
+- tentative future flows;
+- shared released capacity;
+
+belongs to Phase 9.
