@@ -1126,3 +1126,282 @@ experiment indicators.
 
 This order allows every new capability to be validated against a simpler
 working model.
+
+# 24. Phase 9 combined DCA-RRM formulation
+
+## 24.1 Decision epoch and commodity sets
+
+At the booking epoch of current request \(\tilde{k}\), the combined
+DCA-RRM model contains three commodity groups:
+
+\[
+D(\tilde{k})
+\cup
+\{\tilde{k}\}
+\cup
+K(\tilde{k}),
+\]
+
+where:
+
+- \(D(\tilde{k})\) is the set of accepted unfinished demand fragments
+  eligible for rerouting;
+- \(\tilde{k}\) is the current booking request;
+- \(K(\tilde{k})\) is the selected future-demand forecast set.
+
+The fragment construction follows the execution-aware interpretation in
+Assumption A003. The future-set construction follows Assumptions A004 and
+A020.
+
+## 24.2 Current-request variables
+
+For the current request \(\tilde{k}\), let:
+
+\[
+e_{\tilde{k}}
+\]
+
+be its acceptance variable and let:
+
+\[
+v_{\tilde{k}a}
+\]
+
+be its flow on feasible arc \(a\).
+
+The domain of \(e_{\tilde{k}}\) depends on the customer category:
+
+- regular demand is mandatory;
+- fully spot demand is binary;
+- partially spot demand may be fractionally accepted.
+
+Its realised revenue contribution is:
+
+\[
+f_{\tilde{k}}
+Q_{\tilde{k}}
+e_{\tilde{k}}.
+\]
+
+## 24.3 Accepted unfinished fragments
+
+For every fragment \(d\in D(\tilde{k})\), let:
+
+\[
+q_d^{rem}
+\]
+
+be its fixed unfinished accepted volume and:
+
+\[
+w_{da}
+\]
+
+its reconstructed future flow on arc \(a\).
+
+A fragment has no acceptance variable. Its remaining accepted quantity is
+mandatory and cannot be reduced or rejected.
+
+Its flow originates from the fragment's execution-aware effective source
+node and terminates at an eligible sink for the original demand.
+
+Executed movement and immutable in-transit movement remain outside the
+released rerouting decision.
+
+## 24.4 Future-demand protection variables
+
+For each forecast \(k\in K(\tilde{k})\), let:
+
+\[
+y_{kj}\in\{0,1\}
+\]
+
+select positive protected-volume level \(j\), subject to:
+
+\[
+\sum_{j=1}^{VMAX_k}y_{kj}\leq 1.
+\]
+
+The protected volume is:
+
+\[
+maxvol(k)
+=
+\sum_{j=1}^{VMAX_k}j y_{kj}.
+\]
+
+Zero protected volume is represented by selecting no positive level, under
+Assumption A016.
+
+Let:
+
+\[
+z_{ka}
+\]
+
+denote tentative future flow. Future flow conservation routes exactly
+\(maxvol(k)\) units through the selected forecast network.
+
+## 24.5 Combined objective
+
+The Phase 9 objective is:
+
+\[
+\max
+\left[
+f_{\tilde{k}}
+Q_{\tilde{k}}
+e_{\tilde{k}}
++
+\sum_{k\in K(\tilde{k})}
+\sum_{j=1}^{VMAX_k}
+V_{kj}y_{kj}
+\right],
+\]
+
+where \(V_{kj}\) is either:
+
+1. the printed future-value expression used as the reproduction baseline; or
+2. the explicitly labelled capped-value sensitivity.
+
+Revenue from earlier accepted demands is omitted because their acceptance is
+already fixed. Their unfinished volume remains mandatory through fragment
+flow constraints.
+
+## 24.6 Combined transport capacity
+
+For every scheduled transport arc \(a\), current flow, reconstructed fragment
+flow, and tentative future flow share the released rerouting capacity:
+
+\[
+v_{\tilde{k}a}
++
+\sum_{d\in D(\tilde{k})}w_{da}
++
+\sum_{k\in K(\tilde{k})}z_{ka}
+\leq
+C^{release}_{a,\tilde{k}}.
+\]
+
+The released capacity includes:
+
+- ordinary currently bookable capacity; and
+- future reservations released from eligible unfinished fragments.
+
+It excludes:
+
+- completed movement;
+- immutable in-transit movement;
+- reservations belonging to ineligible commitments.
+
+The validator independently recalculates this inequality for every modelled
+transport arc.
+
+## 24.7 Flow conservation
+
+The current request satisfies acceptance-scaled flow conservation.
+
+Every unfinished fragment satisfies fixed-volume flow conservation using
+\(q_d^{rem}\).
+
+Every future forecast satisfies tentative flow conservation using
+\(maxvol(k)\).
+
+Auxiliary sinks retain the original demand's destination and deadline
+semantics.
+
+## 24.8 Persistent transition
+
+After a solved DCA-RRM event, persistent state contains:
+
+- reconstructed prior accepted commitments;
+- the realised current acceptance decision;
+- the realised current route when accepted;
+- preserved booking and execution metadata.
+
+Persistent state does not contain:
+
+- future selectors \(y_{kj}\);
+- `maxvol(k)`;
+- tentative future flows \(z_{ka}\);
+- expected-future objective value.
+
+Those future-planning quantities are discarded and reconstructed at the next
+booking event.
+
+## 24.9 Reduction properties
+
+The implementation must satisfy the following structural reductions.
+
+### No future forecasts
+
+When:
+
+\[
+K(\tilde{k})=\varnothing,
+\]
+
+the combined model reduces to DCA-R.
+
+### No unfinished accepted fragments
+
+When:
+
+\[
+D(\tilde{k})=\varnothing,
+\]
+
+the combined model reduces to DCA-RM.
+
+### Neither fragments nor forecasts
+
+When:
+
+\[
+D(\tilde{k})=\varnothing
+\quad\text{and}\quad
+K(\tilde{k})=\varnothing,
+\]
+
+the model reduces to ordinary DCA.
+
+These reductions are enforced through controlled unit and integration tests.
+
+## 24.10 Evaluation accounting
+
+For each event:
+
+\[
+Objective_{\tilde{k}}
+=
+RealisedCurrentRevenue_{\tilde{k}}
++
+ExpectedFutureContribution_{\tilde{k}}.
+\]
+
+Only realised current-request revenue is accumulated as earned revenue.
+
+Expected-future contributions are diagnostic opportunity values. They may
+overlap with revenue subsequently earned when a forecasted demand actually
+arrives and therefore cannot be added to realised revenue.
+
+## 24.11 Canonical Phase 9 finding
+
+On the canonical seeded instance, each DCA-RRM forecast regime produces the
+same:
+
+- current acceptance sequence;
+- accepted volume;
+- realised revenue;
+- processed-event count;
+- failure event;
+- final accepted-demand set;
+
+as the corresponding DCA-RM regime.
+
+DCA-RRM nevertheless produces a different and generally larger
+expected-future objective contribution because tentative future flow is
+optimised jointly with mandatory unfinished fragments.
+
+This is an observed property of the canonical instance, not a proof that
+DCA-RM and DCA-RRM are generally equivalent.

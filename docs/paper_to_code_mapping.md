@@ -335,3 +335,144 @@ It does not yet implement the combined DCA-RRM model. Integration of:
 - shared released capacity;
 
 belongs to Phase 9.
+
+---
+
+## 8. Phase 9 implemented combined DCA-RRM mapping
+
+The following table is the authoritative mapping for the implemented
+combined rerouting and revenue-management mechanism.
+
+| Phase 9 concept | Operational role | Implemented code location | Validation and output | Assumptions |
+|---|---|---|---|---|
+| Combined DCA-RRM model | Jointly models accepted unfinished fragments, the current request, and tentative future demand | `src/barge_rerouting/optimization/dca_rrm.py` | Variable-index, objective, flow, sink, selector, and combined-capacity tests | A003, A004, A005, A016, A020 |
+| Independent DCA-RRM validator | Recalculates domains, selector linking, balances, sinks, combined capacity, and objective independently of model construction | `src/barge_rerouting/optimization/dca_rrm.py` | Valid-solution and deliberate-tampering tests | A003, A004, A005, A016 |
+| Persistent DCA-RRM transition | Reconstructs prior accepted commitments, persists the current decision, and discards all tentative future decisions | `src/barge_rerouting/revenue_management/rrm_transition.py` | Persistence, invalid-solution rejection, and empty-future reduction tests | A003, A004, A020 |
+| Single-event DCA-RRM orchestration | Builds execution state, eligible fragments, released capacity, future set, combined model, validation, and transition | `src/barge_rerouting/revenue_management/rrm_orchestration.py` | Controlled three-commodity event tests and capacity-transition diagnostics | A003, A004, A020, A021 |
+| Rerouting-aware capacity transition | Records net capacity reservation or release without weakening the original myopic invariant | `src/barge_rerouting/revenue_management/rrm_orchestration.py` | Explicit net-release test | A021 |
+| Time-aware sequential DCA-RRM | Applies the combined mechanism at every incoming booking request and carries reconstructed state forward | `src/barge_rerouting/revenue_management/rrm_run.py` | State-chain, accounting, infeasibility-stop, reduction, and determinism tests | A003, A004, A020 |
+| Canonical four-mechanism evaluation | Compares DCA, DCA-R, DCA-RM, and DCA-RRM under identical timelines and matching forecast regimes | `src/barge_rerouting/revenue_management/rrm_evaluation.py` | Headline regression locks, eventwise RM/RRM comparison, exports, and deterministic rerun | A003, A004, A005, A016, A018, A020 |
+| Canonical evaluation command | Regenerates Phase 9 policy summaries, event data, structured JSON, and interpretation report | `scripts/evaluate_phase9_canonical.py` | `make evaluate-phase9-canonical` | A003, A004, A020 |
+| Sequential diagnostic command | Demonstrates current, past-fragment, and future commodities in a controlled run | `scripts/inspect_sequential_dca_rrm.py` | `make inspect-sequential-dca-rrm` | A003, A004 |
+| Canonical raw outputs | Stores complete policy and event-level machine-readable results | `results/phase9/` | Fingerprinted CSV and JSON outputs | A003, A004, A020 |
+| Canonical interpretation report | Separates realised revenue from expected-future objective contribution and documents the comparison boundary | `docs/phase9_canonical_results.md` | Generated directly from the deterministic evaluator | A003, A004, A018, A020, A021 |
+
+### 8.1 Combined-model contract
+
+At each current booking request \(\tilde{k}\), DCA-RRM jointly considers:
+
+\[
+D(\tilde{k})
+\cup
+\{\tilde{k}\}
+\cup
+K(\tilde{k}).
+\]
+
+The three commodity classes have different persistence and decision semantics:
+
+- accepted unfinished fragments are mandatory;
+- the current request is accepted according to its customer-category domain;
+- future forecasts are tentative capacity-protection commodities.
+
+All three share the released transport capacity.
+
+### 8.2 Persistence boundary
+
+After each event, the implementation persists:
+
+- fixed historical execution;
+- reconstructed future paths for accepted unfinished fragments;
+- the current acceptance decision;
+- the current realised route.
+
+It discards:
+
+- future selectors;
+- protected-volume variables;
+- tentative future flows;
+- expected-future objective contribution.
+
+The next decision rebuilds future protection from the new state.
+
+### 8.3 Reduction validation
+
+The Phase 9 implementation verifies:
+
+- empty future set: DCA-RRM reduces to DCA-R;
+- empty unfinished-fragment set: DCA-RRM reduces to DCA-RM;
+- both sets empty: DCA-RRM reduces to DCA.
+
+These are structural implementation checks, not merely expected qualitative
+behaviour.
+
+### 8.4 Canonical Phase 9 findings
+
+The canonical evaluator runs:
+
+- Sequential DCA;
+- DCA-R / Full-Reroute;
+- six DCA-RM forecast regimes;
+- six corresponding DCA-RRM forecast regimes.
+
+The forecast regimes combine:
+
+- occurrence probabilities \(0.20\), \(0.50\), and \(0.80\);
+- the printed future-value expression;
+- the capped-value sensitivity.
+
+For every regime, DCA-RRM and its corresponding DCA-RM policy have identical:
+
+- processed-event count;
+- current acceptance decisions;
+- accepted volume;
+- realised revenue;
+- accepted-demand set;
+- failure event.
+
+Their optimisation-objective sums and expected-future contributions differ.
+
+This equality is an observed result on the canonical seeded instance. It must
+not be represented as a general equivalence between DCA-RM and DCA-RRM.
+
+### 8.5 Meaning of prior-reoptimising events
+
+The canonical `events_reoptimising_prior_commitments` field counts solved
+events where accepted unfinished commitments participate in the combined
+model.
+
+It does not count confirmed physical itinerary changes.
+
+A physical itinerary change requires explicit before-and-after comparison of
+the commitment's scheduled transport-arc sequence.
+
+### 8.6 Future-set boundary
+
+Phase 9 retains the A004 current-request shared-arc rule used in Phase 8.
+
+Forecasts interacting only with a prior fragment network are not added to the
+baseline combined model. Expanding future-set membership to fragment-only
+interactions would be a separate sensitivity under Assumption A020.
+
+### 8.7 Phase 9 scope boundary
+
+Phase 9 implements:
+
+- combined DCA-RRM optimisation;
+- independent numerical validation;
+- execution-aware persistent transitions;
+- full sequential DCA-RRM;
+- deterministic four-mechanism canonical evaluation;
+- machine-readable and human-readable result exports.
+
+Phase 9 does not yet implement:
+
+- Partial-Reroute forecast-interval triggering;
+- water-level disruption scenarios;
+- truck recourse and truck penalties;
+- order-randomisation sensitivity;
+- fragment-expanded future-set selection;
+- the paper's complete experiment matrix;
+- exact numerical reproduction of unreported paper inputs.
+
+Those components belong to later experimental phases.
