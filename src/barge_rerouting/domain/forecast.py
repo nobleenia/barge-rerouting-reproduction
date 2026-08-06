@@ -3,11 +3,28 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from enum import StrEnum
 from math import isclose, isfinite
 
 from barge_rerouting.domain.demand import CustomerCategory
 
 PROBABILITY_TOLERANCE = 1e-9
+
+
+class FutureValueInterpretation(StrEnum):
+    """Interpretation used to value protected future capacity."""
+
+    PRINTED = "printed"
+    CAPPED = "capped"
+
+
+@dataclass(frozen=True, slots=True)
+class FutureProtectionValue:
+    """Expected future value associated with one protection level."""
+
+    protection_level: int
+    expected_volume: float
+    expected_revenue: float
 
 
 def _validate_nonnegative_integer(name: str, value: object) -> int:
@@ -195,6 +212,16 @@ class FutureDemandForecast:
         return tuple(range(self.maximum_volume + 1))
 
     @property
+    def positive_protection_levels(self) -> tuple[int, ...]:
+        """Return selector levels used by the printed model.
+
+        The published effective formulation uses binary selectors only
+        for positive levels. Selecting no positive level represents a
+        protected volume of zero.
+        """
+        return tuple(range(1, self.maximum_volume + 1))
+
+    @property
     def expected_volume(self) -> float:
         """Return the ordinary expected future volume E[X]."""
         expectation: float = 0.0
@@ -273,3 +300,69 @@ class FutureDemandForecast:
             value += float(capped_volume) * float(outcome.probability)
 
         return value
+
+    def protected_expected_volume(
+        self,
+        protection_level: int,
+        *,
+        interpretation: FutureValueInterpretation,
+    ) -> float:
+        """Return expected credited volume at one protection level."""
+        if not isinstance(
+            interpretation,
+            FutureValueInterpretation,
+        ):
+            raise TypeError("interpretation must be a FutureValueInterpretation.")
+
+        if interpretation is FutureValueInterpretation.PRINTED:
+            return self.paper_prefix_expected_volume(protection_level)
+
+        if interpretation is FutureValueInterpretation.CAPPED:
+            return self.expected_capped_volume(protection_level)
+
+        raise ValueError(f"Unsupported future-value interpretation: {interpretation}")
+
+    def protected_expected_revenue(
+        self,
+        protection_level: int,
+        *,
+        interpretation: FutureValueInterpretation,
+    ) -> float:
+        """Return expected revenue credited to protected capacity."""
+        expected_volume = self.protected_expected_volume(
+            protection_level,
+            interpretation=interpretation,
+        )
+
+        return expected_volume * self.fare_per_teu
+
+    def protection_value_table(
+        self,
+        *,
+        interpretation: FutureValueInterpretation,
+    ) -> tuple[FutureProtectionValue, ...]:
+        """Return the discrete value function over all candidate levels."""
+        if not isinstance(
+            interpretation,
+            FutureValueInterpretation,
+        ):
+            raise TypeError("interpretation must be a FutureValueInterpretation.")
+
+        return tuple(
+            FutureProtectionValue(
+                protection_level=level,
+                expected_volume=(
+                    self.protected_expected_volume(
+                        level,
+                        interpretation=interpretation,
+                    )
+                ),
+                expected_revenue=(
+                    self.protected_expected_revenue(
+                        level,
+                        interpretation=interpretation,
+                    )
+                ),
+            )
+            for level in self.candidate_protection_levels
+        )

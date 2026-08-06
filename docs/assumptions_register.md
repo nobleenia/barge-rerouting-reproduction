@@ -204,13 +204,30 @@ interactions in time with the current demand.
 The exact operational rule used to decide whether a future demand belongs to
 \(K(\tilde{k})\) is not provided.
 
-**Baseline implementation:**  
-Include a future demand when:
+**Implemented Phase 8 baseline:**
+The current `FutureDemandForecast` object does not contain a separate
+reservation-time field. The operational `A004_SHARED_ARC` rule therefore uses
+future availability as the timing proxy.
 
-1. its possible booking and availability window lies within the look-ahead
-   horizon; and
-2. its feasible time-space subgraph shares at least one capacity-constrained
-   transport arc with the current or accepted demands.
+Include a forecast when:
+
+1. its availability time is strictly later than the current decision time;
+2. its availability time lies within the optional look-ahead horizon, when one
+   is supplied;
+3. it has a feasible time-space network; and
+4. its feasible subgraph shares at least one capacity-constrained transport arc
+   with the current demand's feasible subgraph.
+
+An explicit-selection mode is also available for controlled experiments and
+retains supplied feasible forecasts without requiring shared-arc interaction.
+
+The Phase 8 DCA-RM implementation does not include accepted unfinished demands
+when constructing shared-arc interaction because DCA-RM contains no past-demand
+rerouting commodities. This interaction rule must be revisited for the combined
+DCA-RRM model in Phase 9.
+
+This is a disclosed operational interpretation and not a verbatim rule supplied
+by the paper.
 
 **Sensitivity:**  
 Compare:
