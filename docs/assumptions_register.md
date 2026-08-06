@@ -818,3 +818,105 @@ already transported cargo from restarting at the original source.
 A literal original-source interpretation may later be implemented as a
 diagnostic sensitivity, but it is not the primary rolling-horizon rerouting
 mechanism.
+---
+
+## A020 — Combined DCA-RRM future-set interaction boundary
+
+**Status:** Baseline implementation assumption
+
+**Paper evidence:**  
+The combined DCA-RRM formulation includes accepted unfinished demand,
+the current request, and a future-demand set \(K(\tilde{k})\).
+
+**Missing information:**  
+The paper does not fully specify whether a forecast should enter
+\(K(\tilde{k})\) because it interacts with:
+
+1. the current request;
+2. an unfinished accepted fragment;
+3. either of the above.
+
+**Baseline implementation:**  
+Phase 9 preserves the Phase 8 A004 selection rule.
+
+A future forecast enters the combined DCA-RRM model when its feasible
+network shares at least one scheduled transport arc with the feasible
+network of the **current request**.
+
+A forecast that interacts only with a prior unfinished fragment is not
+selected by the baseline rule.
+
+**Reason:**  
+Keeping the same future-set construction in DCA-RM and DCA-RRM makes
+their forecast inputs directly comparable and avoids silently expanding
+the information set in the combined mechanism.
+
+**Sensitivity requirement:**  
+A fragment-expanded future-set rule may later be evaluated as a separate,
+explicitly labelled sensitivity.
+
+**Reporting requirement:**  
+Do not claim that the current-request shared-arc rule is the paper's
+uniquely established construction of \(K(\tilde{k})\).
+
+**Code impact:**  
+`revenue_management/future_set.py`,
+`revenue_management/rrm_orchestration.py`, canonical policy comparison,
+and future Phase 10 sensitivity experiments.
+
+---
+
+## A021 — Rerouting-aware capacity-transition diagnostics
+
+**Status:** Derived implementation requirement
+
+**Implementation issue:**  
+The original rolling-horizon capacity-transition diagnostic was designed
+for myopic booking decisions. Under that mechanism, one event cannot
+increase residual bookable transport capacity.
+
+DCA-R and DCA-RRM may release an earlier future reservation before
+reconstructing accepted unfinished cargo. Residual capacity on an
+individual arc may therefore increase legitimately between the pre-event
+and post-event states.
+
+**Baseline implementation:**  
+Keep the original myopic `ArcCapacityTransition` invariant unchanged.
+
+Use a separate DCA-RRM transition diagnostic that permits:
+
+\[
+C^{after}_{a} > C^{before}_{a}
+\]
+
+when rerouting releases capacity on arc \(a\).
+
+Define the net reserved-volume change as:
+
+\[
+\Delta R_a
+=
+C^{before}_{a}
+-
+C^{after}_{a}.
+\]
+
+Therefore:
+
+- \(\Delta R_a>0\) means additional capacity was reserved;
+- \(\Delta R_a<0\) means capacity was released;
+- \(\Delta R_a=0\) means no net reservation change.
+
+**Validation requirement:**  
+Residual capacities must remain finite and non-negative within numerical
+tolerance. Allowing a release does not relax the combined transport-capacity
+constraint in the optimisation model.
+
+**Reporting requirement:**  
+A capacity release does not by itself prove that a complete physical route
+changed. Route change requires comparison of before-and-after physical arc
+sequences.
+
+**Code impact:**  
+`revenue_management/rrm_orchestration.py`, capacity-transition diagnostics,
+and DCA-RRM run tests.
