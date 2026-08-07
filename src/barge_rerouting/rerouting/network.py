@@ -586,6 +586,92 @@ def _prune_fragment_graph(
     return pruned, reachable_destinations
 
 
+def build_fragment_network_index_from_available_arcs(
+    instance: ExperimentInstance,
+    fragment_state: ReroutingFragmentDecisionState,
+    available_transport_arc_ids: tuple[str, ...],
+) -> FragmentNetworkIndex:
+    """Build one fragment network from an explicit transport-arc set.
+
+    This is the capacity-policy-neutral network-construction core.
+    Capacity magnitudes are enforced by the optimisation model; this
+    function determines only which scheduled transport arcs are
+    structurally available for routing.
+    """
+    if not isinstance(instance, ExperimentInstance):
+        raise TypeError("instance must be an ExperimentInstance.")
+
+    if not isinstance(
+        fragment_state,
+        ReroutingFragmentDecisionState,
+    ):
+        raise TypeError("fragment_state must be a ReroutingFragmentDecisionState.")
+
+    if not isinstance(available_transport_arc_ids, tuple):
+        raise TypeError("available_transport_arc_ids must be a tuple.")
+
+    normalised_arc_ids: list[str] = []
+
+    for arc_id in available_transport_arc_ids:
+        if not isinstance(arc_id, str):
+            raise TypeError("Every available transport arc identifier must be a string.")
+
+        normalised = arc_id.strip()
+
+        if not normalised:
+            raise ValueError("Available transport arc identifiers must be non-empty.")
+
+        arc = instance.arc_by_id(normalised)
+
+        if not arc.is_transport:
+            raise ValueError(
+                f"Fragment transport availability may contain only transport arcs: {normalised}."
+            )
+
+        normalised_arc_ids.append(normalised)
+
+    if len(set(normalised_arc_ids)) != len(normalised_arc_ids):
+        raise ValueError("available_transport_arc_ids must not contain duplicates.")
+
+    demand = instance.demand_by_id(fragment_state.demand_id)
+    source = fragment_state.rerouting_source
+
+    candidate = _candidate_future_graph(
+        instance,
+        source_time=source[1],
+        due_time=demand.due_time,
+        available_transport_arc_ids=set(normalised_arc_ids),
+    )
+
+    pruned, destination_nodes = _prune_fragment_graph(
+        candidate,
+        source=source,
+        destination=demand.destination,
+        due_time=demand.due_time,
+    )
+
+    feasible_arcs = extract_time_space_arcs(pruned)
+    feasible_arc_ids = tuple(arc.arc_id for arc in feasible_arcs)
+
+    sink_arcs = build_auxiliary_sink_arcs(
+        demand_id=fragment_state.fragment_id,
+        destination_nodes=destination_nodes,
+    )
+
+    return FragmentNetworkIndex(
+        fragment_state=fragment_state,
+        demand=demand,
+        source=source,
+        destination_nodes=destination_nodes,
+        auxiliary_sink_id=auxiliary_sink_id_for(fragment_state.fragment_id),
+        sink_arcs=sink_arcs,
+        feasible_arc_ids=feasible_arc_ids,
+        node_flow_indexes=_build_node_flow_indexes(pruned),
+        original_node_count=instance.node_count,
+        original_arc_count=instance.arc_count,
+    )
+
+
 def build_fragment_network_index(
     instance: ExperimentInstance,
     fragment_state: ReroutingFragmentDecisionState,
@@ -613,40 +699,10 @@ def build_fragment_network_index(
     if fragment_state.physical_time != rerouting_capacity.physical_time:
         raise ValueError("Fragment and capacity snapshots must use the same time.")
 
-    demand = instance.demand_by_id(fragment_state.demand_id)
-    source = fragment_state.rerouting_source
-
-    candidate = _candidate_future_graph(
+    return build_fragment_network_index_from_available_arcs(
         instance,
-        source_time=source[1],
-        due_time=demand.due_time,
-        available_transport_arc_ids=set(rerouting_capacity.available_arc_ids),
-    )
-    pruned, destination_nodes = _prune_fragment_graph(
-        candidate,
-        source=source,
-        destination=demand.destination,
-        due_time=demand.due_time,
-    )
-
-    feasible_arcs = extract_time_space_arcs(pruned)
-    feasible_arc_ids = tuple(arc.arc_id for arc in feasible_arcs)
-    sink_arcs = build_auxiliary_sink_arcs(
-        demand_id=fragment_state.fragment_id,
-        destination_nodes=destination_nodes,
-    )
-
-    return FragmentNetworkIndex(
-        fragment_state=fragment_state,
-        demand=demand,
-        source=source,
-        destination_nodes=destination_nodes,
-        auxiliary_sink_id=auxiliary_sink_id_for(fragment_state.fragment_id),
-        sink_arcs=sink_arcs,
-        feasible_arc_ids=feasible_arc_ids,
-        node_flow_indexes=_build_node_flow_indexes(pruned),
-        original_node_count=instance.node_count,
-        original_arc_count=instance.arc_count,
+        fragment_state,
+        tuple(rerouting_capacity.available_arc_ids),
     )
 
 

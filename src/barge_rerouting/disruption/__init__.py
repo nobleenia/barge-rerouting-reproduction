@@ -20,6 +20,9 @@ from barge_rerouting.disruption.recovery_capacity import (
     RecoveryTransportArcCapacity,
     build_recovery_capacity_snapshot,
 )
+from barge_rerouting.disruption.recovery_network import (
+    build_recovery_fragment_network_snapshot,
+)
 from barge_rerouting.disruption.status import (
     ServiceStatusUpdateEvent,
 )
@@ -29,8 +32,29 @@ from barge_rerouting.disruption.timeline import (
     OperationalTimelineEntry,
     build_operational_timeline,
 )
+from barge_rerouting.disruption.truck_recourse import (
+    TRUCK_RECOURSE_TOLERANCE,
+    RecoveryBargeFlowResult,
+    TruckAllocationResult,
+    TruckRecourseModelArtifacts,
+    TruckRecourseSolution,
+    TruckRecourseValidationReport,
+    build_truck_recourse_model,
+    solve_truck_recourse_model,
+    validate_truck_recourse_solution,
+)
 
 __all__ = [
+    "validate_truck_recourse_solution",
+    "solve_truck_recourse_model",
+    "build_truck_recourse_model",
+    "build_recovery_fragment_network_snapshot",
+    "TruckRecourseValidationReport",
+    "TruckRecourseSolution",
+    "TruckRecourseModelArtifacts",
+    "TruckAllocationResult",
+    "RecoveryBargeFlowResult",
+    "TRUCK_RECOURSE_TOLERANCE",
     "build_recovery_capacity_snapshot",
     "build_recovery_fragment_snapshot",
     "RecoveryTransportArcCapacity",

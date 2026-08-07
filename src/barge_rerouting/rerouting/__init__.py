@@ -32,6 +32,7 @@ from barge_rerouting.rerouting.network import (
     FragmentNetworkIndex,
     FragmentNetworkSnapshot,
     build_fragment_network_index,
+    build_fragment_network_index_from_available_arcs,
     build_fragment_network_snapshot,
 )
 from barge_rerouting.rerouting.optimization import (
@@ -83,6 +84,7 @@ __all__ = [
     "ReroutingExclusionReason",
     "ReroutingFragmentDecisionState",
     "build_fragment_network_index",
+    "build_fragment_network_index_from_available_arcs",
     "build_fragment_network_snapshot",
     "build_rerouting_capacity_snapshot",
     "build_rerouting_decision_snapshot",
