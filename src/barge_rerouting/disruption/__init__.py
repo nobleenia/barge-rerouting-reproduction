@@ -11,6 +11,15 @@ from barge_rerouting.disruption.capacity import (
     ActualTransportArcCapacity,
     build_actual_capacity_profile,
 )
+from barge_rerouting.disruption.recovery import (
+    RecoveryFragmentSnapshot,
+    build_recovery_fragment_snapshot,
+)
+from barge_rerouting.disruption.recovery_capacity import (
+    RecoveryCapacitySnapshot,
+    RecoveryTransportArcCapacity,
+    build_recovery_capacity_snapshot,
+)
 from barge_rerouting.disruption.status import (
     ServiceStatusUpdateEvent,
 )
@@ -22,6 +31,11 @@ from barge_rerouting.disruption.timeline import (
 )
 
 __all__ = [
+    "build_recovery_capacity_snapshot",
+    "build_recovery_fragment_snapshot",
+    "RecoveryTransportArcCapacity",
+    "RecoveryCapacitySnapshot",
+    "RecoveryFragmentSnapshot",
     "build_operational_timeline",
     "OperationalTimelineEntry",
     "OperationalTimeline",
