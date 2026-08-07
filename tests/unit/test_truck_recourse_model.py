@@ -10,7 +10,9 @@ from barge_rerouting.config import (
     SolverConfig,
 )
 from barge_rerouting.disruption import (
+    RecoveryOperationalState,
     ServiceStatusUpdateEvent,
+    apply_truck_recourse_solution,
     build_actual_capacity_profile,
     build_recovery_capacity_snapshot,
     build_recovery_fragment_network_snapshot,
@@ -183,6 +185,7 @@ def build_recovery_example(
         "networks": networks,
         "artifacts": artifacts,
         "solution": solution,
+        "state": state,
     }
 
 
@@ -350,5 +353,114 @@ def test_repeated_solution_is_deterministic() -> None:
         second = solve_truck_recourse_model(example["artifacts"])
 
         assert second == example["solution"]
+    finally:
+        example["artifacts"].model.end()
+
+
+def test_recovery_transition_preserves_booking_history() -> None:
+    """A status event changes operations, not the booking decision."""
+    example = build_recovery_example(0.7)
+
+    try:
+        before = RecoveryOperationalState.empty(example["state"])
+
+        transition = apply_truck_recourse_solution(
+            example["artifacts"],
+            example["solution"],
+            before,
+        )
+
+        assert transition.state_after.booking_state == example["state"]
+        assert (
+            transition.state_after.booking_state.processed_event_count
+            == example["state"].processed_event_count
+        )
+        assert transition.state_after.recovery_event_count == 1
+        assert transition.state_after.recovery_event_ids == (example["recovery"].event_id,)
+    finally:
+        example["artifacts"].model.end()
+
+
+def test_recovery_transition_persists_seven_plus_three_split() -> None:
+    """The 10-TEU fragment persists as seven barge and three truck."""
+    example = build_recovery_example(0.7)
+
+    try:
+        before = RecoveryOperationalState.empty(example["state"])
+
+        transition = apply_truck_recourse_solution(
+            example["artifacts"],
+            example["solution"],
+            before,
+        )
+
+        fragment_id = example["recovery"].fragment_ids[0]
+        plan = transition.state_after.plan_for(fragment_id)
+
+        assert plan.original_remaining_volume == pytest.approx(10.0)
+        assert plan.barge_volume == pytest.approx(7.0)
+        assert plan.truck_volume == pytest.approx(3.0)
+
+        assert plan.truck_transfer is not None
+        assert plan.truck_transfer.transfer_node == ("A", 0)
+        assert plan.truck_transfer.penalty_value == pytest.approx(75.0)
+
+        assert transition.state_after.total_truck_volume == pytest.approx(3.0)
+        assert transition.state_after.total_truck_penalty == pytest.approx(75.0)
+
+        for arc_id in example["capacity"].available_arc_ids:
+            assert plan.barge_flow_on(arc_id) == pytest.approx(7.0)
+    finally:
+        example["artifacts"].model.end()
+
+
+def test_nominal_recovery_persists_no_truck_transfer() -> None:
+    """Unreduced capacity preserves the full barge plan."""
+    example = build_recovery_example(1.0)
+
+    try:
+        before = RecoveryOperationalState.empty(example["state"])
+
+        transition = apply_truck_recourse_solution(
+            example["artifacts"],
+            example["solution"],
+            before,
+        )
+
+        fragment_id = example["recovery"].fragment_ids[0]
+        plan = transition.state_after.plan_for(fragment_id)
+
+        assert plan.barge_volume == pytest.approx(10.0)
+        assert plan.truck_volume == pytest.approx(0.0)
+        assert plan.truck_transfer is None
+
+        assert transition.state_after.truck_transfer_history == ()
+        assert transition.state_after.total_truck_volume == pytest.approx(0.0)
+    finally:
+        example["artifacts"].model.end()
+
+
+def test_recovery_event_cannot_be_persisted_twice() -> None:
+    """Operational recovery events are idempotence-protected."""
+    example = build_recovery_example(0.7)
+
+    try:
+        before = RecoveryOperationalState.empty(example["state"])
+
+        first = apply_truck_recourse_solution(
+            example["artifacts"],
+            example["solution"],
+            before,
+        )
+
+        with pytest.raises(
+            ValueError,
+            match="cannot be applied twice",
+        ):
+            apply_truck_recourse_solution(
+                example["artifacts"],
+                example["solution"],
+                first.state_after,
+            )
     finally:
         example["artifacts"].model.end()

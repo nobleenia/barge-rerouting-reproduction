@@ -23,6 +23,14 @@ from barge_rerouting.disruption.recovery_capacity import (
 from barge_rerouting.disruption.recovery_network import (
     build_recovery_fragment_network_snapshot,
 )
+from barge_rerouting.disruption.recovery_transition import (
+    RecoveredFragmentPlan,
+    RecoveryArcFlow,
+    RecoveryOperationalState,
+    TruckRecourseTransitionResult,
+    TruckTransferPlan,
+    apply_truck_recourse_solution,
+)
 from barge_rerouting.disruption.status import (
     ServiceStatusUpdateEvent,
 )
@@ -45,6 +53,12 @@ from barge_rerouting.disruption.truck_recourse import (
 )
 
 __all__ = [
+    "apply_truck_recourse_solution",
+    "TruckTransferPlan",
+    "TruckRecourseTransitionResult",
+    "RecoveryOperationalState",
+    "RecoveryArcFlow",
+    "RecoveredFragmentPlan",
     "validate_truck_recourse_solution",
     "solve_truck_recourse_model",
     "build_truck_recourse_model",
