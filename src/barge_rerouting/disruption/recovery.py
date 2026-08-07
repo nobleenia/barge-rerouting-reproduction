@@ -25,13 +25,31 @@ from barge_rerouting.rolling_horizon.execution import (
 from barge_rerouting.rolling_horizon.state import (
     RollingBookingState,
 )
+from barge_rerouting.rolling_horizon.timeline import (
+    BookingDecisionEvent,
+)
+
+type RecoveryTriggerEvent = ServiceStatusUpdateEvent | BookingDecisionEvent
+
+
+def recovery_trigger_time(
+    event: RecoveryTriggerEvent,
+) -> int:
+    """Return the physical time of one recovery trigger."""
+    if isinstance(event, ServiceStatusUpdateEvent):
+        return int(event.update_time)
+
+    if isinstance(event, BookingDecisionEvent):
+        return int(event.decision_time)
+
+    raise TypeError("Recovery trigger must be a service-status update or booking event.")
 
 
 @dataclass(frozen=True, slots=True)
 class RecoveryFragmentSnapshot:
     """Unfinished accepted fragments at one status-update event."""
 
-    event: ServiceStatusUpdateEvent
+    event: RecoveryTriggerEvent
     physical_time: int
     instance_fingerprint: str
     fragments: tuple[ReroutingFragmentDecisionState, ...]
@@ -40,9 +58,12 @@ class RecoveryFragmentSnapshot:
         """Validate recovery-event and fragment consistency."""
         if not isinstance(
             self.event,
-            ServiceStatusUpdateEvent,
+            (
+                ServiceStatusUpdateEvent,
+                BookingDecisionEvent,
+            ),
         ):
-            raise TypeError("event must be a ServiceStatusUpdateEvent.")
+            raise TypeError("event must be a ServiceStatusUpdateEvent or BookingDecisionEvent.")
 
         if isinstance(self.physical_time, bool) or not isinstance(
             self.physical_time,
@@ -53,8 +74,8 @@ class RecoveryFragmentSnapshot:
         if self.physical_time < 0:
             raise ValueError("physical_time must be non-negative.")
 
-        if self.physical_time != self.event.update_time:
-            raise ValueError("Recovery time must equal status update time.")
+        if self.physical_time != recovery_trigger_time(self.event):
+            raise ValueError("Recovery time must equal the trigger-event time.")
 
         if not isinstance(self.instance_fingerprint, str):
             raise TypeError("instance_fingerprint must be a string.")
@@ -103,7 +124,7 @@ class RecoveryFragmentSnapshot:
 
     @property
     def event_id(self) -> str:
-        """Return the status event identifier."""
+        """Return the recovery-trigger event identifier."""
         return str(self.event.event_id)
 
     @property
@@ -239,9 +260,9 @@ def build_recovery_fragment_snapshot(
     booking_state: RollingBookingState,
     execution_snapshot: ExecutionSnapshot,
     ordinary_capacity: TransportCapacitySnapshot,
-    event: ServiceStatusUpdateEvent,
+    event: RecoveryTriggerEvent,
 ) -> RecoveryFragmentSnapshot:
-    """Build recovery fragments without inventing a booking event."""
+    """Build unfinished fragments for one recovery trigger."""
     if not isinstance(instance, ExperimentInstance):
         raise TypeError("instance must be an ExperimentInstance.")
 
@@ -265,9 +286,14 @@ def build_recovery_fragment_snapshot(
 
     if not isinstance(
         event,
-        ServiceStatusUpdateEvent,
+        (
+            ServiceStatusUpdateEvent,
+            BookingDecisionEvent,
+        ),
     ):
-        raise TypeError("event must be a ServiceStatusUpdateEvent.")
+        raise TypeError("event must be a ServiceStatusUpdateEvent or BookingDecisionEvent.")
+
+    event_time = recovery_trigger_time(event)
 
     fingerprint = instance.demand_fingerprint
 
@@ -283,15 +309,15 @@ def build_recovery_fragment_snapshot(
     if execution_snapshot.physical_time != ordinary_capacity.physical_time:
         raise ValueError("Execution and ordinary capacity must use the same physical time.")
 
-    if execution_snapshot.physical_time != event.update_time:
-        raise ValueError("Status-update time must equal the recovery snapshot time.")
+    if execution_snapshot.physical_time != event_time:
+        raise ValueError("Trigger-event time must equal the recovery snapshot time.")
 
     path_by_id = {path.path_id: path for path in execution_snapshot.planned_paths}
 
     commitment_by_demand_id = {
         commitment.demand_id: commitment
         for commitment in booking_state.commitments
-        if commitment.decision_time <= event.update_time
+        if commitment.decision_time <= event_time
     }
 
     decision_states: list[ReroutingFragmentDecisionState] = []
@@ -331,7 +357,7 @@ def build_recovery_fragment_snapshot(
 
     return RecoveryFragmentSnapshot(
         event=event,
-        physical_time=event.update_time,
+        physical_time=event_time,
         instance_fingerprint=fingerprint,
         fragments=tuple(decision_states),
     )
