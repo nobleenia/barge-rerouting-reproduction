@@ -50,28 +50,40 @@ def _validate_nonnegative_integer(
 def _latest_plans_by_demand(
     state: RecoveryOperationalState,
 ) -> dict[str, tuple[RecoveredFragmentPlan, ...]]:
-    """Return the most recent recovery-plan generation per demand."""
+    """Return the most recent persisted recovery generation per demand.
+
+    Recovery chronology is defined by ``recovery_event_ids`` rather
+    than lexicographic event identifiers. This matters when multiple
+    recovery triggers occur at the same physical time, such as a
+    status update immediately followed by a Full-Reroute booking.
+    """
     grouped: dict[str, list[RecoveredFragmentPlan]] = defaultdict(list)
 
     for plan in state.active_fragment_plans:
         grouped[plan.demand_id].append(plan)
 
+    event_order = {event_id: position for position, event_id in enumerate(state.recovery_event_ids)}
+
     latest: dict[str, tuple[RecoveredFragmentPlan, ...]] = {}
 
     for demand_id, plans in grouped.items():
-        latest_key = max((plan.recovery_time, plan.event_id) for plan in plans)
+        unknown_event_ids = tuple(
+            sorted({plan.event_id for plan in plans if plan.event_id not in event_order})
+        )
+
+        if unknown_event_ids:
+            raise ValueError(
+                f"Recovered plans reference unknown recovery events: {unknown_event_ids}."
+            )
+
+        latest_event_id = max(
+            (plan.event_id for plan in plans),
+            key=event_order.__getitem__,
+        )
 
         selected = tuple(
             sorted(
-                (
-                    plan
-                    for plan in plans
-                    if (
-                        plan.recovery_time,
-                        plan.event_id,
-                    )
-                    == latest_key
-                ),
+                (plan for plan in plans if plan.event_id == latest_event_id),
                 key=lambda plan: plan.fragment_id,
             )
         )
@@ -261,7 +273,12 @@ def _delivery_time_for(
     # candidate destination nodes. Rebuild them rather than parsing
     # the string representation.
     sink_arcs = build_auxiliary_sink_arcs(
-        demand_id=(path.path_id.split("::recovery::", 1)[0]),
+        demand_id=(
+            path.path_id.rsplit(
+                "::recovery::",
+                1,
+            )[0]
+        ),
         destination_nodes=tuple(destination_nodes),
     )
 

@@ -147,6 +147,7 @@ class DynamicFullRerouteModelArtifacts:
     fragment_networks: FragmentNetworkSnapshot
     current_network_index: DemandNetworkIndex
     truck_penalty_per_teu_by_demand: dict[str, float]
+    allow_current_truck: bool
     model: Any
     acceptance_variable: Any
     current_flow_variables: dict[str, Any]
@@ -340,6 +341,7 @@ def build_dynamic_full_reroute_model(
     fragment_networks: FragmentNetworkSnapshot,
     *,
     truck_penalty_per_teu_by_demand: Mapping[str, float],
+    allow_current_truck: bool = True,
 ) -> DynamicFullRerouteModelArtifacts:
     """Build current booking + prior fragments + truck recourse."""
     _validate_inputs(
@@ -349,6 +351,9 @@ def build_dynamic_full_reroute_model(
         recovery_capacity,
         fragment_networks,
     )
+
+    if not isinstance(allow_current_truck, bool):
+        raise TypeError("allow_current_truck must be a boolean.")
 
     penalties = _normalise_penalties(
         event,
@@ -408,7 +413,7 @@ def build_dynamic_full_reroute_model(
 
     current_truck_variable = model.continuous_var(
         lb=0.0,
-        ub=float(demand.volume),
+        ub=(float(demand.volume) if allow_current_truck else 0.0),
         name=_solver_name(
             "current_truck",
             demand.demand_id,
@@ -590,6 +595,7 @@ def build_dynamic_full_reroute_model(
         fragment_networks=fragment_networks,
         current_network_index=current_network_index,
         truck_penalty_per_teu_by_demand=penalties,
+        allow_current_truck=allow_current_truck,
         model=model,
         acceptance_variable=acceptance_variable,
         current_flow_variables=current_flow_variables,
