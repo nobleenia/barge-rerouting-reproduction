@@ -11,6 +11,10 @@ from barge_rerouting.disruption.capacity import (
     ActualTransportArcCapacity,
     build_actual_capacity_profile,
 )
+from barge_rerouting.disruption.operational_execution import (
+    build_operational_execution_snapshot,
+    build_operational_transport_capacity_snapshot,
+)
 from barge_rerouting.disruption.recovery import (
     RecoveryFragmentSnapshot,
     build_recovery_fragment_snapshot,
@@ -53,6 +57,8 @@ from barge_rerouting.disruption.truck_recourse import (
 )
 
 __all__ = [
+    "build_operational_transport_capacity_snapshot",
+    "build_operational_execution_snapshot",
     "apply_truck_recourse_solution",
     "TruckTransferPlan",
     "TruckRecourseTransitionResult",

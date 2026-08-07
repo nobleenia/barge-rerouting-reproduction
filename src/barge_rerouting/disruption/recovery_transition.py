@@ -177,6 +177,7 @@ class RecoveredFragmentPlan:
     """Persistent operational plan for one recovered fragment."""
 
     event_id: str
+    recovery_time: int
     fragment_id: str
     demand_id: str
     original_remaining_volume: float
@@ -192,6 +193,15 @@ class RecoveredFragmentPlan:
             "event_id",
             self.event_id,
         )
+        if isinstance(self.recovery_time, bool) or not isinstance(
+            self.recovery_time,
+            int,
+        ):
+            raise TypeError("recovery_time must be an integer.")
+
+        if self.recovery_time < 0:
+            raise ValueError("recovery_time must be non-negative.")
+
         fragment_id = _normalise_identifier(
             "fragment_id",
             self.fragment_id,
@@ -696,6 +706,7 @@ def apply_truck_recourse_solution(
         fragment_plans.append(
             RecoveredFragmentPlan(
                 event_id=event_id,
+                recovery_time=(artifacts.recovery_fragments.physical_time),
                 fragment_id=fragment_id,
                 demand_id=index.demand_id,
                 original_remaining_volume=(fragment_state.volume),
