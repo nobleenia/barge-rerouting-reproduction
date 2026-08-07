@@ -21,6 +21,11 @@ from barge_rerouting.disruption.operational_execution import (
     build_operational_execution_snapshot,
     build_operational_transport_capacity_snapshot,
 )
+from barge_rerouting.disruption.partial_reroute import (
+    PartialRerouteEventResult,
+    PartialRerouteRun,
+    run_partial_reroute,
+)
 from barge_rerouting.disruption.recovery import (
     RecoveryFragmentSnapshot,
     build_recovery_fragment_snapshot,
@@ -63,6 +68,9 @@ from barge_rerouting.disruption.truck_recourse import (
 )
 
 __all__ = [
+    "run_partial_reroute",
+    "PartialRerouteRun",
+    "PartialRerouteEventResult",
     "build_actual_bookable_capacity_snapshot",
     "ActualBookableCapacitySnapshot",
     "ActualBookableArcCapacity",
