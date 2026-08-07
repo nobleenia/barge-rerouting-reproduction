@@ -504,6 +504,37 @@ class RecoveryOperationalState:
 
         raise KeyError(f"Unknown recovered fragment: {normalised}")
 
+    def with_booking_state(
+        self,
+        booking_state: RollingBookingState,
+    ) -> RecoveryOperationalState:
+        """Advance contractual booking history by one event."""
+        if not isinstance(
+            booking_state,
+            RollingBookingState,
+        ):
+            raise TypeError("booking_state must be a RollingBookingState.")
+
+        if booking_state.instance_fingerprint != self.instance_fingerprint:
+            raise ValueError("The new booking state belongs to another experiment instance.")
+
+        if booking_state.processed_event_count != self.booking_state.processed_event_count + 1:
+            raise ValueError(
+                "Operational booking advancement must append exactly one booking event."
+            )
+
+        if booking_state.records[:-1] != self.booking_state.records:
+            raise ValueError(
+                "Operational booking advancement cannot rewrite previous booking history."
+            )
+
+        return RecoveryOperationalState(
+            booking_state=booking_state,
+            active_fragment_plans=(self.active_fragment_plans),
+            truck_transfer_history=(self.truck_transfer_history),
+            recovery_event_ids=(self.recovery_event_ids),
+        )
+
     def with_recovery(
         self,
         *,

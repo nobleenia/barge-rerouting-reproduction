@@ -5,6 +5,12 @@ from barge_rerouting.disruption.assessment import (
     FutureArcDisruption,
     build_disruption_assessment,
 )
+from barge_rerouting.disruption.booking_capacity import (
+    ACTUAL_BOOKING_CAPACITY_TOLERANCE,
+    ActualBookableArcCapacity,
+    ActualBookableCapacitySnapshot,
+    build_actual_bookable_capacity_snapshot,
+)
 from barge_rerouting.disruption.capacity import (
     ACTUAL_CAPACITY_TOLERANCE,
     ActualCapacityProfile,
@@ -57,6 +63,10 @@ from barge_rerouting.disruption.truck_recourse import (
 )
 
 __all__ = [
+    "build_actual_bookable_capacity_snapshot",
+    "ActualBookableCapacitySnapshot",
+    "ActualBookableArcCapacity",
+    "ACTUAL_BOOKING_CAPACITY_TOLERANCE",
     "build_operational_transport_capacity_snapshot",
     "build_operational_execution_snapshot",
     "apply_truck_recourse_solution",
