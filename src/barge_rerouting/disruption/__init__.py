@@ -26,6 +26,11 @@ from barge_rerouting.disruption.dynamic_full_reroute import (
     solve_dynamic_full_reroute_model,
     validate_dynamic_full_reroute_solution,
 )
+from barge_rerouting.disruption.dynamic_full_reroute_run import (
+    DynamicFullRerouteEventResult,
+    DynamicFullRerouteRun,
+    run_dynamic_full_reroute,
+)
 from barge_rerouting.disruption.dynamic_full_reroute_transition import (
     DynamicFullRerouteTransitionResult,
     apply_dynamic_full_reroute_solution,
@@ -83,6 +88,9 @@ from barge_rerouting.disruption.truck_recourse import (
 )
 
 __all__ = [
+    "run_dynamic_full_reroute",
+    "DynamicFullRerouteRun",
+    "DynamicFullRerouteEventResult",
     "apply_dynamic_full_reroute_solution",
     "DynamicFullRerouteTransitionResult",
     "recovery_trigger_time",
