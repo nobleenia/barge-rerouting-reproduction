@@ -17,6 +17,15 @@ from barge_rerouting.disruption.capacity import (
     ActualTransportArcCapacity,
     build_actual_capacity_profile,
 )
+from barge_rerouting.disruption.dynamic_full_reroute import (
+    DYNAMIC_FULL_REROUTE_TOLERANCE,
+    DynamicFullRerouteModelArtifacts,
+    DynamicFullRerouteSolution,
+    DynamicFullRerouteValidationReport,
+    build_dynamic_full_reroute_model,
+    solve_dynamic_full_reroute_model,
+    validate_dynamic_full_reroute_solution,
+)
 from barge_rerouting.disruption.operational_execution import (
     build_operational_execution_snapshot,
     build_operational_transport_capacity_snapshot,
@@ -68,6 +77,13 @@ from barge_rerouting.disruption.truck_recourse import (
 )
 
 __all__ = [
+    "validate_dynamic_full_reroute_solution",
+    "solve_dynamic_full_reroute_model",
+    "build_dynamic_full_reroute_model",
+    "DynamicFullRerouteValidationReport",
+    "DynamicFullRerouteSolution",
+    "DynamicFullRerouteModelArtifacts",
+    "DYNAMIC_FULL_REROUTE_TOLERANCE",
     "run_partial_reroute",
     "PartialRerouteRun",
     "PartialRerouteEventResult",
