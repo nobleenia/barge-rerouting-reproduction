@@ -456,3 +456,93 @@ Was an explicit variable \(y_{k0}\) created, or was zero protected volume
 represented by setting all positive-level selectors to zero?
 
 **Related assumption:** A016
+
+---
+
+## Q032 — Exact truck decision and penalty definition
+
+In the general objective, the penalty term refers to demand volume shifted
+from barges to trucks.
+
+How was truck usage represented in the authors' implementation?
+
+In particular:
+
+- was there an explicit truck-volume decision variable;
+- was truck represented by network arcs;
+- was the penalty linear per TEU;
+- could the penalty differ by demand?
+
+**Implementation impact:** determines whether A025 matches the unpublished
+operational formulation.
+
+---
+
+## Q033 — Truck origin, travel time and capacity
+
+When barge cargo is transferred to truck after a disruption:
+
+- from which terminal does the truck movement begin;
+- is truck capacity unlimited;
+- is truck travel time modelled;
+- must truck delivery explicitly satisfy the original due time?
+
+**Current baseline:** direct unlimited recourse from the fragment's
+execution-aware rerouting source, assumed capable of meeting the deadline.
+
+**Related assumption:** A025
+
+---
+
+## Q034 — May the newly arriving request be assigned directly to truck?
+
+During Full-Reroute under changing service status, is truck recourse restricted
+to already accepted demand that becomes infeasible, or may the current booking
+request itself be accepted directly onto truck?
+
+**Current production baseline:** the arriving request is not directly trucked.
+
+**Related assumption:** A026
+
+---
+
+## Q035 — Water-adjusted capacity rounding and service scope
+
+When vessel capacity is changed proportionally with water level:
+
+- is the product rounded to an integer TEU capacity;
+- if so, what rounding rule is used;
+- does one water factor apply to every service or only selected services/legs?
+
+**Current baseline:** no rounding; status events may target selected services.
+
+**Related assumption:** A023
+
+---
+
+## Q036 — Ordering of status updates and bookings at the same time
+
+If a water/service forecast update and a demand request occur in the same
+half-day period, which is processed first?
+
+**Current baseline:** status update first so the booking sees the newest
+capacity information.
+
+**Related assumption:** A024
+
+---
+
+## Q037 — Dynamic-experiment indicator formulas
+
+Could the exact formulas and denominators used for the following indicators
+be provided?
+
+- AFR;
+- NFR;
+- VTR;
+- VFB;
+- VOB;
+- VOA.
+
+This is required for exact Table 5/6 numerical reproduction even when the
+underlying routing decisions are reproduced correctly.

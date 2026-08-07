@@ -969,3 +969,256 @@ Phase 10 introduces:
 **Reporting requirement:**
 Phase 9 canonical results are mechanism-validation results for the
 stable-capacity, truck-disabled core.
+
+---
+
+## A023 — Proportional water-adjusted actual capacity
+
+**Status:** Baseline operational assumption
+
+**Paper evidence:**
+The service-status-change experiment states that vessel capacity changes
+proportionally with the water level.
+
+**Baseline implementation:**
+
+For a future transport arc \(a\) covered by water-status factor
+\(\lambda_\tau\),
+
+\[
+C_{a,\tau}^{actual}
+=
+\lambda_\tau C_a^{nominal}.
+\]
+
+The baseline applies no integer rounding after the multiplication.
+
+Only not-yet-departed transport legs are modified by a newly available
+status update. Completed and currently in-transit movements retain their
+historical execution state.
+
+**Missing information:**
+The publication does not specify:
+
+- a TEU-capacity rounding rule;
+- whether all services receive the same water factor;
+- the exact realised water-level sequence used in the reported experiments.
+
+**Reporting requirement:**
+Do not describe the no-rounding convention or a synthetic water-status
+sequence as a uniquely established paper implementation.
+
+**Code impact:**
+`disruption/status.py`,
+`disruption/capacity.py`,
+`disruption/assessment.py`,
+and Phase 10 dynamic experiments.
+
+---
+
+## A024 — Same-time status precedence and immutable execution
+
+**Status:** Baseline operational assumption
+
+**Missing information:**
+The publication does not specify the ordering when a new service-status
+forecast and a booking request occur at the same model timestamp.
+
+**Baseline implementation:**
+
+At a common physical time:
+
+1. the status update is processed first;
+2. actual future capacities are reconstructed;
+3. unfinished accepted demand is recovered when required;
+4. the booking decision then observes the newest capacity information.
+
+Already completed movement and movement already in transit are immutable.
+
+The operational timeline therefore uses the deterministic ordering:
+
+\[
+(\text{time},\ \text{status before booking},\ \text{local sequence}).
+\]
+
+**Reason:**
+A booking occurring at the publication time of a new forecast should not
+silently optimise against superseded capacity information.
+
+**Reporting requirement:**
+This ordering must be reported as an implementation assumption, not as a
+timing rule explicitly stated by the authors.
+
+**Code impact:**
+`disruption/timeline.py`,
+`disruption/recovery.py`,
+`disruption/operational_execution.py`,
+`disruption/partial_reroute.py`,
+and `disruption/dynamic_full_reroute_run.py`.
+
+---
+
+## A025 — Explicit direct truck recourse
+
+**Status:** Transparent operationalisation of an under-specified paper term
+
+**Paper evidence:**
+The printed general objective contains a penalty for demand volume shifted
+from barge to trucks, and the service-status-change discussion states that
+trucks can be used when accepted cargo cannot be transported by barge.
+
+**Missing information:**
+The displayed formulation does not fully define:
+
+- a truck decision variable;
+- truck arcs or routes;
+- truck capacity;
+- truck travel time;
+- the exact transfer terminal;
+- the numerical truck penalty.
+
+**Baseline implementation:**
+For every reroutable unfinished fragment \(r\), introduce:
+
+\[
+q_r^{truck}\geq0.
+\]
+
+The remaining contractual volume satisfies:
+
+\[
+Q_r^{remaining}
+=
+Q_r^{barge}
++
+q_r^{truck}.
+\]
+
+Truck transfer is:
+
+- direct from the fragment's execution-aware rerouting source;
+- unlimited in capacity;
+- assumed able to satisfy the existing delivery deadline;
+- terminal, so trucked volume cannot return to the barge network;
+- penalised linearly per TEU.
+
+At a status-only recovery epoch:
+
+\[
+\min
+\sum_r c_r^{truck}q_r^{truck}.
+\]
+
+The penalty coefficients must be supplied explicitly by the experiment.
+They are never silently inferred.
+
+**Interpretation boundary:**
+This is an operationalisation of the paper's truck-penalty concept.
+It is not presented as a verbatim reconstruction of an unpublished truck
+submodel.
+
+**Code impact:**
+`disruption/truck_recourse.py`,
+`disruption/recovery_transition.py`,
+and dynamic PR/FR orchestration.
+
+---
+
+## A026 — Current-request trucking boundary in production dynamic FR
+
+**Status:** Baseline implementation boundary
+
+**Paper ambiguity:**
+The printed general penalty expression may be read as permitting truck
+allocation for the current request as well as previously accepted demand,
+but the publication does not specify when an incoming request may be
+initially assigned to truck.
+
+**Model capability:**
+The Phase 10 dynamic Full-Reroute optimisation exposes an explicit
+current-request truck variable as a diagnostic/general modelling capability.
+
+**Production baseline:**
+The operational dynamic Full-Reroute runner sets:
+
+\[
+q_{\tilde{k}}^{truck}=0
+\]
+
+for the newly arriving request.
+
+Truck recourse is therefore used for already accepted unfinished cargo,
+while the current request is accepted only when its accepted volume can be
+represented by the barge booking state.
+
+**Reason:**
+`RollingBookingState` and `DemandCommitment` intentionally preserve the
+Phase 6--9 contractual barge-plan invariant. Hiding an immediate current
+truck assignment inside that state would silently corrupt its semantics.
+
+**Sensitivity boundary:**
+Allowing direct current-request trucking remains an explicit diagnostic or
+future sensitivity and must be labelled separately.
+
+**Code impact:**
+`disruption/dynamic_full_reroute.py`,
+`disruption/dynamic_full_reroute_transition.py`,
+and `disruption/dynamic_full_reroute_run.py`.
+
+---
+
+## A027 — Repeated recovery uses incremental terminal truck history
+
+**Status:** Derived implementation requirement
+
+**Operational issue:**
+The same accepted demand may be rerouted more than once, for example:
+
+1. after a status update; and
+2. again after a same-time or later Full-Reroute booking trigger.
+
+Already trucked cargo must not re-enter the barge recovery commodity set.
+
+**Baseline implementation:**
+Each new recovery solve operates only on the demand volume that remains
+operationally unfinished after previous terminal truck transfers.
+
+Truck history is cumulative:
+
+\[
+Q_k^{truck,total}
+=
+\sum_g q_{kg}^{truck,new},
+\]
+
+where \(g\) indexes successive recovery generations.
+
+For example, if an initial status recovery sends 3 TEU to truck and a later
+booking-triggered recovery sends one additional TEU, the cumulative volume is:
+
+\[
+3+1=4,
+\]
+
+not 7 TEU and not a new four-TEU transfer.
+
+Recovery-generation chronology is determined by the persisted
+`recovery_event_ids` sequence, not by lexicographic event-ID ordering.
+
+**Validation requirement:**
+At every execution epoch:
+
+\[
+Q_k^{accepted}
+=
+Q_k^{remaining}
++
+Q_k^{delivered,barge}
++
+Q_k^{delivered,truck}.
+\]
+
+**Code impact:**
+`disruption/recovery_transition.py`,
+`disruption/operational_execution.py`,
+and dynamic Full-Reroute transition/run tests.

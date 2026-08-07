@@ -136,6 +136,7 @@ def build_sequential_booking_model(
     event: BookingDecisionEvent,
     *,
     capacity_snapshot: TransportCapacitySnapshot | None = None,
+    residual_capacity_overrides: dict[str, float] | None = None,
 ) -> SequentialBookingModelArtifacts:
     """Build one myopic booking model using residual transport capacity."""
     if not isinstance(instance, ExperimentInstance):
@@ -165,6 +166,61 @@ def build_sequential_booking_model(
 
         if capacity_snapshot.physical_time != event.decision_time:
             raise ValueError("The capacity snapshot time must equal the booking decision time.")
+
+    if capacity_snapshot is not None and residual_capacity_overrides is not None:
+        raise ValueError(
+            "capacity_snapshot and residual_capacity_overrides are mutually exclusive."
+        )
+
+    normalised_capacity_overrides: dict[str, float] | None = None
+
+    if residual_capacity_overrides is not None:
+        if not isinstance(
+            residual_capacity_overrides,
+            dict,
+        ):
+            raise TypeError("residual_capacity_overrides must be a dictionary or None.")
+
+        normalised_capacity_overrides = {}
+
+        for raw_arc_id, raw_capacity in residual_capacity_overrides.items():
+            if not isinstance(raw_arc_id, str):
+                raise TypeError("Residual-capacity arc identifiers must be strings.")
+
+            arc_id = raw_arc_id.strip()
+
+            if not arc_id:
+                raise ValueError("Residual-capacity arc identifiers must be non-empty.")
+
+            arc = instance.arc_by_id(arc_id)
+
+            if not arc.is_transport:
+                raise ValueError("Residual-capacity overrides may contain only transport arcs.")
+
+            if isinstance(raw_capacity, bool) or not isinstance(
+                raw_capacity,
+                (int, float),
+            ):
+                raise TypeError("Residual-capacity values must be real numbers.")
+
+            residual_capacity = float(raw_capacity)
+
+            if not isfinite(residual_capacity):
+                raise ValueError("Residual-capacity values must be finite.")
+
+            if residual_capacity < -COMMITMENT_TOLERANCE:
+                raise ValueError("Residual-capacity values must be non-negative.")
+
+            if arc.nominal_capacity is None:
+                raise ValueError(f"Transport arc {arc_id} has no nominal capacity.")
+
+            if residual_capacity - float(arc.nominal_capacity) > COMMITMENT_TOLERANCE:
+                raise ValueError(f"Residual capacity cannot exceed nominal capacity on {arc_id}.")
+
+            normalised_capacity_overrides[arc_id] = max(
+                0.0,
+                residual_capacity,
+            )
 
     demand = instance.demand_by_id(event.demand_id)
 
@@ -250,15 +306,20 @@ def build_sequential_booking_model(
         if not arc.is_transport:
             continue
 
-        if capacity_snapshot is None:
+        if normalised_capacity_overrides is not None:
+            if arc_id not in normalised_capacity_overrides:
+                raise ValueError(f"Missing residual-capacity override for transport arc {arc_id}.")
+
+            residual_capacity = float(normalised_capacity_overrides[arc_id])
+        elif capacity_snapshot is not None:
+            residual_capacity = float(capacity_snapshot.bookable_capacity_for(arc_id))
+        else:
             residual_capacity = float(
                 state.residual_transport_capacity(
                     instance,
                     arc_id,
                 )
             )
-        else:
-            residual_capacity = float(capacity_snapshot.bookable_capacity_for(arc_id))
 
         residual_capacities[arc_id] = residual_capacity
 

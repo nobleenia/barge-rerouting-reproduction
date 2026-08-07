@@ -1434,3 +1434,213 @@ the trucked volume.
 
 This separation prevents an unreported truck formulation from being hidden
 inside the Phase 9 model.
+
+---
+
+# 25. Phase 10 implemented service-disruption formulation
+
+This section records the implemented operationalisation used in Phase 10.
+It supplements the general formulation above and must not be interpreted as
+a claim that every operational detail appears explicitly in the publication.
+
+## 25.1 Water-adjusted actual capacity
+
+For a future scheduled transport arc \(a\) affected by status factor
+\(\lambda_\tau\),
+
+\[
+C_{a,\tau}^{actual}
+=
+\lambda_\tau C_a^{nominal}.
+\]
+
+The baseline uses no integer rounding.
+
+Completed and currently in-transit movements are immutable. The changed
+capacity applies to future unexecuted scheduled legs only.
+
+## 25.2 Status-triggered recovery
+
+Let \(R(\tau)\) denote unfinished accepted fragments reconstructed at a
+status-update epoch.
+
+For each fragment \(r\),
+
+\[
+Q_r^{remaining}
+=
+Q_r^{barge}
++
+q_r^{truck}.
+\]
+
+The status-only optimisation is:
+
+\[
+\min
+\sum_{r\in R(\tau)}
+c_r^{truck}q_r^{truck}.
+\]
+
+Subject to execution-aware flow conservation and:
+
+\[
+\sum_{r\in R(\tau)}v_{ra}
+\le
+C_{a,\tau}^{available},
+\]
+
+where available recovery capacity is the actual capacity remaining after
+fixed non-released reservations.
+
+## 25.3 Partial-Reroute
+
+At a status update, PR performs the recovery problem in Section 25.2.
+
+At an ordinary booking event, PR does **not** release or reroute unfinished
+prior accepted cargo.
+
+The current booking is solved against actual residual capacity:
+
+\[
+C_{a,\tau}^{bookable}
+=
+C_{a,\tau}^{actual}
+-
+R_{a,\tau}^{operational}.
+\]
+
+Thus a reduced actual capacity cannot be replaced silently by nominal
+residual capacity.
+
+## 25.4 Dynamic Full-Reroute booking model
+
+At the arrival of current request \(\tilde{k}\), dynamic Full-Reroute jointly
+considers:
+
+- the current request;
+- unfinished accepted fragments;
+- actual water-adjusted capacity;
+- truck recourse for prior unfinished cargo.
+
+The general implemented model supports:
+
+\[
+q_{\tilde{k}}^{truck}\ge0,
+\]
+
+but the production operational runner applies A026:
+
+\[
+q_{\tilde{k}}^{truck}=0.
+\]
+
+For prior unfinished fragments \(r\),
+
+\[
+q_r^{truck}\ge0.
+\]
+
+The production booking objective is:
+
+\[
+\max
+\left[
+f_{\tilde{k}}q_{\tilde{k}}\xi_{\tilde{k}}
+-
+\sum_r c_r^{truck}q_r^{truck}
+\right].
+\]
+
+Revenue from previously accepted demand is sunk and is therefore absent from
+the booking-triggered recovery objective.
+
+The shared actual-capacity constraint is:
+
+\[
+v_{\tilde{k}a}
++
+\sum_r v_{ra}
+\le
+C_{a,\tau}^{available}.
+\]
+
+## 25.5 Repeated recovery
+
+Truck transfer is terminal.
+
+A later recovery does not reconsider cargo already transferred to truck.
+
+If \(G_k\) is the sequence of recovery generations for demand \(k\),
+
+\[
+Q_k^{truck,total}
+=
+\sum_{g\in G_k}
+q_{kg}^{truck,new}.
+\]
+
+The execution accounting identity is:
+
+\[
+Q_k^{accepted}
+=
+Q_k^{remaining}
++
+Q_k^{delivered,barge}
++
+Q_k^{delivered,truck}.
+\]
+
+This prevents repeated rerouting from double-counting previously trucked
+volume.
+
+## 25.6 Forced-reduction validation
+
+The controlled Phase 10 gate uses:
+
+\[
+C^{nominal}=10,
+\qquad
+\lambda=0.7,
+\qquad
+C^{actual}=7.
+\]
+
+An alternative one-TEU barge route remains available.
+
+The solved recovery is:
+
+\[
+7_{\text{primary}}
++
+1_{\text{alternate}}
++
+2_{\text{truck}}
+=
+10.
+\]
+
+Hence:
+
+\[
+\text{raw primary overload}=3
+\]
+
+while:
+
+\[
+q^{truck}=2.
+\]
+
+Therefore truck recourse represents residual network infeasibility after
+rerouting, not raw arc overload itself.
+
+## 25.7 Reproduction boundary
+
+The Phase 10 formulation is suitable for controlled mechanism validation.
+
+Exact dynamic-table reproduction still requires unpublished or insufficiently
+specified inputs, including truck costs, complete schedules, realised water
+sequences, demand generation, rounding conventions and exact indicator
+denominators.
