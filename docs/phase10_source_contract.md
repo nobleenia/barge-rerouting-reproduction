@@ -153,3 +153,130 @@ A forced capacity reduction must demonstrate that:
 8. Partial-Reroute triggers only at configured status updates;
 9. Full-Reroute triggers at every booking and every required status recovery;
 10. disabling truck recourse reproduces the existing truck-disabled behaviour.
+
+## 8. Implemented Phase 10 operational boundary
+
+The completed Phase 10 baseline implements the service-status-change
+mechanisms using the following explicit boundaries:
+
+- water-adjusted actual capacity follows A023;
+- same-time status precedence and immutable execution follow A024;
+- explicit direct truck recourse follows A025;
+- production dynamic Full-Reroute disables direct trucking of the newly
+  arriving request under A026;
+- repeated recoveries use incremental terminal truck history under A027.
+
+The implemented dynamic policies are:
+
+### Partial-Reroute
+
+At a service-status update:
+
+- reconstruct unfinished accepted cargo;
+- release its future flexible reservations;
+- reroute against current actual capacity;
+- send only unavoidable residual volume to truck.
+
+At an ordinary booking event:
+
+- use the current actual residual capacity;
+- process the request through ordinary DCA;
+- do not reoptimise prior accepted cargo.
+
+### Full-Reroute
+
+At a service-status update:
+
+- perform the same disruption recovery as Partial-Reroute.
+
+At every incoming booking:
+
+- reconstruct unfinished prior accepted fragments;
+- release their flexible future barge reservations;
+- jointly optimise those fragments with the current request;
+- enforce current actual capacity;
+- use explicit truck recourse for prior unfinished fragments;
+- persist the new booking and operational recovery generation.
+
+The stable-capacity Phase 7 and Phase 9 mechanisms remain unchanged and
+truck-disabled.
+
+## 9. Controlled Phase 10 mechanism-validation results
+
+Phase 10 contains two principal controlled validation cases.
+
+### 9.1 PR versus dynamic FR
+
+With:
+
+\[
+C^{nominal}=10,\qquad
+\lambda=0.7,\qquad
+C^{actual}=7,
+\]
+
+a previously accepted 10-TEU demand is first recovered as:
+
+\[
+7\text{ barge}+3\text{ truck}.
+\]
+
+A later one-TEU high-value request produces:
+
+- Partial-Reroute: prior cargo remains \(7+3\), current request rejected;
+- Full-Reroute: prior cargo becomes \(6\) barge \(+4\) cumulative truck,
+  and the current one-TEU request is accepted on barge.
+
+This is a controlled mechanism test, not a numerical reproduction of a
+published table.
+
+### 9.2 Forced-reduction gate
+
+A second controlled network starts with a 10-TEU plan on a primary service.
+The primary service is reduced to seven TEU, while an unused one-TEU
+alternative barge path remains available.
+
+Recovery yields:
+
+\[
+7\text{ primary barge}
++
+1\text{ alternative barge}
++
+2\text{ truck}
+=
+10.
+\]
+
+Therefore the raw primary overload is:
+
+\[
+10-7=3,
+\]
+
+while unavoidable truck volume is only:
+
+\[
+q^{truck}=2.
+\]
+
+The gate verifies that truck volume is residual infeasibility after network
+rerouting, not simply the magnitude of raw capacity overload.
+
+## 10. Phase 10 completion boundary
+
+Phase 10 completes the operational mechanism layer required before the paper's
+larger experiments can be attempted.
+
+Phase 10 does **not** claim exact numerical reproduction of Tables 5 or 6
+because the publication does not disclose enough information to reconstruct
+all experimental inputs uniquely.
+
+Phase 11 is responsible for:
+
+- stable Table 4-style experimental reconstruction;
+- standard-water Table 5-style DCA/PR/FR experiments;
+- water-factor Table 6-style PR experiments;
+- indicator reconstruction;
+- sensitivity analysis;
+- explicit separation between publication reproduction and extensions.

@@ -498,3 +498,76 @@ Phase 9 model.
 
 Explicit truck recourse, actual capacity, water-level updates, PR triggers and
 disruption-aware FR are assigned to Phase 10 under Assumption A022.
+
+---
+
+## 9. Phase 10 service-disruption and truck-recourse mapping
+
+| Phase 10 concept | Operational role | Implemented code location | Validation | Assumptions |
+|---|---|---|---|---|
+| Service-status update | Represents publication of new water/service information | `src/barge_rerouting/disruption/status.py` | Status-domain and validity-window tests | A023, A024 |
+| Actual capacity profile | Converts nominal service capacity into current water-adjusted capacity | `src/barge_rerouting/disruption/capacity.py` | Nominal, reduced-water, service-specific and historical-leg tests | A023 |
+| Disruption assessment | Detects future reservations exceeding actual capacity | `src/barge_rerouting/disruption/assessment.py` | Nominal-feasible and reduced-capacity overload tests | A023 |
+| Operational timeline | Merges forecast/status and booking events with deterministic status-first ties | `src/barge_rerouting/disruption/timeline.py` | Ordering, sequence and same-time tests | A024 |
+| Recovery fragments | Reconstructs unfinished execution-aware accepted cargo at status or booking recovery triggers | `src/barge_rerouting/disruption/recovery.py` | Status-triggered and booking-triggered fragment tests | A024, A027 |
+| Recovery capacity | Releases flexible prior reservations and computes actual capacity available to recovery | `src/barge_rerouting/disruption/recovery_capacity.py` | Release, fixed-reservation and overload tests | A023, A024 |
+| Recovery networks | Builds feasible networks from each fragment's effective rerouting source | `src/barge_rerouting/disruption/recovery_network.py` | Fragment-network and available-arc tests | A024 |
+| Explicit truck recourse | Minimises truck penalty while maintaining barge-plus-truck delivery balance | `src/barge_rerouting/disruption/truck_recourse.py` | Independent balance, capacity and objective validation | A025 |
+| Recovery persistence | Stores new barge plans and terminal truck transfers without rewriting contractual booking history | `src/barge_rerouting/disruption/recovery_transition.py` | Persistence and truck-accounting tests | A025, A027 |
+| Operational execution overlay | Reconstructs execution from latest recovery generation plus cumulative truck history | `src/barge_rerouting/disruption/operational_execution.py` | 7+3, repeated-recovery 6+4 and final-delivery tests | A024, A027 |
+| Actual booking capacity | Prevents bookings from using nominal residual capacity after a water reduction | `src/barge_rerouting/disruption/booking_capacity.py` and `rolling_horizon/sequential.py` | Nominal-residual versus actual-residual tests | A023 |
+| Dynamic Partial-Reroute | Reroutes at status updates; ordinary bookings do not reroute prior cargo | `src/barge_rerouting/disruption/partial_reroute.py` | End-to-end PR tests | A023, A024, A025 |
+| Dynamic Full-Reroute model | Jointly optimises current acceptance, unfinished prior fragments and truck recourse | `src/barge_rerouting/disruption/dynamic_full_reroute.py` | Independent objective, flow, delivery and capacity validation | A023, A025, A026 |
+| Dynamic Full-Reroute transition | Persists booking-triggered rerouting and only newly created truck transfers | `src/barge_rerouting/disruption/dynamic_full_reroute_transition.py` | Incremental 3+1=4 truck-history tests | A026, A027 |
+| Dynamic Full-Reroute run | Applies recovery at status updates and rerouting at every incoming request | `src/barge_rerouting/disruption/dynamic_full_reroute_run.py` | PR/FR end-to-end policy differentiation | A023–A027 |
+| Forced-reduction gate | Demonstrates alternative barge rerouting before residual truck recourse | `tests/unit/test_phase10_forced_reduction_gate.py` | 7 primary + 1 alternate + 2 truck = 10 | A023, A025 |
+
+### 9.1 Policy boundary
+
+The implementation maintains three distinct policy contexts.
+
+**Stable Full-Reroute**
+
+- Phase 7/9;
+- booking-triggered rerouting;
+- nominal capacity;
+- truck disabled.
+
+**Dynamic Partial-Reroute**
+
+- service-status recovery at forecast updates;
+- ordinary booking decisions between updates;
+- actual capacity;
+- truck recourse for unfinished accepted cargo.
+
+**Dynamic Full-Reroute**
+
+- service-status recovery at forecast updates;
+- additional rerouting at every incoming booking;
+- actual capacity;
+- truck recourse for unfinished accepted cargo.
+
+These mechanisms must not be merged in reporting.
+
+### 9.2 Explicit truck interpretation
+
+The publication's printed penalty expression motivates truck recourse but does
+not uniquely define the truck submodel.
+
+The implementation therefore records explicit truck quantities and their
+constraints under A025 rather than presenting them as a verbatim copy of the
+printed formulation.
+
+### 9.3 Remaining numerical-reproduction boundary
+
+Exact numerical reproduction of the publication's dynamic tables remains
+blocked by unresolved inputs including:
+
+- truck penalty values;
+- complete service schedules;
+- exact demand generation and seeds;
+- exact realised water sequence;
+- capacity rounding;
+- some indicator definitions and denominators.
+
+Phase 10 validates mechanisms despite these missing numerical inputs.
