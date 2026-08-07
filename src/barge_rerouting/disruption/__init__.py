@@ -14,8 +14,18 @@ from barge_rerouting.disruption.capacity import (
 from barge_rerouting.disruption.status import (
     ServiceStatusUpdateEvent,
 )
+from barge_rerouting.disruption.timeline import (
+    OperationalEventKind,
+    OperationalTimeline,
+    OperationalTimelineEntry,
+    build_operational_timeline,
+)
 
 __all__ = [
+    "build_operational_timeline",
+    "OperationalTimelineEntry",
+    "OperationalTimeline",
+    "OperationalEventKind",
     "build_disruption_assessment",
     "FutureArcDisruption",
     "DisruptionAssessment",
