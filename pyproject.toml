@@ -14,6 +14,7 @@ authors = [
 dependencies = [
     "cplex>=22.1",
     "docplex>=2.30",
+    "highspy>=1.15.1,<2.0",
     "matplotlib>=3.8",
     "networkx>=3.2",
     "numpy>=1.26",

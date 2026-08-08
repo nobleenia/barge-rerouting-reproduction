@@ -709,3 +709,41 @@ def test_rrm_transition_rejects_invalid_solution() -> None:
             )
     finally:
         artifacts.model.end()
+
+
+def test_highs_combined_solution_matches_cplex_and_validates() -> None:
+    """HiGHS must solve genuine past-current-future DCA-RRM."""
+    from barge_rerouting.optimization.dca_rrm import (
+        validate_dca_rrm_solution,
+    )
+    from barge_rerouting.optimization.highs_bridge import (
+        solve_dca_rrm_model_highs,
+    )
+
+    artifacts, cplex_solution = build_solved_combined_model()
+
+    try:
+        highs_solution = solve_dca_rrm_model_highs(artifacts)
+
+        highs_report = validate_dca_rrm_solution(
+            artifacts,
+            highs_solution,
+        )
+    finally:
+        artifacts.model.end()
+
+    assert artifacts.fragment_count > 0
+    assert artifacts.forecast_count > 0
+
+    assert cplex_solution.is_solved
+    assert highs_solution.is_solved
+    assert highs_report.is_valid
+
+    assert highs_solution.objective_value == pytest.approx(cplex_solution.objective_value)
+
+    assert highs_solution.acceptance_fraction == pytest.approx(cplex_solution.acceptance_fraction)
+
+    assert highs_report.violations == ()
+    assert highs_report.max_capacity_violation == pytest.approx(0.0)
+    assert highs_report.max_fragment_flow_balance_violation == pytest.approx(0.0)
+    assert highs_report.max_future_flow_balance_violation == pytest.approx(0.0)

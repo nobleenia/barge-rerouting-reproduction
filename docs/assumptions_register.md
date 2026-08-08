@@ -1778,3 +1778,49 @@ Scientific fields must match between runs. Wall-clock time is excluded from
 the determinism comparison.
 
 **Code impact:** `experiments/phase11_pilot.py`.
+
+---
+
+## A035 — HiGHS solver substitution for unrestricted MILP execution
+
+**Status:** Controlled computational substitution
+
+The publication reports IBM CPLEX as its optimisation solver. The local
+reproduction environment provides CPLEX Community Edition, whose model-size
+limit prevents execution of some Phase 11 revenue-management models.
+
+The mathematical formulations remain constructed with DOcplex and are not
+rewritten for HiGHS.
+
+For HiGHS execution, the already-constructed DOcplex model is exported in
+CPLEX LP format, read by HiGHS, solved, and the resulting primal values are
+mapped back to the existing solution structures by preserved variable names.
+
+The substitution has been regression-validated on:
+
+- a DCA-RM model, where CPLEX and HiGHS produced the same objective,
+  acceptance decision and tested protection decision, and the HiGHS-derived
+  solution passed the existing independent DCA-RM validator;
+- a genuine DCA-RRM model containing unfinished past demand, current demand
+  and future demand protection, where both solvers produced the same
+  objective and complete primal assignment within tolerance, and the
+  HiGHS-derived solution passed every existing independent DCA-RRM validation
+  check.
+
+HiGHS version 1.15.1 is the validated implementation version.
+
+This is a solver substitution, not a change to the published mathematical
+method or to the controlled Phase 11 input data.
+
+Solver backend and solver version must be reported with experimental results.
+No silent automatic fallback between CPLEX and HiGHS is permitted.
+
+Solver runtime obtained with HiGHS must not be presented as a reproduction of
+the publication's CPLEX runtime. Numerical objective, allocation and flow
+results remain subject to the existing independent validators and numerical
+tolerances.
+
+Alternative optimal primal assignments may differ between solvers even when
+the objective is identical. Such cases must be assessed through feasibility,
+objective equivalence and downstream state validity rather than requiring
+bit-for-bit route equality.

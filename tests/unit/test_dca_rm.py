@@ -298,3 +298,52 @@ def test_solution_is_deterministic() -> None:
     assert first_report.is_valid
     assert second_report.is_valid
     assert first == second
+
+
+def test_highs_solution_matches_cplex_and_passes_validator() -> None:
+    """HiGHS must solve the same exported DCA-RM MILP correctly."""
+    from barge_rerouting.optimization.highs_bridge import (
+        solve_dca_rm_model_highs,
+    )
+
+    instance, state, event = build_example()
+
+    future_set = select_explicit_future_set(
+        instance,
+        event,
+        (future_forecast(probability_four=0.5),),
+    )
+
+    artifacts = build_dca_rm_model(
+        instance,
+        state,
+        event,
+        future_set,
+        value_interpretation=(FutureValueInterpretation.PRINTED),
+    )
+
+    try:
+        cplex_solution = solve_dca_rm_model(artifacts)
+
+        highs_solution = solve_dca_rm_model_highs(artifacts)
+
+        highs_report = validate_dca_rm_solution(
+            artifacts,
+            highs_solution,
+        )
+    finally:
+        artifacts.model.end()
+
+    assert cplex_solution.is_solved
+    assert highs_solution.is_solved
+    assert highs_report.is_valid
+
+    assert highs_solution.objective_value == pytest.approx(cplex_solution.objective_value)
+
+    assert highs_solution.acceptance_fraction == pytest.approx(cplex_solution.acceptance_fraction)
+
+    assert highs_solution.protection_for("FUTURE").protected_volume == pytest.approx(
+        cplex_solution.protection_for("FUTURE").protected_volume
+    )
+
+    assert highs_report.violations == ()
