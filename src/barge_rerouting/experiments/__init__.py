@@ -51,6 +51,21 @@ from barge_rerouting.experiments.phase11_forecasts import (
     table4_forecast_seed,
     write_table4_forecast_catalogue,
 )
+from barge_rerouting.experiments.phase11_pilot import (
+    TABLE4_PILOT_CAPACITY_TEU,
+    TABLE4_PILOT_DEMAND_SET_ID,
+    TABLE4_PILOT_EXPECTED_DEMAND_FINGERPRINT,
+    TABLE4_PILOT_EXPECTED_FORECAST_FINGERPRINT,
+    TABLE4_PILOT_SEED,
+    TABLE4_PILOT_SERVICE_FAMILY,
+    Table4PilotInputs,
+    Table4PilotResult,
+    build_table4_pilot_config,
+    build_table4_pilot_inputs,
+    run_table4_pilot,
+    run_table4_pilot_once,
+    write_table4_pilot,
+)
 from barge_rerouting.experiments.phase11_services import (
     TABLE4_ADJACENT_TRAVEL_PERIODS,
     TABLE4_FAMILY_1_DEPARTURE_OFFSETS,
@@ -88,6 +103,19 @@ from barge_rerouting.experiments.phase11_table4 import (
 )
 
 __all__ = [
+    "write_table4_pilot",
+    "run_table4_pilot_once",
+    "run_table4_pilot",
+    "build_table4_pilot_inputs",
+    "build_table4_pilot_config",
+    "Table4PilotResult",
+    "Table4PilotInputs",
+    "TABLE4_PILOT_SERVICE_FAMILY",
+    "TABLE4_PILOT_SEED",
+    "TABLE4_PILOT_EXPECTED_FORECAST_FINGERPRINT",
+    "TABLE4_PILOT_EXPECTED_DEMAND_FINGERPRINT",
+    "TABLE4_PILOT_DEMAND_SET_ID",
+    "TABLE4_PILOT_CAPACITY_TEU",
     "write_table4_forecast_catalogue",
     "table4_forecast_seed",
     "forecasts_after_decision_time",

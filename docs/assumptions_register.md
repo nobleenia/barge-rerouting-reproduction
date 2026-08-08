@@ -1705,3 +1705,76 @@ No Phase 11 result may describe A033 as the authors' exact forecast data.
 **Code impact:**
 `experiments/phase11_forecasts.py`, Table 4 DCA-RM/DCA-RRM execution and
 forecast traceability.
+
+---
+
+## A034 — Stable Table 4 pilot reporting boundary
+
+**Status:** Controlled reporting interpretation
+
+The first Phase 11 Table 4 pilot uses the frozen A028--A033 input stack and
+runs:
+
+- DCA;
+- DCA-RM;
+- DCA-Reroute / Full-Reroute;
+- DCA-RRM.
+
+The cell is fixed as Service Family 1, nominal capacity 10 TEU and
+`demand_set_01`.
+
+Truck recourse is disabled and water factor is 1.
+
+### Volume reporting
+
+The existing stable-capacity models create full barge commitments for accepted
+positive-volume demand.
+
+For this pilot:
+
+\[
+transportedVolume = acceptedVolume.
+\]
+
+This is the controlled mapping used for the Table 4 volume IR pipeline.
+
+It must be revisited if later source evidence distinguishes accepted volume
+from the paper's transported-volume denominator.
+
+### Timing reporting
+
+`solve_time_seconds` in the pilot raw record is external wall-clock time for
+the complete sequential policy run.
+
+It is not presented as the paper's CPLEX `ST` metric.
+
+### Solver diagnostics
+
+The existing high-level sequential run APIs do not currently propagate
+aggregate:
+
+- MIP gap;
+- variable count;
+- constraint count;
+- branch-and-bound node count.
+
+These fields remain null during the first pipeline-validation pilot.
+
+They must be instrumented before solver-complexity comparisons are promoted to
+full Phase 11 scientific results.
+
+### Completion gate
+
+DCA-relative Table 4 IR is produced only if all four policy runs complete.
+
+If any mechanism terminates on an infeasible or unsolved booking event, raw
+results are retained but paper-facing IR aggregation is blocked.
+
+### Determinism
+
+The four-policy pilot is executed twice.
+
+Scientific fields must match between runs. Wall-clock time is excluded from
+the determinism comparison.
+
+**Code impact:** `experiments/phase11_pilot.py`.

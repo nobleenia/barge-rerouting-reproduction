@@ -461,3 +461,29 @@ The publication-facing controlled baseline uses:
 The Phase 8/9 attribute-conditioned diagnostic provider must not be used for
 the Phase 11 Table 4 baseline because it reads unrevealed realised future
 attributes.
+
+## 18. First four-policy paired pilot
+
+The first optimisation pilot is:
+
+- Service Family 1;
+- nominal capacity 10 TEU;
+- demand set 01 / seed 11001;
+- stable capacity;
+- water factor 1;
+- truck disabled.
+
+All four mechanisms use the exact same assembled demand fingerprint.
+
+DCA-RM and DCA-RRM additionally use the exact same A033 forecast catalogue
+fingerprint.
+
+Raw policy records are written before any DCA-relative transformation.
+
+Revenue IR and volume IR are generated only when all four policy runs complete.
+
+The pilot is executed twice and must reproduce identical scientific outputs
+before Phase 11 is scaled beyond this single cell.
+
+Wall-clock timing is recorded diagnostically but excluded from the
+deterministic equality test.
