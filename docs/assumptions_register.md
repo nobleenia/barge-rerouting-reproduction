@@ -1222,3 +1222,82 @@ Q_k^{delivered,truck}.
 `disruption/recovery_transition.py`,
 `disruption/operational_execution.py`,
 and dynamic Full-Reroute transition/run tests.
+
+---
+
+## A028 — Phase 11 periodic service-schedule reconstruction
+
+**Status:** Controlled substitute-input assumption
+
+**Paper evidence:**
+The experimental network contains five consecutive terminals A--E with equal
+travel times between adjacent terminals.
+
+The time unit is half a day.
+
+Scheduled services repeat weekly, corresponding to 14 model periods.
+
+The publication distinguishes two service formations:
+
+- Service Family 1: two recurring services in each direction;
+- Service Family 2: four recurring services in each direction.
+
+Service Family 2 therefore has twice the service frequency of Service
+Family 1.
+
+**Missing information:**
+The publication does not uniquely disclose:
+
+- the exact within-week departure offsets;
+- the first departure epoch;
+- the numerical travel duration between adjacent terminals.
+
+**Controlled baseline:**
+Phase 11 uses a 14-period repetition cycle.
+
+Service Family 1 uses departure offsets:
+
+\[
+(0,7).
+\]
+
+Service Family 2 uses departure offsets:
+
+\[
+(0,3,7,10).
+\]
+
+Both sets of offsets apply independently in both directions.
+
+Adjacent-terminal travel time is set to one model period, corresponding to
+one half-day in the implementation.
+
+A recurring service slot retains the same service identifier across weekly
+cycles.
+
+Only complete corridor occurrences that fit within the configured
+experimental horizon are generated.
+
+**Reason:**
+The baseline preserves:
+
+- the published five-terminal corridor;
+- equal adjacent travel times;
+- weekly periodicity;
+- two versus four service slots per direction;
+- the exact 2:1 frequency relationship;
+
+without pretending that unpublished departure times are known.
+
+**Sensitivity requirement:**
+Alternative departure offsets and adjacent travel durations must be evaluated
+as explicitly labelled schedule sensitivities rather than silently replacing
+this baseline.
+
+**Reporting requirement:**
+No numerical result depending on these schedule offsets may be described as
+an exact reconstruction of the authors' unpublished timetable.
+
+**Code impact:**
+`experiments/phase11_services.py` and all Phase 11 publication-facing
+experiment configurations.

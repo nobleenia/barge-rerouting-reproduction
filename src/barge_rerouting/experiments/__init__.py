@@ -1,5 +1,17 @@
 """Publication-oriented experimental infrastructure."""
 
+from barge_rerouting.experiments.phase11_services import (
+    TABLE4_ADJACENT_TRAVEL_PERIODS,
+    TABLE4_FAMILY_1_DEPARTURE_OFFSETS,
+    TABLE4_FAMILY_2_DEPARTURE_OFFSETS,
+    TABLE4_REPEAT_PERIOD,
+    TABLE4_TERMINALS,
+    PeriodicServiceFamilySpec,
+    build_periodic_corridor_transport_legs,
+    build_table4_network_config,
+    default_table4_service_family_specs,
+    table4_service_family_spec,
+)
 from barge_rerouting.experiments.phase11_table4 import (
     CONTROLLED_SUBSTITUTE_INPUT,
     DEFAULT_TABLE4_DEMAND_SEEDS,
@@ -25,6 +37,16 @@ from barge_rerouting.experiments.phase11_table4 import (
 )
 
 __all__ = [
+    "table4_service_family_spec",
+    "default_table4_service_family_specs",
+    "build_table4_network_config",
+    "build_periodic_corridor_transport_legs",
+    "PeriodicServiceFamilySpec",
+    "TABLE4_TERMINALS",
+    "TABLE4_REPEAT_PERIOD",
+    "TABLE4_FAMILY_2_DEPARTURE_OFFSETS",
+    "TABLE4_FAMILY_1_DEPARTURE_OFFSETS",
+    "TABLE4_ADJACENT_TRAVEL_PERIODS",
     "CONTROLLED_SUBSTITUTE_INPUT",
     "DEFAULT_TABLE4_DEMAND_SEEDS",
     "TABLE4_CAPACITIES_TEU",

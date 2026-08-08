@@ -312,3 +312,29 @@ instance and demand fingerprint must be supplied to:
 
 The seed registry is therefore a common-random-number device for paired policy
 comparison, not a claim about the authors' unpublished random seeds.
+
+## 12. Table 4 periodic service-family reconstruction
+
+The publication-facing network generator must preserve the reported structural
+properties:
+
+- terminals A--E;
+- only consecutive-terminal service movement;
+- equal adjacent travel times;
+- half-day periods;
+- 14-period weekly repetition;
+- two service slots per direction for Service Family 1;
+- four service slots per direction for Service Family 2.
+
+Because the publication does not disclose exact departure offsets or the
+numerical adjacent travel duration, the controlled baseline follows A028:
+
+- Family 1 offsets: `0, 7`;
+- Family 2 offsets: `0, 3, 7, 10`;
+- adjacent travel duration: one half-day period.
+
+These values are fixed before experimental solving and must not be tuned to
+increase agreement with Table 4.
+
+The experimental horizon remains a separate Phase 11 demand-generation
+decision and is not fixed merely by the service-family generator.
