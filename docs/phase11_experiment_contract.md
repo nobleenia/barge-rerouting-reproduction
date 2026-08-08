@@ -284,3 +284,31 @@ Also preserve as printed when comparing with the paper:
 
 Any mathematically plausible correction must be reported in a separate
 diagnostic field rather than replacing the published value.
+
+## 11. Controlled Table 4 demand-set seed registry
+
+The original five random seeds are not disclosed by the publication.
+
+The controlled substitute-input baseline therefore uses the explicit seeds:
+
+- demand_set_01: 11001;
+- demand_set_02: 11002;
+- demand_set_03: 11003;
+- demand_set_04: 11004;
+- demand_set_05: 11005.
+
+These values were selected before running the Phase 11 experimental matrix.
+
+They must not be tuned in response to agreement or disagreement with the
+publication's reported Table 4 values.
+
+Within every service-family/capacity cell, the identical realised demand
+instance and demand fingerprint must be supplied to:
+
+- DCA;
+- DCA-RM;
+- DCA-Reroute;
+- DCA-RRM.
+
+The seed registry is therefore a common-random-number device for paired policy
+comparison, not a claim about the authors' unpublished random seeds.

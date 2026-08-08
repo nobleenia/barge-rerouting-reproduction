@@ -1,0 +1,1010 @@
+{
+  "capacities_teu": [
+    10,
+    15,
+    20
+  ],
+  "demand_sets": [
+    {
+      "demand_set_id": "demand_set_01",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11001
+    },
+    {
+      "demand_set_id": "demand_set_02",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11002
+    },
+    {
+      "demand_set_id": "demand_set_03",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11003
+    },
+    {
+      "demand_set_id": "demand_set_04",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11004
+    },
+    {
+      "demand_set_id": "demand_set_05",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11005
+    }
+  ],
+  "experiment": "phase11_table4",
+  "paired_cell_count": 30,
+  "policy_keys": [
+    "dca",
+    "dca_rm",
+    "dca_r",
+    "dca_rrm"
+  ],
+  "policy_run_count": 120,
+  "reproduction_class": "controlled_substitute_input",
+  "run_plan": [
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_01",
+      "policy_key": "dca",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11001,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_01",
+      "policy_key": "dca_rm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11001,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_01",
+      "policy_key": "dca_r",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11001,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_01",
+      "policy_key": "dca_rrm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11001,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_02",
+      "policy_key": "dca",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11002,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_02",
+      "policy_key": "dca_rm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11002,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_02",
+      "policy_key": "dca_r",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11002,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_02",
+      "policy_key": "dca_rrm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11002,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_03",
+      "policy_key": "dca",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11003,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_03",
+      "policy_key": "dca_rm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11003,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_03",
+      "policy_key": "dca_r",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11003,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_03",
+      "policy_key": "dca_rrm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11003,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_04",
+      "policy_key": "dca",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11004,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_04",
+      "policy_key": "dca_rm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11004,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_04",
+      "policy_key": "dca_r",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11004,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_04",
+      "policy_key": "dca_rrm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11004,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_05",
+      "policy_key": "dca",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11005,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_05",
+      "policy_key": "dca_rm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11005,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_05",
+      "policy_key": "dca_r",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11005,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_05",
+      "policy_key": "dca_rrm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11005,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_01",
+      "policy_key": "dca",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11001,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_01",
+      "policy_key": "dca_rm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11001,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_01",
+      "policy_key": "dca_r",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11001,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_01",
+      "policy_key": "dca_rrm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11001,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_02",
+      "policy_key": "dca",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11002,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_02",
+      "policy_key": "dca_rm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11002,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_02",
+      "policy_key": "dca_r",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11002,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_02",
+      "policy_key": "dca_rrm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11002,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_03",
+      "policy_key": "dca",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11003,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_03",
+      "policy_key": "dca_rm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11003,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_03",
+      "policy_key": "dca_r",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11003,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_03",
+      "policy_key": "dca_rrm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11003,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_04",
+      "policy_key": "dca",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11004,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_04",
+      "policy_key": "dca_rm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11004,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_04",
+      "policy_key": "dca_r",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11004,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_04",
+      "policy_key": "dca_rrm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11004,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_05",
+      "policy_key": "dca",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11005,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_05",
+      "policy_key": "dca_rm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11005,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_05",
+      "policy_key": "dca_r",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11005,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_05",
+      "policy_key": "dca_rrm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11005,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_01",
+      "policy_key": "dca",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11001,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_01",
+      "policy_key": "dca_rm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11001,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_01",
+      "policy_key": "dca_r",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11001,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_01",
+      "policy_key": "dca_rrm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11001,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_02",
+      "policy_key": "dca",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11002,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_02",
+      "policy_key": "dca_rm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11002,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_02",
+      "policy_key": "dca_r",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11002,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_02",
+      "policy_key": "dca_rrm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11002,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_03",
+      "policy_key": "dca",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11003,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_03",
+      "policy_key": "dca_rm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11003,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_03",
+      "policy_key": "dca_r",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11003,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_03",
+      "policy_key": "dca_rrm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11003,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_04",
+      "policy_key": "dca",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11004,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_04",
+      "policy_key": "dca_rm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11004,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_04",
+      "policy_key": "dca_r",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11004,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_04",
+      "policy_key": "dca_rrm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11004,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_05",
+      "policy_key": "dca",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11005,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_05",
+      "policy_key": "dca_rm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11005,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_05",
+      "policy_key": "dca_r",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11005,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_05",
+      "policy_key": "dca_rrm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11005,
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_01",
+      "policy_key": "dca",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11001,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_01",
+      "policy_key": "dca_rm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11001,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_01",
+      "policy_key": "dca_r",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11001,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_01",
+      "policy_key": "dca_rrm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11001,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_02",
+      "policy_key": "dca",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11002,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_02",
+      "policy_key": "dca_rm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11002,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_02",
+      "policy_key": "dca_r",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11002,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_02",
+      "policy_key": "dca_rrm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11002,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_03",
+      "policy_key": "dca",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11003,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_03",
+      "policy_key": "dca_rm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11003,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_03",
+      "policy_key": "dca_r",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11003,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_03",
+      "policy_key": "dca_rrm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11003,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_04",
+      "policy_key": "dca",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11004,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_04",
+      "policy_key": "dca_rm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11004,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_04",
+      "policy_key": "dca_r",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11004,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_04",
+      "policy_key": "dca_rrm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11004,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_05",
+      "policy_key": "dca",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11005,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_05",
+      "policy_key": "dca_rm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11005,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_05",
+      "policy_key": "dca_r",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11005,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 10,
+      "demand_set_id": "demand_set_05",
+      "policy_key": "dca_rrm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11005,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_01",
+      "policy_key": "dca",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11001,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_01",
+      "policy_key": "dca_rm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11001,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_01",
+      "policy_key": "dca_r",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11001,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_01",
+      "policy_key": "dca_rrm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11001,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_02",
+      "policy_key": "dca",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11002,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_02",
+      "policy_key": "dca_rm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11002,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_02",
+      "policy_key": "dca_r",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11002,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_02",
+      "policy_key": "dca_rrm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11002,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_03",
+      "policy_key": "dca",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11003,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_03",
+      "policy_key": "dca_rm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11003,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_03",
+      "policy_key": "dca_r",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11003,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_03",
+      "policy_key": "dca_rrm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11003,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_04",
+      "policy_key": "dca",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11004,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_04",
+      "policy_key": "dca_rm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11004,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_04",
+      "policy_key": "dca_r",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11004,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_04",
+      "policy_key": "dca_rrm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11004,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_05",
+      "policy_key": "dca",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11005,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_05",
+      "policy_key": "dca_rm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11005,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_05",
+      "policy_key": "dca_r",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11005,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 15,
+      "demand_set_id": "demand_set_05",
+      "policy_key": "dca_rrm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11005,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_01",
+      "policy_key": "dca",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11001,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_01",
+      "policy_key": "dca_rm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11001,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_01",
+      "policy_key": "dca_r",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11001,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_01",
+      "policy_key": "dca_rrm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11001,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_02",
+      "policy_key": "dca",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11002,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_02",
+      "policy_key": "dca_rm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11002,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_02",
+      "policy_key": "dca_r",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11002,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_02",
+      "policy_key": "dca_rrm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11002,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_03",
+      "policy_key": "dca",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11003,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_03",
+      "policy_key": "dca_rm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11003,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_03",
+      "policy_key": "dca_r",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11003,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_03",
+      "policy_key": "dca_rrm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11003,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_04",
+      "policy_key": "dca",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11004,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_04",
+      "policy_key": "dca_rm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11004,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_04",
+      "policy_key": "dca_r",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11004,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_04",
+      "policy_key": "dca_rrm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11004,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_05",
+      "policy_key": "dca",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11005,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_05",
+      "policy_key": "dca_rm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11005,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_05",
+      "policy_key": "dca_r",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11005,
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 20,
+      "demand_set_id": "demand_set_05",
+      "policy_key": "dca_rrm",
+      "reproduction_class": "controlled_substitute_input",
+      "seed": 11005,
+      "service_family": "service_family_2"
+    }
+  ],
+  "service_families": [
+    "service_family_1",
+    "service_family_2"
+  ]
+}
