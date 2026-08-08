@@ -104,3 +104,28 @@ def test_missing_checkpoint_loads_empty_state(
 
     assert records == []
     assert metadata == {}
+
+
+def test_campaign_imports_in_clean_python_process() -> None:
+    """Campaign imports must not depend on prior module import order."""
+    import subprocess
+    import sys
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            (
+                "from "
+                "barge_rerouting.experiments."
+                "phase11_table4_campaign "
+                "import run_table4_campaign; "
+                "assert callable(run_table4_campaign)"
+            ),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr

@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from barge_rerouting.optimization.solver_backend import (
+        SolverBackend,
+    )
 
 from barge_rerouting.instance import ExperimentInstance
-from barge_rerouting.optimization.solver_backend import (
-    SolverBackend,
-    solve_dca_reroute_with_backend,
-)
 from barge_rerouting.rerouting.capacity import (
     ReroutingCapacitySnapshot,
     build_rerouting_capacity_snapshot,
@@ -274,9 +276,20 @@ def run_full_reroute_event(
     state: RollingBookingState,
     event: BookingDecisionEvent,
     *,
-    solver_backend: SolverBackend = SolverBackend.CPLEX,
+    solver_backend: SolverBackend | None = None,
 ) -> FullRerouteEventResult:
     """Run one complete Full-Reroute booking event."""
+
+    # Import locally to avoid the solver_backend -> rerouting ->
+    # orchestration -> solver_backend import cycle.
+    from barge_rerouting.optimization.solver_backend import (
+        SolverBackend,
+        solve_dca_reroute_with_backend,
+    )
+
+    if solver_backend is None:
+        solver_backend = SolverBackend.CPLEX
+
     if not isinstance(instance, ExperimentInstance):
         raise TypeError("instance must be an ExperimentInstance.")
 
