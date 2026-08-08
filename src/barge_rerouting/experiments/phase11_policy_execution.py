@@ -589,6 +589,7 @@ def run_phase11_dca_r(
     instance: ExperimentInstance,
     *,
     timeline: BookingTimeline | None = None,
+    solver_backend: SolverBackend = SolverBackend.CPLEX,
 ) -> Phase11PolicyRun:
     """Run Full-Reroute with Phase 11 A036 semantics."""
     selected = _selected_timeline(
@@ -605,6 +606,7 @@ def run_phase11_dca_r(
             instance,
             state,
             event,
+            solver_backend=solver_backend,
         )
 
         stop = False
@@ -638,7 +640,7 @@ def run_phase11_dca_r(
 
     return Phase11PolicyRun(
         policy_key="dca_r",
-        solver_backend=SolverBackend.CPLEX,
+        solver_backend=solver_backend,
         timeline=selected,
         event_results=tuple(results),
         final_state=state,

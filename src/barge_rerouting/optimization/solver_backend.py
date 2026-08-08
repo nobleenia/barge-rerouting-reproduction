@@ -3,6 +3,13 @@
 from __future__ import annotations
 
 from enum import StrEnum
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from barge_rerouting.rerouting.optimization import (
+        DcaRerouteModelArtifacts,
+        DcaRerouteSolution,
+    )
 
 from barge_rerouting.optimization.dca_rm import (
     DcaRmModelArtifacts,
@@ -147,3 +154,37 @@ def solve_dca_rrm_with_backend(
         return solve_dca_rrm_model_highs(artifacts)
 
     raise ValueError(f"Unsupported solver backend: {backend}")
+
+
+def solve_dca_reroute_with_backend(
+    artifacts: DcaRerouteModelArtifacts,
+    *,
+    backend: SolverBackend = SolverBackend.CPLEX,
+) -> DcaRerouteSolution:
+    """Solve DCA-Reroute using an explicit or CE-aware backend."""
+    from barge_rerouting.optimization.highs_bridge import (
+        solve_dca_reroute_model_highs,
+    )
+    from barge_rerouting.rerouting.optimization import (
+        DcaRerouteModelArtifacts,
+        solve_dca_reroute_model,
+    )
+
+    if not isinstance(
+        artifacts,
+        DcaRerouteModelArtifacts,
+    ):
+        raise TypeError("artifacts must be DcaRerouteModelArtifacts.")
+
+    resolved = resolve_solver_backend(
+        backend,
+        artifacts.model,
+    )
+
+    if resolved is SolverBackend.CPLEX:
+        return solve_dca_reroute_model(artifacts)
+
+    if resolved is SolverBackend.HIGHS:
+        return solve_dca_reroute_model_highs(artifacts)
+
+    raise ValueError(f"Unsupported resolved solver backend: {resolved}")

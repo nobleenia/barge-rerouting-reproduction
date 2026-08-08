@@ -5,6 +5,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from barge_rerouting.instance import ExperimentInstance
+from barge_rerouting.optimization.solver_backend import (
+    SolverBackend,
+    solve_dca_reroute_with_backend,
+)
 from barge_rerouting.rerouting.capacity import (
     ReroutingCapacitySnapshot,
     build_rerouting_capacity_snapshot,
@@ -24,7 +28,6 @@ from barge_rerouting.rerouting.network import (
 from barge_rerouting.rerouting.optimization import (
     DcaRerouteSolution,
     build_dca_reroute_model,
-    solve_dca_reroute_model,
 )
 from barge_rerouting.rerouting.transition import (
     DcaRerouteTransitionResult,
@@ -270,6 +273,8 @@ def run_full_reroute_event(
     instance: ExperimentInstance,
     state: RollingBookingState,
     event: BookingDecisionEvent,
+    *,
+    solver_backend: SolverBackend = SolverBackend.CPLEX,
 ) -> FullRerouteEventResult:
     """Run one complete Full-Reroute booking event."""
     if not isinstance(instance, ExperimentInstance):
@@ -342,7 +347,10 @@ def run_full_reroute_event(
     transition: DcaRerouteTransitionResult | None = None
 
     try:
-        reroute_solution = solve_dca_reroute_model(reroute_artifacts)
+        reroute_solution = solve_dca_reroute_with_backend(
+            reroute_artifacts,
+            backend=solver_backend,
+        )
 
         if reroute_solution.is_solved:
             transition = apply_dca_reroute_solution(

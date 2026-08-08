@@ -183,6 +183,7 @@ def _execute_policy(
         return run_phase11_dca_r(
             instance,
             timeline=timeline,
+            solver_backend=(SolverBackend.CPLEX_CE_AWARE),
         )
 
     provider = build_table4_forecast_provider(inputs.forecast_catalogue)
@@ -578,7 +579,7 @@ def _write_campaign_manifest(
         "all_runs_completed": (len(completed_records) == expected_run_count),
         "solver_backends": {
             "dca": SolverBackend.CPLEX.value,
-            "dca_r": SolverBackend.CPLEX.value,
+            "dca_r": SolverBackend.CPLEX_CE_AWARE.value,
             "dca_rm": (SolverBackend.CPLEX_CE_AWARE.value),
             "dca_rrm": (SolverBackend.CPLEX_CE_AWARE.value),
         },

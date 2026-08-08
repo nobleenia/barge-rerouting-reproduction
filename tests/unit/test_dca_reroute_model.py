@@ -304,3 +304,61 @@ def test_joint_solution_is_deterministic() -> None:
     second = solve_dca_reroute_model(example["reroute_artifacts"])
 
     assert second == example["reroute_solution"]
+
+
+def test_highs_backend_matches_cplex_joint_reroute_solution() -> None:
+    """HiGHS must reproduce the validated CPLEX DCA-Reroute optimum."""
+    from barge_rerouting.optimization.solver_backend import (
+        SolverBackend,
+        solve_dca_reroute_with_backend,
+    )
+
+    example = build_switch_example()
+
+    artifacts = example["reroute_artifacts"]
+    cplex_solution = example["reroute_solution"]
+
+    try:
+        highs_solution = solve_dca_reroute_with_backend(
+            artifacts,
+            backend=SolverBackend.HIGHS,
+        )
+    finally:
+        artifacts.model.end()
+
+    assert highs_solution.is_solved
+    assert cplex_solution.is_solved
+
+    assert highs_solution.objective_value == pytest.approx(cplex_solution.objective_value)
+
+    assert highs_solution.acceptance_fraction == pytest.approx(cplex_solution.acceptance_fraction)
+
+    cplex_current = {result.arc_id: result.volume for result in cplex_solution.current_flows}
+
+    highs_current = {result.arc_id: result.volume for result in highs_solution.current_flows}
+
+    assert set(highs_current) == set(cplex_current)
+
+    for arc_id, value in cplex_current.items():
+        assert highs_current[arc_id] == pytest.approx(value)
+
+    cplex_fragments = {
+        (
+            result.fragment_id,
+            result.arc_id,
+        ): result.volume
+        for result in cplex_solution.fragment_flows
+    }
+
+    highs_fragments = {
+        (
+            result.fragment_id,
+            result.arc_id,
+        ): result.volume
+        for result in highs_solution.fragment_flows
+    }
+
+    assert set(highs_fragments) == set(cplex_fragments)
+
+    for key, value in cplex_fragments.items():
+        assert highs_fragments[key] == pytest.approx(value)

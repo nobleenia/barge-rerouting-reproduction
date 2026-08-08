@@ -1953,3 +1953,21 @@ Phase 11 must identify the solver-selection rule as
 `cplex_ce_aware`. Timings obtained under mixed CPLEX/HiGHS execution
 must not be represented as reproductions of the publication's CPLEX
 runtime results.
+
+### A037 extension — DCA-Reroute models
+
+The deterministic CPLEX Community Edition-aware backend rule also
+applies to the joint DCA-Reroute optimisation used by Full Rerouting.
+
+CPLEX remains the preferred solver whenever the already-constructed
+rerouting model contains no more than 1000 variables and no more than
+1000 constraints. HiGHS is selected before optimisation whenever
+either model dimension exceeds the Community Edition ceiling.
+
+This extension became necessary during the frozen Table 4 campaign:
+Service Family 1 / 10 TEU / demand_set_04 produced a DCA-Reroute model
+with 1022 variables and 790 constraints. CPLEX Community Edition
+therefore refused the model with error 1016.
+
+The backend substitution changes neither the DCA-Reroute mathematical
+programme nor its state-transition semantics.

@@ -19,9 +19,15 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import highspy
+
+if TYPE_CHECKING:
+    from barge_rerouting.rerouting.optimization import (
+        DcaRerouteModelArtifacts,
+        DcaRerouteSolution,
+    )
 
 from barge_rerouting.optimization.dca_rm import (
     DcaRmCurrentFlowResult,
@@ -461,4 +467,85 @@ def solve_dca_rrm_model_highs(
         selectors=selectors,
         protections=tuple(protections),
         future_flows=future_flows,
+    )
+
+
+def solve_dca_reroute_model_highs(
+    artifacts: DcaRerouteModelArtifacts,
+) -> DcaRerouteSolution:
+    """Solve and extract one existing DCA-Reroute model using HiGHS."""
+    from barge_rerouting.rerouting.optimization import (
+        CurrentDemandFlowResult,
+        DcaRerouteModelArtifacts,
+        DcaRerouteSolution,
+        FragmentFlowResult,
+    )
+
+    if not isinstance(
+        artifacts,
+        DcaRerouteModelArtifacts,
+    ):
+        raise TypeError("artifacts must be DcaRerouteModelArtifacts.")
+
+    result = solve_docplex_mip_with_highs(
+        artifacts.model,
+        time_limit_seconds=(artifacts.instance.config.solver.time_limit_seconds),
+        relative_mip_gap=(artifacts.instance.config.solver.relative_mip_gap),
+        log_output=(artifacts.instance.config.solver.log_output),
+    )
+
+    if not result.is_solved or result.objective_value is None:
+        return DcaRerouteSolution(
+            event_id=artifacts.event.event_id,
+            demand_id=artifacts.event.demand_id,
+            is_solved=False,
+            solve_status=result.solve_status,
+            objective_value=None,
+            acceptance_fraction=None,
+            current_flows=(),
+            fragment_flows=(),
+        )
+
+    values = result.values
+
+    acceptance = _value_of(
+        values,
+        artifacts.acceptance_variable,
+    )
+
+    current_flows = tuple(
+        CurrentDemandFlowResult(
+            arc_id=arc_id,
+            volume=_value_of(
+                values,
+                variable,
+            ),
+        )
+        for arc_id, variable in sorted(artifacts.current_flow_variables.items())
+    )
+
+    fragment_flows = tuple(
+        FragmentFlowResult(
+            fragment_id=fragment_id,
+            arc_id=arc_id,
+            volume=_value_of(
+                values,
+                variable,
+            ),
+        )
+        for (
+            fragment_id,
+            arc_id,
+        ), variable in sorted(artifacts.fragment_flow_variables.items())
+    )
+
+    return DcaRerouteSolution(
+        event_id=artifacts.event.event_id,
+        demand_id=artifacts.event.demand_id,
+        is_solved=True,
+        solve_status=result.solve_status,
+        objective_value=float(result.objective_value),
+        acceptance_fraction=float(acceptance),
+        current_flows=current_flows,
+        fragment_flows=fragment_flows,
     )
