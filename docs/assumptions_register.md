@@ -1301,3 +1301,69 @@ an exact reconstruction of the authors' unpublished timetable.
 **Code impact:**
 `experiments/phase11_services.py` and all Phase 11 publication-facing
 experiment configurations.
+
+---
+
+## A029 — Phase 11 structural demand-generation boundary
+
+**Status:** Paper-supported structure with controlled substitute timing pools
+
+**Paper-supported structure:**
+The Phase 11 publication-facing demand process preserves:
+
+- ten request arrivals per half-day period;
+- ordered origin-destination selection over terminals A--E;
+- uniform OD sampling;
+- uniform selection among customer categories R, P and F;
+- anticipation parameters selected from distance-dependent pools;
+- delivery-time parameters selected from distance-dependent pools.
+
+**Missing information:**
+The publication does not uniquely disclose:
+
+- the numerical distance-dependent anticipation pools;
+- the numerical distance-dependent delivery pools;
+- the exact realised-demand volume distribution;
+- the value of VMAX needed to reconstruct realised volumes;
+- complete base fares and fare multipliers;
+- the original random seeds.
+
+**Implementation boundary:**
+Phase 11 first generates immutable structural request templates containing:
+
+- OD;
+- reservation time;
+- anticipation lag;
+- availability time;
+- delivery slack;
+- due time;
+- customer category.
+
+Volume and fare are deliberately absent from this structural layer.
+
+They may be attached only after their own controlled-input contract is
+defined.
+
+**Common-random-number requirement:**
+The structural request generator must not depend on:
+
+- service family;
+- nominal vessel capacity;
+- policy.
+
+For a fixed seed and structural demand specification, the identical request
+template fingerprint must therefore be reusable across all relevant
+experimental cells.
+
+**Horizon rule:**
+Request periods must be chosen so every value in every configured timing pool
+fits inside the horizon. The generator does not silently truncate, redraw or
+bias late-horizon timing values.
+
+**Reporting requirement:**
+The structural generation process may be described as publication-facing.
+The undisclosed numerical timing pools remain controlled substitute inputs.
+
+**Code impact:**
+`experiments/phase11_demands.py` and the later Phase 11 demand-realisation
+layer.

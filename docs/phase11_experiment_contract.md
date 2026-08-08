@@ -338,3 +338,31 @@ increase agreement with Table 4.
 
 The experimental horizon remains a separate Phase 11 demand-generation
 decision and is not fixed merely by the service-family generator.
+
+## 13. Structural demand-generation boundary
+
+Phase 11 separates the publication-supported request-arrival process from
+undisclosed economic parameters.
+
+The structural generator follows A029 and produces:
+
+- ten requests for every configured half-day request period;
+- uniformly sampled ordered OD pairs over A--E;
+- uniformly sampled R/P/F customer categories;
+- distance-dependent anticipation draws;
+- distance-dependent delivery-slack draws.
+
+The same structural request stream must be reused across service families,
+capacities and policies whenever the experimental design requires the same
+demand set.
+
+The following are intentionally not assigned numerical baseline values in
+the structural generator:
+
+- realised-demand volume distribution;
+- VMAX;
+- base fare;
+- anticipation fare multiplier;
+- delivery-time fare multiplier.
+
+Those values must be locked separately before the first Table 4 pilot solve.

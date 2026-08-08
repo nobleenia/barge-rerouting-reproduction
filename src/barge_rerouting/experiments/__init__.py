@@ -1,5 +1,18 @@
 """Publication-oriented experimental infrastructure."""
 
+from barge_rerouting.experiments.phase11_demands import (
+    TABLE4_CUSTOMER_CATEGORIES,
+    TABLE4_ORDERED_OD_PAIRS,
+    TABLE4_REQUESTS_PER_HALF_DAY,
+    DistanceTimingPool,
+    Table4DemandProcessSpec,
+    Table4RequestTemplate,
+    corridor_distance,
+    generate_table4_request_templates,
+    request_template_fingerprint,
+    request_template_records,
+    write_request_templates_csv,
+)
 from barge_rerouting.experiments.phase11_services import (
     TABLE4_ADJACENT_TRAVEL_PERIODS,
     TABLE4_FAMILY_1_DEPARTURE_OFFSETS,
@@ -37,6 +50,17 @@ from barge_rerouting.experiments.phase11_table4 import (
 )
 
 __all__ = [
+    "write_request_templates_csv",
+    "request_template_records",
+    "request_template_fingerprint",
+    "generate_table4_request_templates",
+    "corridor_distance",
+    "Table4RequestTemplate",
+    "Table4DemandProcessSpec",
+    "DistanceTimingPool",
+    "TABLE4_REQUESTS_PER_HALF_DAY",
+    "TABLE4_ORDERED_OD_PAIRS",
+    "TABLE4_CUSTOMER_CATEGORIES",
     "table4_service_family_spec",
     "default_table4_service_family_specs",
     "build_table4_network_config",
