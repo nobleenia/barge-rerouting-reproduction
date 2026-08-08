@@ -25,6 +25,82 @@ class SolverBackend(StrEnum):
 
     CPLEX = "cplex"
     HIGHS = "highs"
+    CPLEX_CE_AWARE = "cplex_ce_aware"
+
+
+CPLEX_COMMUNITY_MAX_VARIABLES = 1000
+CPLEX_COMMUNITY_MAX_CONSTRAINTS = 1000
+
+
+def select_cplex_ce_aware_backend(
+    variable_count: int,
+    constraint_count: int,
+) -> SolverBackend:
+    """Select CPLEX when the model fits the local Community Edition.
+
+    HiGHS is selected only when either model dimension exceeds the
+    local CPLEX Community Edition limit. Selection depends only on
+    model dimensions and occurs before optimisation.
+    """
+    if isinstance(variable_count, bool) or not isinstance(
+        variable_count,
+        int,
+    ):
+        raise TypeError("variable_count must be an integer.")
+
+    if isinstance(constraint_count, bool) or not isinstance(
+        constraint_count,
+        int,
+    ):
+        raise TypeError("constraint_count must be an integer.")
+
+    if variable_count < 0:
+        raise ValueError("variable_count must be non-negative.")
+
+    if constraint_count < 0:
+        raise ValueError("constraint_count must be non-negative.")
+
+    if (
+        variable_count <= CPLEX_COMMUNITY_MAX_VARIABLES
+        and constraint_count <= CPLEX_COMMUNITY_MAX_CONSTRAINTS
+    ):
+        return SolverBackend.CPLEX
+
+    return SolverBackend.HIGHS
+
+
+def resolve_solver_backend(
+    backend: SolverBackend,
+    model: object,
+) -> SolverBackend:
+    """Resolve an explicit or CE-aware backend before solving."""
+    if not isinstance(backend, SolverBackend):
+        raise TypeError("backend must be a SolverBackend.")
+
+    if backend is not SolverBackend.CPLEX_CE_AWARE:
+        return backend
+
+    variable_count = getattr(
+        model,
+        "number_of_variables",
+        None,
+    )
+    constraint_count = getattr(
+        model,
+        "number_of_constraints",
+        None,
+    )
+
+    if not isinstance(variable_count, int):
+        raise TypeError("model.number_of_variables must be an integer.")
+
+    if not isinstance(constraint_count, int):
+        raise TypeError("model.number_of_constraints must be an integer.")
+
+    return select_cplex_ce_aware_backend(
+        variable_count,
+        constraint_count,
+    )
 
 
 def solve_dca_rm_with_backend(
@@ -38,6 +114,8 @@ def solve_dca_rm_with_backend(
         SolverBackend,
     ):
         raise TypeError("backend must be a SolverBackend.")
+
+    backend = resolve_solver_backend(backend, artifacts.model)
 
     if backend is SolverBackend.CPLEX:
         return solve_dca_rm_model(artifacts)
@@ -59,6 +137,8 @@ def solve_dca_rrm_with_backend(
         SolverBackend,
     ):
         raise TypeError("backend must be a SolverBackend.")
+
+    backend = resolve_solver_backend(backend, artifacts.model)
 
     if backend is SolverBackend.CPLEX:
         return solve_dca_rrm_model(artifacts)

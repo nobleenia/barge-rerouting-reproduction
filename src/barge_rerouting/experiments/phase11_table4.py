@@ -385,6 +385,11 @@ class Table4PolicyRunRecord:
     accepted_volume: float
     solver_status: str
 
+    ordinary_rejection_count: int = 0
+    feasibility_rejection_count: int = 0
+    feasibility_rejected_demand_ids: tuple[str, ...] = ()
+    solver_failure_count: int = 0
+
     solve_time_seconds: float | None = None
     mip_gap: float | None = None
     variable_count: int | None = None
@@ -487,6 +492,54 @@ class Table4PolicyRunRecord:
                 "solver_status",
                 self.solver_status,
             ),
+        )
+
+        for count_name in (
+            "ordinary_rejection_count",
+            "feasibility_rejection_count",
+            "solver_failure_count",
+        ):
+            count = getattr(self, count_name)
+
+            if isinstance(count, bool) or not isinstance(
+                count,
+                int,
+            ):
+                raise TypeError(f"{count_name} must be an integer.")
+
+            if count < 0:
+                raise ValueError(f"{count_name} must be non-negative.")
+
+        if not isinstance(
+            self.feasibility_rejected_demand_ids,
+            tuple,
+        ):
+            raise TypeError("feasibility_rejected_demand_ids must be a tuple.")
+
+        feasibility_rejected_demand_ids = tuple(
+            _normalise_nonempty_string(
+                "feasibility_rejected_demand_id",
+                demand_id,
+            )
+            for demand_id in self.feasibility_rejected_demand_ids
+        )
+
+        if len(set(feasibility_rejected_demand_ids)) != len(feasibility_rejected_demand_ids):
+            raise ValueError("A036-rejected demand identifiers must be unique.")
+
+        if self.feasibility_rejection_count != len(feasibility_rejected_demand_ids):
+            raise ValueError(
+                "feasibility_rejection_count must equal the "
+                "number of A036-rejected demand identifiers."
+            )
+
+        if self.completed and self.solver_failure_count:
+            raise ValueError("A completed policy run cannot contain solver failures.")
+
+        object.__setattr__(
+            self,
+            "feasibility_rejected_demand_ids",
+            feasibility_rejected_demand_ids,
         )
 
         object.__setattr__(

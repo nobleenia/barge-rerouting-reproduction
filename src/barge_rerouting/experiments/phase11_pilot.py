@@ -41,6 +41,13 @@ from barge_rerouting.experiments.phase11_forecasts import (
     build_table4_forecast_catalogue,
     build_table4_forecast_provider,
 )
+from barge_rerouting.experiments.phase11_policy_execution import (
+    Phase11PolicyRun,
+    run_phase11_dca,
+    run_phase11_dca_r,
+    run_phase11_dca_rm,
+    run_phase11_dca_rrm,
+)
 from barge_rerouting.experiments.phase11_services import (
     build_table4_network_config,
 )
@@ -60,19 +67,9 @@ from barge_rerouting.instance import (
 from barge_rerouting.optimization.solver_backend import (
     SolverBackend,
 )
-from barge_rerouting.rerouting.run import (
-    run_full_reroute,
-)
-from barge_rerouting.revenue_management.rrm_run import (
-    run_time_aware_dca_rrm,
-)
-from barge_rerouting.revenue_management.run import (
-    run_time_aware_dca_rm,
-)
 from barge_rerouting.rolling_horizon import (
     BookingTimeline,
     build_booking_timeline,
-    run_time_aware_sequential_dca,
 )
 
 TABLE4_PILOT_SERVICE_FAMILY: Final = "service_family_1"
@@ -216,30 +213,40 @@ def build_table4_pilot_inputs() -> Table4PilotInputs:
 def _record(
     *,
     inputs: Table4PilotInputs,
-    policy_key: str,
-    completed: bool,
-    total_revenue: float,
-    accepted_volume: float,
+    run: Phase11PolicyRun,
     elapsed_seconds: float,
 ) -> Table4PolicyRunRecord:
     """Build one raw stable-capacity pilot record."""
+    failure = run.failure_event
+
+    if run.completed:
+        solver_status = "all_events_processed"
+    elif failure is not None:
+        solver_status = f"solver_failure: {failure.solver_status}"
+    else:
+        solver_status = "run_incomplete"
+
     return Table4PolicyRunRecord(
         service_family=(TABLE4_PILOT_SERVICE_FAMILY),
         capacity_teu=TABLE4_PILOT_CAPACITY_TEU,
         demand_set_id=(TABLE4_PILOT_DEMAND_SET_ID),
         seed=TABLE4_PILOT_SEED,
-        policy_key=policy_key,
+        policy_key=run.policy_key,
         reproduction_class=(CONTROLLED_SUBSTITUTE_INPUT),
         configuration_fingerprint=(inputs.configuration_fingerprint),
         demand_fingerprint=(inputs.demand_fingerprint),
-        completed=completed,
-        total_revenue=float(total_revenue),
+        completed=run.completed,
+        total_revenue=run.total_revenue,
         # Stable Table 4 contains no truck recourse.
         # Every accepted commitment is therefore a
         # barge-transport commitment.
-        transported_volume=float(accepted_volume),
-        accepted_volume=float(accepted_volume),
-        solver_status=("all_events_solved" if completed else "run_incomplete"),
+        transported_volume=run.accepted_volume,
+        accepted_volume=run.accepted_volume,
+        solver_status=solver_status,
+        ordinary_rejection_count=(run.ordinary_rejection_count),
+        feasibility_rejection_count=(run.feasibility_rejection_count),
+        feasibility_rejected_demand_ids=(run.feasibility_rejected_demand_ids),
+        solver_failure_count=(run.solver_failure_count),
         solve_time_seconds=float(elapsed_seconds),
         mip_gap=None,
         variable_count=None,
@@ -266,7 +273,7 @@ def run_table4_pilot_once(
     records: list[Table4PolicyRunRecord] = []
 
     start = perf_counter()
-    dca_run = run_time_aware_sequential_dca(
+    dca_run = run_phase11_dca(
         instance,
         timeline=timeline,
     )
@@ -275,39 +282,33 @@ def run_table4_pilot_once(
     records.append(
         _record(
             inputs=inputs,
-            policy_key="dca",
-            completed=dca_run.completed,
-            total_revenue=dca_run.total_revenue,
-            accepted_volume=dca_run.accepted_volume,
+            run=dca_run,
             elapsed_seconds=elapsed,
         )
     )
 
     start = perf_counter()
-    rm_run = run_time_aware_dca_rm(
+    rm_run = run_phase11_dca_rm(
         instance,
         provider,
         value_interpretation=(TABLE4_FORECAST_VALUE_INTERPRETATION),
         selection_mode=(TABLE4_FORECAST_SELECTION_MODE),
         timeline=timeline,
         lookahead_periods=(TABLE4_FORECAST_LOOKAHEAD_PERIODS),
-        solver_backend=SolverBackend.HIGHS,
+        solver_backend=SolverBackend.CPLEX_CE_AWARE,
     )
     elapsed = perf_counter() - start
 
     records.append(
         _record(
             inputs=inputs,
-            policy_key="dca_rm",
-            completed=rm_run.completed,
-            total_revenue=(rm_run.total_realised_revenue),
-            accepted_volume=(rm_run.accepted_volume),
+            run=rm_run,
             elapsed_seconds=elapsed,
         )
     )
 
     start = perf_counter()
-    reroute_run = run_full_reroute(
+    reroute_run = run_phase11_dca_r(
         instance,
         timeline=timeline,
     )
@@ -316,33 +317,27 @@ def run_table4_pilot_once(
     records.append(
         _record(
             inputs=inputs,
-            policy_key="dca_r",
-            completed=(reroute_run.completed),
-            total_revenue=(reroute_run.total_revenue),
-            accepted_volume=(reroute_run.accepted_volume),
+            run=reroute_run,
             elapsed_seconds=elapsed,
         )
     )
 
     start = perf_counter()
-    rrm_run = run_time_aware_dca_rrm(
+    rrm_run = run_phase11_dca_rrm(
         instance,
         provider,
         value_interpretation=(TABLE4_FORECAST_VALUE_INTERPRETATION),
         selection_mode=(TABLE4_FORECAST_SELECTION_MODE),
         timeline=timeline,
         lookahead_periods=(TABLE4_FORECAST_LOOKAHEAD_PERIODS),
-        solver_backend=SolverBackend.HIGHS,
+        solver_backend=SolverBackend.CPLEX_CE_AWARE,
     )
     elapsed = perf_counter() - start
 
     records.append(
         _record(
             inputs=inputs,
-            policy_key="dca_rrm",
-            completed=rrm_run.completed,
-            total_revenue=(rrm_run.total_realised_revenue),
-            accepted_volume=(rrm_run.accepted_volume),
+            run=rrm_run,
             elapsed_seconds=elapsed,
         )
     )
@@ -351,25 +346,23 @@ def run_table4_pilot_once(
 
 
 def _scientific_signature(
-    records: tuple[Table4PolicyRunRecord, ...],
-) -> tuple[
-    tuple[
-        str,
-        bool,
-        float,
-        float,
-        str,
-        str,
+    records: tuple[
+        Table4PolicyRunRecord,
+        ...,
     ],
-    ...,
-]:
-    """Return deterministic fields excluding wall-clock timing."""
+) -> tuple[tuple[object, ...], ...]:
+    """Return deterministic scientific fields excluding timing."""
     return tuple(
         (
             record.policy_key,
             record.completed,
             record.total_revenue,
             record.accepted_volume,
+            record.ordinary_rejection_count,
+            record.feasibility_rejection_count,
+            record.feasibility_rejected_demand_ids,
+            record.solver_failure_count,
+            record.solver_status,
             record.configuration_fingerprint,
             record.demand_fingerprint,
         )
@@ -465,12 +458,26 @@ def write_table4_pilot(
         "water_factor": 1.0,
         "solver_backends": {
             "dca": SolverBackend.CPLEX.value,
-            "dca_rm": SolverBackend.HIGHS.value,
+            "dca_rm": SolverBackend.CPLEX_CE_AWARE.value,
             "dca_r": SolverBackend.CPLEX.value,
-            "dca_rrm": SolverBackend.HIGHS.value,
+            "dca_rrm": SolverBackend.CPLEX_CE_AWARE.value,
         },
         "deterministic_rerun_verified": (result.deterministic_rerun_verified),
         "all_policies_completed": (result.all_policies_completed),
+        "a036_feasibility_continuation": {
+            "classification": ("controlled interpretation of an underspecified edge case"),
+            "policy_rejections": {
+                record.policy_key: list(record.feasibility_rejected_demand_ids)
+                for record in result.records
+            },
+            "note": (
+                "A Regular request explicitly certified "
+                "infeasible is recorded with zero realised "
+                "acceptance outside the optimisation "
+                "acceptance variable; prior commitments are "
+                "unchanged and the timeline continues."
+            ),
+        },
         "raw_records": [asdict(record) for record in result.records],
         "paired_comparisons": [asdict(comparison) for comparison in result.comparisons],
         "timing_note": (

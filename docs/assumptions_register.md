@@ -1896,3 +1896,60 @@ published paper.
 
 Ask how the original simulator handled an incoming Regular request when no
 feasible time-space itinerary remained under the selected booking policy.
+
+---
+
+## A037 — Deterministic CPLEX Community Edition-aware solver selection
+
+**Status:** Controlled computational-environment rule
+
+The publication reports CPLEX as its optimisation solver. The local
+reproduction environment contains CPLEX Community Edition, which imposes
+a 1000-variable and 1000-constraint model-size limit.
+
+Phase 11 therefore retains CPLEX whenever the already-constructed
+optimisation model lies within both local Community Edition limits.
+
+If either:
+
+- number of variables > 1000; or
+- number of constraints > 1000,
+
+the same already-constructed linear/mixed-integer model is solved with
+HiGHS through the validated solver bridge.
+
+The backend is selected before optimisation using model dimensions only.
+
+No solver is selected on the basis of:
+
+- objective value;
+- acceptance decision;
+- feasibility outcome;
+- solution quality;
+- runtime observed after the solve starts; or
+- agreement with an expected experimental result.
+
+This rule supersedes any Phase 11 use of HiGHS as the unconditional
+backend for DCA-RM or DCA-RRM.
+
+The mathematical model, decision variables, constraints, objective,
+demand inputs, forecasts, and rolling-horizon state are unchanged by
+backend selection.
+
+**Observed motivation:**
+
+For the frozen Table 4 pilot, event K0050 produced a DCA-RM model with
+194 variables and 159 constraints. The model was solved by local CPLEX
+to integer optimality in approximately 0.006 seconds and independently
+validated, while unconditional HiGHS execution exhibited pathological
+runtime on the same event.
+
+Conversely, models exceeding the Community Edition size ceiling have
+already been cross-validated through the HiGHS bridge.
+
+**Reporting requirement:**
+
+Phase 11 must identify the solver-selection rule as
+`cplex_ce_aware`. Timings obtained under mixed CPLEX/HiGHS execution
+must not be represented as reproductions of the publication's CPLEX
+runtime results.
