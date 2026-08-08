@@ -415,3 +415,49 @@ The following quantities are distinct experiment metadata:
 This separation is required by A030 because the article simultaneously reports
 a 400/800-time-instant horizon, demand density 10, and an 800-demand dynamic
 experiment without providing a unique mapping between them.
+
+## 16. Pre-registered controlled numerical baseline
+
+A032 defines the first complete numerical substitute input set.
+
+It is frozen before any Table 4 optimisation output is inspected.
+
+The initial one-week pilot contains 140 generated demand opportunities per
+seed. Zero-volume opportunities remain part of the stochastic generation
+record but are not converted to positive-volume `Demand` objects.
+
+Each saved demand set therefore contains three identities:
+
+1. structural request-template fingerprint;
+2. economic-input fingerprint;
+3. realised positive-demand fingerprint.
+
+The same realised positive-demand fingerprint must be used across every policy
+within a paired experimental cell.
+
+The A032 pilot is a pipeline-validation experiment. It is not itself evidence
+that the unpublished parameters of the paper have been recovered.
+
+## 17. Table 4 forecast catalogue
+
+The first Table 4 pilot uses the A033 ex-ante forecast catalogue.
+
+For every demand-set seed, forecast attributes are generated once using an
+independent deterministic random stream and persisted before optimisation.
+
+DCA-RM and DCA-RRM must use the exact same forecast catalogue fingerprint.
+
+DCA and DCA-Reroute receive no future-demand catalogue.
+
+At a current decision time `t`, the provider exposes only potential forecast
+requests with a forecast reservation period strictly greater than `t`.
+
+The publication-facing controlled baseline uses:
+
+- `A004_SHARED_ARC` future-set selection;
+- the printed future-value interpretation;
+- no additional look-ahead truncation during the one-week pilot.
+
+The Phase 8/9 attribute-conditioned diagnostic provider must not be used for
+the Phase 11 Table 4 baseline because it reads unrevealed realised future
+attributes.

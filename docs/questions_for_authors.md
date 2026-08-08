@@ -584,3 +584,26 @@ These values are required for exact numerical reproduction of Table 4 rather
 than only methodological reproduction.
 
 **Related assumption:** A031
+
+---
+
+## Q040 — Construction and information content of future-demand forecasts
+
+For the stable DCA-RM and DCA-RRM experiments, how was the potential future
+set \(K(\tilde{k})\) generated?
+
+In particular:
+
+- were future OD pairs known or probabilistic?
+- were future availability and due times known?
+- were customer classes and fares known?
+- how many potential future requests were represented per decision epoch?
+- were requests later in the same half-day included?
+- was there a finite forecast look-ahead horizon?
+- were forecasts fixed at the beginning of the simulation or regenerated
+  during the rolling horizon?
+
+The Phase 11 baseline currently uses an independent ex-ante forecast catalogue
+under A033 rather than unrevealed realised request attributes.
+
+**Related assumptions:** A004, A033

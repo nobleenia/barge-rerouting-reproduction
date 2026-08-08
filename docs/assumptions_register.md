@@ -1489,3 +1489,219 @@ resolved.
 **Code impact:**
 `experiments/phase11_economics.py`, demand realisation, forecast generation,
 configuration fingerprints and Table 4 experiments.
+
+---
+
+## A032 — Pre-registered controlled Table 4 numerical baseline
+
+**Status:** Controlled substitute input
+
+The source paper specifies the structure of the volume, timing and fare
+generation processes but does not publish the complete numerical inputs needed
+for exact Table 4 reproduction.
+
+The following baseline is fixed before the first Table 4 optimisation run.
+
+### Volume
+
+\[
+VMAX=2
+\]
+
+with:
+
+\[
+P(X=0)=0.40,\quad
+P(X=1)=0.40,\quad
+P(X=2)=0.20.
+\]
+
+Hence:
+
+\[
+E[X]=0.8.
+\]
+
+A zero-volume draw represents a generated demand opportunity that does not
+become a positive-volume optimisation booking.
+
+### Timing pools
+
+For corridor distance \(d\):
+
+\[
+anticipation \in \{d,d+1,d+2\},
+\]
+
+and:
+
+\[
+deliverySlack \in \{d+7,d+8,d+9\}.
+\]
+
+The anticipation threshold is \(d+1\).
+
+The delivery threshold is \(d+8\).
+
+Anticipation at or above the threshold is classified as early reservation.
+
+Delivery slack at or above the threshold is classified as standard delivery.
+
+The minimum delivery slack \(d+7\) is a controlled feasibility choice aligned
+with the seven-period maximum Family-1 departure headway plus corridor travel.
+
+### Fare
+
+For corridor distance \(d\):
+
+\[
+p_d=100d.
+\]
+
+The published reference rates remain:
+
+\[
+r_{early}=1,\qquad
+r_{standard}=1.
+\]
+
+The controlled premium rates are:
+
+\[
+r_{late}=1.25,\qquad
+r_{express}=1.25.
+\]
+
+### Pilot request window
+
+Demand opportunities are generated for periods 0 through 13 inclusive:
+
+\[
+14\times10=140
+\]
+
+opportunities per demand set.
+
+The network/delivery horizon extends to period 32 solely so that every
+configured timing-pool outcome fits without truncation.
+
+### Random streams
+
+Structural generation uses the registered demand-set seed.
+
+Economic realisation uses:
+
+\[
+seed_{economic}=seed+1,000,000.
+\]
+
+This separates volume draws from structural OD/timing/category random draws.
+
+### Scientific boundary
+
+None of these unresolved numerical values is claimed to be the value used by
+Cui et al.
+
+They are not calibrated against Table 4.
+
+If original supplementary inputs become available, those inputs replace A032
+for strict numerical reproduction. A032 remains a controlled sensitivity
+baseline.
+
+**Code impact:** `experiments/phase11_baseline.py`.
+
+---
+
+## A033 — Ex-ante non-oracle Table 4 forecast catalogue
+
+**Status:** Controlled substitute input
+
+**Paper-supported structure:**
+DCA-RM and DCA-RRM consider potential future demands using probability
+distributions.
+
+DCA and DCA-Reroute do not use future-demand revenue management.
+
+The exact construction of the experimental future-demand set and forecast
+information is not sufficiently disclosed for exact numerical reproduction.
+
+**Problem with the Phase 8/9 diagnostic provider:**
+The earlier diagnostic provider deliberately reused unrevealed realised
+future-request attributes while replacing only realised volume by a probability
+distribution.
+
+That provider remains valid for Phase 8/9 mechanism diagnostics but is not used
+as the Phase 11 publication-facing baseline.
+
+**Controlled Phase 11 forecast process:**
+Before any optimisation decision, an independent forecast catalogue is
+generated from the same controlled structural and economic distributions used
+by A032.
+
+For registered demand-set seed \(s\):
+
+\[
+s_{forecast}=s+2,000,000.
+\]
+
+The catalogue contains ten independent potential forecast opportunities for
+each configured half-day request period.
+
+Forecast structural attributes are therefore statistically generated rather
+than copied from the realised future demand set.
+
+Each forecast retains the complete A032 volume distribution:
+
+\[
+P(X=0)=0.40,\qquad
+P(X=1)=0.40,\qquad
+P(X=2)=0.20.
+\]
+
+**Information rule at decision time \(t\):**
+Only forecast entries whose forecast reservation period is strictly later than
+\(t\) are provided.
+
+Potential forecasts from the same half-day as the current realised request are
+excluded because the publication does not uniquely specify within-period
+request ordering and information revelation.
+
+**Future-set rule:**
+The supplied forecasts are subsequently filtered by the existing A004
+shared-transport-arc interpretation of direct possible interaction.
+
+The baseline uses:
+
+- `FutureDemandSelectionMode.A004_SHARED_ARC`;
+- no additional numerical look-ahead truncation for the one-week pilot;
+- the printed future-value expression.
+
+The capped future-value interpretation remains sensitivity analysis.
+
+**Common-random-number requirement:**
+DCA-RM and DCA-RRM must receive the identical catalogue fingerprint within a
+paired experiment.
+
+The catalogue must also be identical across capacities and service families
+for the same registered demand-set seed; network interaction is determined
+afterward by the selected network.
+
+**Non-oracle guarantee:**
+Forecast construction must not inspect:
+
+- realised future volume;
+- realised future OD;
+- realised future availability;
+- realised future deadline;
+- realised future category;
+- realised future fare.
+
+**Scientific boundary:**
+A033 reproduces the disclosed stochastic-forecast concept but not an
+undisclosed original forecasting algorithm.
+
+No Phase 11 result may describe A033 as the authors' exact forecast data.
+
+**Code impact:**
+`experiments/phase11_forecasts.py`, Table 4 DCA-RM/DCA-RRM execution and
+forecast traceability.

@@ -1,4 +1,4 @@
-.PHONY: inspect-sequential-dca-rm inspect-dca-rm inspect-future-set inspect-future-value evaluate-phase7-canonical inspect-full-reroute-run inspect-full-reroute-event inspect-dca-reroute-transition inspect-dca-reroute-model inspect-rerouting-network inspect-rerouting-in-transit inspect-rerouting-capacity inspect-rerouting-eligibility solve-time-aware-sequential-dca inspect-time-aware-capacity inspect-physical-execution solve-toy-sequential-dca solve-sequential-dca inspect-booking-commitments inspect-booking-timeline solve-toy-dca solve-tiny-dca inspect-toy-instance generate-toy-demands plot-time-space plot-physical install solve-toy test lint format type-check check versions environment clean evaluate-phase8-canonical inspect-sequential-dca-rrm evaluate-phase9-canonical prepare-phase11-table4 inspect-phase11-services
+.PHONY: inspect-sequential-dca-rm inspect-dca-rm inspect-future-set inspect-future-value evaluate-phase7-canonical inspect-full-reroute-run inspect-full-reroute-event inspect-dca-reroute-transition inspect-dca-reroute-model inspect-rerouting-network inspect-rerouting-in-transit inspect-rerouting-capacity inspect-rerouting-eligibility solve-time-aware-sequential-dca inspect-time-aware-capacity inspect-physical-execution solve-toy-sequential-dca solve-sequential-dca inspect-booking-commitments inspect-booking-timeline solve-toy-dca solve-tiny-dca inspect-toy-instance generate-toy-demands plot-time-space plot-physical install solve-toy test lint format type-check check versions environment clean evaluate-phase8-canonical inspect-sequential-dca-rrm evaluate-phase9-canonical prepare-phase11-table4 inspect-phase11-services prepare-phase11-demand-sets prepare-phase11-forecasts
 
 install:
 	python -m pip install -e ".[dev]"
@@ -135,3 +135,9 @@ prepare-phase11-table4:
 
 inspect-phase11-services:
 	python scripts/inspect_phase11_service_families.py
+
+prepare-phase11-demand-sets:
+	python scripts/generate_phase11_table4_demand_sets.py
+
+prepare-phase11-forecasts:
+	python scripts/generate_phase11_table4_forecasts.py

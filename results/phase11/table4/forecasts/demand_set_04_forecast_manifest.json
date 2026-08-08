@@ -1,0 +1,13 @@
+{
+  "catalogue_fingerprint": "e6ec8a310a794463e54f4388dc53da4033454e5571a429fe8e17d022f9b3b98d",
+  "classification": "controlled_substitute_input",
+  "demand_set_id": "demand_set_04",
+  "forecast_entry_count": 140,
+  "forecast_seed": 2011004,
+  "lookahead_periods": null,
+  "provider_rule": "strictly_later_reservation_period",
+  "seed": 11004,
+  "selection_mode": "a004-shared-arc",
+  "uses_realised_future_attributes": false,
+  "value_interpretation": "printed"
+}

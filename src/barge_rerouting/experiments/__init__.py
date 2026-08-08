@@ -1,5 +1,21 @@
 """Publication-oriented experimental infrastructure."""
 
+from barge_rerouting.experiments.phase11_baseline import (
+    TABLE4_CONTROLLED_BASE_FARE_PER_DISTANCE,
+    TABLE4_CONTROLLED_HORIZON_END,
+    TABLE4_CONTROLLED_PREMIUM_RATE,
+    TABLE4_CONTROLLED_REQUEST_PERIODS,
+    TABLE4_CONTROLLED_VMAX,
+    TABLE4_CONTROLLED_VOLUME_PROBABILITIES,
+    TABLE4_ECONOMIC_SEED_OFFSET,
+    Table4ControlledDemandSet,
+    build_table4_controlled_demand_set,
+    default_table4_controlled_demand_process,
+    default_table4_controlled_economic_spec,
+    default_table4_controlled_timing_pools,
+    table4_economic_seed,
+    write_table4_controlled_demand_set,
+)
 from barge_rerouting.experiments.phase11_demands import (
     TABLE4_CUSTOMER_CATEGORIES,
     TABLE4_ORDERED_OD_PAIRS,
@@ -20,6 +36,20 @@ from barge_rerouting.experiments.phase11_economics import (
     FareClassRates,
     Table4EconomicInputSpec,
     table4_economic_input_fingerprint,
+)
+from barge_rerouting.experiments.phase11_forecasts import (
+    TABLE4_FORECAST_LOOKAHEAD_PERIODS,
+    TABLE4_FORECAST_SEED_OFFSET,
+    TABLE4_FORECAST_SELECTION_MODE,
+    TABLE4_FORECAST_VALUE_INTERPRETATION,
+    Table4ForecastCatalogue,
+    Table4ForecastCatalogueEntry,
+    build_table4_forecast_catalogue,
+    build_table4_forecast_provider,
+    forecast_catalogue_fingerprint,
+    forecasts_after_decision_time,
+    table4_forecast_seed,
+    write_table4_forecast_catalogue,
 )
 from barge_rerouting.experiments.phase11_services import (
     TABLE4_ADJACENT_TRAVEL_PERIODS,
@@ -58,6 +88,32 @@ from barge_rerouting.experiments.phase11_table4 import (
 )
 
 __all__ = [
+    "write_table4_forecast_catalogue",
+    "table4_forecast_seed",
+    "forecasts_after_decision_time",
+    "forecast_catalogue_fingerprint",
+    "build_table4_forecast_provider",
+    "build_table4_forecast_catalogue",
+    "Table4ForecastCatalogueEntry",
+    "Table4ForecastCatalogue",
+    "TABLE4_FORECAST_VALUE_INTERPRETATION",
+    "TABLE4_FORECAST_SELECTION_MODE",
+    "TABLE4_FORECAST_SEED_OFFSET",
+    "TABLE4_FORECAST_LOOKAHEAD_PERIODS",
+    "write_table4_controlled_demand_set",
+    "table4_economic_seed",
+    "default_table4_controlled_timing_pools",
+    "default_table4_controlled_economic_spec",
+    "default_table4_controlled_demand_process",
+    "build_table4_controlled_demand_set",
+    "Table4ControlledDemandSet",
+    "TABLE4_ECONOMIC_SEED_OFFSET",
+    "TABLE4_CONTROLLED_VOLUME_PROBABILITIES",
+    "TABLE4_CONTROLLED_VMAX",
+    "TABLE4_CONTROLLED_REQUEST_PERIODS",
+    "TABLE4_CONTROLLED_PREMIUM_RATE",
+    "TABLE4_CONTROLLED_HORIZON_END",
+    "TABLE4_CONTROLLED_BASE_FARE_PER_DISTANCE",
     "table4_economic_input_fingerprint",
     "Table4EconomicInputSpec",
     "FareClassRates",

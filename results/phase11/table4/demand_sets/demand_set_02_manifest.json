@@ -1,0 +1,39 @@
+{
+  "classification": "controlled_substitute_input",
+  "controlled_baseline": {
+    "base_fare_per_distance": 100.0,
+    "horizon_end": 32,
+    "premium_rate": 1.25,
+    "request_periods": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13
+    ],
+    "vmax": 2,
+    "volume_probabilities": [
+      0.4,
+      0.4,
+      0.2
+    ]
+  },
+  "demand_fingerprint": "8a1d1809a806f278caa783dd14987ba3c9b969eb57aef4b8534d86c9fa91830e",
+  "demand_set_id": "demand_set_02",
+  "economic_fingerprint": "58edb3adb0a7b453e813fc4b50e8e0d2e960fd2f7a79d94e1f51b391f577b1ba",
+  "economic_seed": 1011002,
+  "opportunity_count": 140,
+  "positive_demand_count": 97,
+  "seed": 11002,
+  "structural_fingerprint": "a41366e38ac8f3a97452feecd546f2cd99fa7264a29ba2a194e7662a216c8d10",
+  "zero_volume_count": 43
+}
