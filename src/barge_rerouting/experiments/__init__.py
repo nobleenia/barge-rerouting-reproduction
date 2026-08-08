@@ -13,6 +13,14 @@ from barge_rerouting.experiments.phase11_demands import (
     request_template_records,
     write_request_templates_csv,
 )
+from barge_rerouting.experiments.phase11_economics import (
+    PUBLISHED_STRUCTURE,
+    DiscreteVolumeDistribution,
+    DistanceEconomicInput,
+    FareClassRates,
+    Table4EconomicInputSpec,
+    table4_economic_input_fingerprint,
+)
 from barge_rerouting.experiments.phase11_services import (
     TABLE4_ADJACENT_TRAVEL_PERIODS,
     TABLE4_FAMILY_1_DEPARTURE_OFFSETS,
@@ -50,6 +58,12 @@ from barge_rerouting.experiments.phase11_table4 import (
 )
 
 __all__ = [
+    "table4_economic_input_fingerprint",
+    "Table4EconomicInputSpec",
+    "FareClassRates",
+    "DistanceEconomicInput",
+    "DiscreteVolumeDistribution",
+    "PUBLISHED_STRUCTURE",
     "write_request_templates_csv",
     "request_template_records",
     "request_template_fingerprint",

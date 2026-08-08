@@ -546,3 +546,41 @@ be provided?
 
 This is required for exact Table 5/6 numerical reproduction even when the
 underlying routing decisions are reproduced correctly.
+
+---
+
+## Q038 — Relationship between 400/800 time instants and demand counts
+
+Section 4.1 reports:
+
+- a rolling-time horizon of 400/800 time instants;
+- demand density 10 per half-day;
+- while the dynamic experiment later refers to a set of 800 demands.
+
+How exactly are these quantities related in the original simulation?
+
+In particular, how many demand-generation opportunities and positive-volume
+booking requests are used in the stable Table 4 instances?
+
+**Related assumption:** A030
+
+---
+
+## Q039 — Complete numerical demand and fare generation parameters
+
+Could the original numerical generation inputs be provided for:
+
+- VMAX;
+- the probability mass on `0..VMAX`;
+- anticipation pools by OD distance;
+- delivery-time pools by OD distance;
+- early/late and standard/express thresholds;
+- base fares by OD distance;
+- late-reservation multiplier;
+- express-delivery multiplier;
+- random seeds?
+
+These values are required for exact numerical reproduction of Table 4 rather
+than only methodological reproduction.
+
+**Related assumption:** A031

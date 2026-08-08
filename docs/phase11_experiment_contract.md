@@ -366,3 +366,52 @@ the structural generator:
 - delivery-time fare multiplier.
 
 Those values must be locked separately before the first Table 4 pilot solve.
+
+## 14. Economic and stochastic input gate
+
+Before the first Table 4 optimisation run, the experiment configuration must
+explicitly contain and fingerprint:
+
+- VMAX;
+- the complete probability mass over `0..VMAX`;
+- distance-specific anticipation pools;
+- distance-specific delivery pools;
+- timing-class thresholds;
+- base fares by OD distance;
+- late-reservation fare multiplier;
+- express-delivery fare multiplier.
+
+The implementation preserves the published multiplicative fare relationship:
+
+\[
+f(k)
+=
+p
+\times r_{\mathrm{anticipation}}
+\times r_{\mathrm{delivery}}.
+\]
+
+Early-reservation and standard-delivery rates are fixed to 1 as stated in the
+paper.
+
+The numerical premium rates, base fares, VMAX, probability distribution and
+timing thresholds remain unresolved inputs unless recovered from supplementary
+material or author-provided data.
+
+No Table 4 solve may silently inherit the Phase 8/9 diagnostic forecast
+parameters.
+
+## 15. Horizon/count separation
+
+The following quantities are distinct experiment metadata:
+
+- configured network horizon;
+- request-generation periods;
+- requests per period;
+- generated demand opportunities;
+- zero-volume realisations;
+- positive-volume booking events.
+
+This separation is required by A030 because the article simultaneously reports
+a 400/800-time-instant horizon, demand density 10, and an 800-demand dynamic
+experiment without providing a unique mapping between them.

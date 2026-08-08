@@ -1367,3 +1367,125 @@ The undisclosed numerical timing pools remain controlled substitute inputs.
 **Code impact:**
 `experiments/phase11_demands.py` and the later Phase 11 demand-realisation
 layer.
+
+---
+
+## A030 — Phase 11 horizon and demand-count interpretation
+
+**Status:** Unresolved publication ambiguity
+
+**Paper evidence:**
+Section 4.1 states a simulated rolling-time horizon of `400/800` time
+instants.
+
+The same section states a demand density of 10 requests per half-day time
+unit.
+
+For the service-status-change experiments, the paper separately reports a set
+of 800 demands and states that 40 demand requests occur during four
+half-day periods.
+
+**Ambiguity:**
+The publication does not establish a unique mapping between:
+
+- the 400/800 time-instants statement;
+- the number of generated demand opportunities;
+- the number of positive-volume realised requests;
+- the 800-demand dynamic experiment.
+
+At density 10, interpreting 800 time instants as 800 realised requests would
+be inconsistent.
+
+**Baseline implementation rule:**
+Do not infer the experiment demand count by multiplying or identifying these
+quantities silently.
+
+Store separately:
+
+- network horizon;
+- request-generation periods;
+- demand density;
+- generated structural request count;
+- zero-volume realisations;
+- positive-volume booking-event count.
+
+The Table 4 pilot will not be promoted to the full experiment until this
+distinction is explicit in configuration and outputs.
+
+**Reporting requirement:**
+Do not claim that 400/800 time instants means 400/800 demands.
+
+**Question for authors:**
+How do the reported 400/800 time instants, density 10, and 800-demand dynamic
+experiment relate to one another?
+
+**Code impact:**
+Phase 11 experiment configuration, demand realisation, run metadata and
+Table 4/5 reproduction.
+
+---
+
+## A031 — Phase 11 volume and fare numerical inputs
+
+**Status:** Published structure with unresolved numerical values
+
+**Paper evidence:**
+For the experimental demand process:
+
+- demand volume is a discrete random realisation on `0..VMAX`;
+- one maximum volume is assumed for the experimental demands;
+- volume follows a specified probability distribution;
+- OD pairs are generated uniformly;
+- anticipation and delivery values are selected uniformly from
+  distance-dependent pools;
+- thresholds classify early/late reservation and standard/express delivery;
+- each OD distance has a base fare `p`;
+- unit fare follows the multiplicative structure
+
+\[
+f(k)
+=
+p
+\times r_{\mathrm{anticipation}}
+\times r_{\mathrm{delivery}};
+\]
+
+- the early-reservation rate equals 1;
+- the standard-delivery rate equals 1;
+- premium timing-class rates are strictly greater than 1.
+
+**Missing numerical information:**
+The article does not disclose sufficiently for exact numerical reproduction:
+
+- `VMAX`;
+- the probability mass over `0..VMAX`;
+- the anticipation pools;
+- the delivery pools;
+- the timing-class thresholds;
+- base fares by OD distance;
+- the late-reservation multiplier;
+- the express-delivery multiplier;
+- original random seeds.
+
+**Baseline implementation rule:**
+The software first encodes and validates the published input structure without
+assigning substitute values.
+
+Any numerical baseline subsequently introduced must be classified as
+`controlled_substitute_input`, stored in configuration, fingerprinted, and
+fixed before comparison with Table 4.
+
+No parameter may be calibrated merely to move the reproduced IR values toward
+the published values.
+
+**Zero-volume boundary:**
+The paper explicitly permits a volume realisation of zero while also describing
+ten requests entering the system per half-day.
+
+The implementation must therefore distinguish a generated demand opportunity
+from a positive-volume optimisation booking event until this interpretation is
+resolved.
+
+**Code impact:**
+`experiments/phase11_economics.py`, demand realisation, forecast generation,
+configuration fingerprints and Table 4 experiments.
