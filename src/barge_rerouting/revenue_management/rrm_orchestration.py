@@ -17,8 +17,11 @@ from barge_rerouting.optimization.dca_rm import (
 from barge_rerouting.optimization.dca_rrm import (
     DcaRrmSolution,
     build_dca_rrm_model,
-    solve_dca_rrm_model,
     validate_dca_rrm_solution,
+)
+from barge_rerouting.optimization.solver_backend import (
+    SolverBackend,
+    solve_dca_rrm_with_backend,
 )
 from barge_rerouting.rerouting.capacity import (
     ReroutingCapacitySnapshot,
@@ -510,6 +513,7 @@ def run_dca_rrm_event(
     value_interpretation: FutureValueInterpretation,
     selection_mode: FutureDemandSelectionMode,
     lookahead_periods: int | None = None,
+    solver_backend: SolverBackend = SolverBackend.CPLEX,
 ) -> DcaRrmEventResult:
     """Run one complete combined DCA-RRM booking event."""
     if not isinstance(instance, ExperimentInstance):
@@ -532,6 +536,12 @@ def run_dca_rrm_event(
         FutureDemandSelectionMode,
     ):
         raise TypeError("selection_mode must be a FutureDemandSelectionMode.")
+
+    if not isinstance(
+        solver_backend,
+        SolverBackend,
+    ):
+        raise TypeError("solver_backend must be a SolverBackend.")
 
     _validate_lookahead(lookahead_periods)
 
@@ -599,7 +609,10 @@ def run_dca_rrm_event(
     }
 
     try:
-        solution = solve_dca_rrm_model(artifacts)
+        solution = solve_dca_rrm_with_backend(
+            artifacts,
+            backend=solver_backend,
+        )
 
         if solution.is_solved:
             validation = validate_dca_rrm_solution(

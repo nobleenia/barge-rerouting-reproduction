@@ -57,6 +57,9 @@ from barge_rerouting.instance import (
     ExperimentInstance,
     assemble_experiment_instance,
 )
+from barge_rerouting.optimization.solver_backend import (
+    SolverBackend,
+)
 from barge_rerouting.rerouting.run import (
     run_full_reroute,
 )
@@ -288,6 +291,7 @@ def run_table4_pilot_once(
         selection_mode=(TABLE4_FORECAST_SELECTION_MODE),
         timeline=timeline,
         lookahead_periods=(TABLE4_FORECAST_LOOKAHEAD_PERIODS),
+        solver_backend=SolverBackend.HIGHS,
     )
     elapsed = perf_counter() - start
 
@@ -328,6 +332,7 @@ def run_table4_pilot_once(
         selection_mode=(TABLE4_FORECAST_SELECTION_MODE),
         timeline=timeline,
         lookahead_periods=(TABLE4_FORECAST_LOOKAHEAD_PERIODS),
+        solver_backend=SolverBackend.HIGHS,
     )
     elapsed = perf_counter() - start
 
@@ -458,6 +463,12 @@ def write_table4_pilot(
         "forecast_lookahead_periods": (TABLE4_FORECAST_LOOKAHEAD_PERIODS),
         "truck_enabled": False,
         "water_factor": 1.0,
+        "solver_backends": {
+            "dca": SolverBackend.CPLEX.value,
+            "dca_rm": SolverBackend.HIGHS.value,
+            "dca_r": SolverBackend.CPLEX.value,
+            "dca_rrm": SolverBackend.HIGHS.value,
+        },
         "deterministic_rerun_verified": (result.deterministic_rerun_verified),
         "all_policies_completed": (result.all_policies_completed),
         "raw_records": [asdict(record) for record in result.records],

@@ -15,8 +15,11 @@ from barge_rerouting.optimization.dca_rm import (
     DcaRmSolution,
     FutureProtectionResult,
     build_dca_rm_model,
-    solve_dca_rm_model,
     validate_dca_rm_solution,
+)
+from barge_rerouting.optimization.solver_backend import (
+    SolverBackend,
+    solve_dca_rm_with_backend,
 )
 from barge_rerouting.revenue_management.future_set import (
     FutureDemandSelectionMode,
@@ -524,6 +527,7 @@ def run_time_aware_dca_rm(
     selection_mode: FutureDemandSelectionMode,
     timeline: BookingTimeline | None = None,
     lookahead_periods: int | None = None,
+    solver_backend: SolverBackend = SolverBackend.CPLEX,
 ) -> TimeAwareDcaRmRun:
     """Run DCA-RM sequentially over the booking timeline."""
     if not isinstance(instance, ExperimentInstance):
@@ -543,6 +547,12 @@ def run_time_aware_dca_rm(
         FutureDemandSelectionMode,
     ):
         raise TypeError("selection_mode must be a FutureDemandSelectionMode.")
+
+    if not isinstance(
+        solver_backend,
+        SolverBackend,
+    ):
+        raise TypeError("solver_backend must be a SolverBackend.")
 
     if lookahead_periods is not None:
         if isinstance(lookahead_periods, bool) or not isinstance(lookahead_periods, int):
@@ -604,7 +614,10 @@ def run_time_aware_dca_rm(
             )
 
             try:
-                solution = solve_dca_rm_model(artifacts)
+                solution = solve_dca_rm_with_backend(
+                    artifacts,
+                    backend=solver_backend,
+                )
 
                 capacity_arc_ids = tuple(sorted(artifacts.available_capacities))
                 residual_before = {

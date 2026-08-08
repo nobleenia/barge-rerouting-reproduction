@@ -10,6 +10,9 @@ from barge_rerouting.domain import (
     FutureValueInterpretation,
 )
 from barge_rerouting.instance import ExperimentInstance
+from barge_rerouting.optimization.solver_backend import (
+    SolverBackend,
+)
 from barge_rerouting.revenue_management.future_set import (
     FutureDemandSelectionMode,
 )
@@ -252,6 +255,7 @@ def run_time_aware_dca_rrm(
     selection_mode: FutureDemandSelectionMode,
     timeline: BookingTimeline | None = None,
     lookahead_periods: int | None = None,
+    solver_backend: SolverBackend = SolverBackend.CPLEX,
 ) -> TimeAwareDcaRrmRun:
     """Run combined DCA-RRM over the booking timeline."""
     if not isinstance(instance, ExperimentInstance):
@@ -271,6 +275,12 @@ def run_time_aware_dca_rrm(
         FutureDemandSelectionMode,
     ):
         raise TypeError("selection_mode must be a FutureDemandSelectionMode.")
+
+    if not isinstance(
+        solver_backend,
+        SolverBackend,
+    ):
+        raise TypeError("solver_backend must be a SolverBackend.")
 
     if lookahead_periods is not None:
         if isinstance(lookahead_periods, bool) or not isinstance(
@@ -315,6 +325,7 @@ def run_time_aware_dca_rrm(
             value_interpretation=value_interpretation,
             selection_mode=selection_mode,
             lookahead_periods=lookahead_periods,
+            solver_backend=solver_backend,
         )
         event_results.append(result)
 
