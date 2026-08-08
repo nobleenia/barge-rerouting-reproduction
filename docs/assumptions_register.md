@@ -1824,3 +1824,75 @@ Alternative optimal primal assignments may differ between solvers even when
 the objective is identical. Such cases must be assessed through feasibility,
 objective equivalence and downstream state validity rather than requiring
 bit-for-bit route equality.
+
+---
+
+## A036 — Infeasible incoming Regular demand during controlled experiments
+
+**Status:** Controlled experimental interpretation
+
+**Paper evidence:**
+
+The paper defines Regular customers as customers for whom the carrier
+undertakes to transport all demands. The mathematical acceptance domain
+therefore fixes the current Regular request to full acceptance.
+
+The paper also states that the acceptance/rejection decision for each
+incoming request depends on demand feasibility, where feasibility means
+that sufficient residual capacity exists on the time-space network to
+satisfy the current request.
+
+**Missing information:**
+
+The publication does not explicitly specify the simulation transition when
+these two statements conflict: a current Regular request arrives but cannot
+be accommodated by the available network capacity.
+
+**Controlled Phase 11 interpretation:**
+
+If and only if the optimisation solver explicitly certifies the current
+Regular booking problem as infeasible after all policy-specific flexibility
+has been considered, the request is recorded as a feasibility rejection
+outside the category-dependent optimisation acceptance variable.
+
+No commitment is created for that request.
+
+Existing accepted commitments remain unchanged.
+
+The rolling booking state advances to the next incoming request.
+
+**Non-applicability:**
+
+This rule MUST NOT convert any of the following into a booking rejection:
+
+- time-limit termination;
+- numerical failure;
+- unknown solver status;
+- unbounded status;
+- ambiguous infeasible-or-unbounded status;
+- independent-validation failure;
+- infeasibility of a P or F request, because those categories already
+  possess an explicit zero-acceptance decision.
+
+Such cases remain computational or modelling failures and terminate the
+controlled experiment.
+
+**Scope:**
+
+A036 is an experiment-layer interpretation used for Phase 11 controlled
+reproduction. It does not modify the mathematical acceptance domain of
+Regular demand and does not retroactively change the validated Phase 6–10
+core-policy semantics.
+
+**Reporting requirement:**
+
+Every Phase 11 raw policy result must report the number and identifiers of
+A036 feasibility-rejected requests.
+
+This interpretation must not be represented as uniquely established by the
+published paper.
+
+**Author clarification required:**
+
+Ask how the original simulator handled an incoming Regular request when no
+feasible time-space itinerary remained under the selected booking policy.
