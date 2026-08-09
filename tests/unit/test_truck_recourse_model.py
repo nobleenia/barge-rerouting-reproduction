@@ -464,3 +464,52 @@ def test_recovery_event_cannot_be_persisted_twice() -> None:
             )
     finally:
         example["artifacts"].model.end()
+
+
+def test_highs_matches_cplex_truck_recourse_solution() -> None:
+    """HiGHS must reproduce the validated CPLEX truck-recourse optimum."""
+    from barge_rerouting.disruption.truck_recourse import (
+        solve_truck_recourse_model,
+        validate_truck_recourse_solution,
+    )
+    from barge_rerouting.optimization.solver_backend import (
+        SolverBackend,
+        solve_truck_recourse_with_backend,
+    )
+
+    example = build_recovery_example(0.7)
+    artifacts = example["artifacts"]
+
+    try:
+        cplex_solution = solve_truck_recourse_model(artifacts)
+
+        highs_solution = solve_truck_recourse_with_backend(
+            artifacts,
+            backend=SolverBackend.HIGHS,
+        )
+
+        assert cplex_solution.is_solved
+        assert highs_solution.is_solved
+
+        assert highs_solution.objective_value == pytest.approx(cplex_solution.objective_value)
+
+        assert highs_solution.total_truck_volume == pytest.approx(cplex_solution.total_truck_volume)
+
+        assert highs_solution.total_truck_penalty == pytest.approx(
+            cplex_solution.total_truck_penalty
+        )
+
+        cplex_report = validate_truck_recourse_solution(
+            artifacts,
+            cplex_solution,
+        )
+
+        highs_report = validate_truck_recourse_solution(
+            artifacts,
+            highs_solution,
+        )
+
+        assert cplex_report.is_valid
+        assert highs_report.is_valid
+    finally:
+        artifacts.model.end()

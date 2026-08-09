@@ -13,6 +13,12 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from barge_rerouting.optimization.solver_backend import (
+        SolverBackend,
+    )
 
 from barge_rerouting.disruption.booking_capacity import (
     ActualBookableCapacitySnapshot,
@@ -51,7 +57,6 @@ from barge_rerouting.disruption.timeline import (
 from barge_rerouting.disruption.truck_recourse import (
     TruckRecourseSolution,
     build_truck_recourse_model,
-    solve_truck_recourse_model,
 )
 from barge_rerouting.instance import ExperimentInstance
 from barge_rerouting.rolling_horizon.sequential import (
@@ -334,6 +339,7 @@ def _status_result(
         ...,
     ],
     truck_penalty_per_teu_by_demand: Mapping[str, float],
+    solver_backend: SolverBackend,
 ) -> PartialRerouteEventResult:
     """Process one forecast/status update under PR."""
     status_event = entry.status_update
@@ -408,7 +414,14 @@ def _status_result(
     )
 
     try:
-        solution = solve_truck_recourse_model(artifacts)
+        from barge_rerouting.optimization.solver_backend import (
+            solve_truck_recourse_with_backend,
+        )
+
+        solution = solve_truck_recourse_with_backend(
+            artifacts,
+            backend=solver_backend,
+        )
 
         if not solution.is_solved:
             return PartialRerouteEventResult(
@@ -522,8 +535,21 @@ def run_partial_reroute(
         float,
     ],
     timeline: OperationalTimeline | None = None,
+    solver_backend: SolverBackend | None = None,
 ) -> PartialRerouteRun:
     """Run dynamic Partial-Reroute over the operational timeline."""
+
+    from barge_rerouting.optimization.solver_backend import (
+        SolverBackend,
+    )
+
+    if solver_backend is None:
+        solver_backend = SolverBackend.CPLEX
+    elif not isinstance(
+        solver_backend,
+        SolverBackend,
+    ):
+        raise TypeError("solver_backend must be a SolverBackend.")
     if not isinstance(instance, ExperimentInstance):
         raise TypeError("instance must be an ExperimentInstance.")
 
@@ -569,6 +595,7 @@ def run_partial_reroute(
                 entry,
                 tuple(known_status_updates),
                 truck_penalty_per_teu_by_demand,
+                solver_backend,
             )
         else:
             result = _booking_result(

@@ -6,9 +6,13 @@ from enum import StrEnum
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from barge_rerouting.rerouting.optimization import (
-        DcaRerouteModelArtifacts,
-        DcaRerouteSolution,
+    from barge_rerouting.disruption.dynamic_full_reroute import (
+        DynamicFullRerouteModelArtifacts,
+        DynamicFullRerouteSolution,
+    )
+    from barge_rerouting.disruption.truck_recourse import (
+        TruckRecourseModelArtifacts,
+        TruckRecourseSolution,
     )
 
 from barge_rerouting.optimization.dca_rm import (
@@ -24,6 +28,10 @@ from barge_rerouting.optimization.dca_rrm import (
 from barge_rerouting.optimization.highs_bridge import (
     solve_dca_rm_model_highs,
     solve_dca_rrm_model_highs,
+)
+from barge_rerouting.rerouting.optimization import (
+    DcaRerouteModelArtifacts,
+    DcaRerouteSolution,
 )
 
 
@@ -186,5 +194,73 @@ def solve_dca_reroute_with_backend(
 
     if resolved is SolverBackend.HIGHS:
         return solve_dca_reroute_model_highs(artifacts)
+
+    raise ValueError(f"Unsupported resolved solver backend: {resolved}")
+
+
+def solve_truck_recourse_with_backend(
+    artifacts: TruckRecourseModelArtifacts,
+    *,
+    backend: SolverBackend = SolverBackend.CPLEX,
+) -> TruckRecourseSolution:
+    """Solve truck recourse using an explicit or CE-aware backend."""
+    from barge_rerouting.disruption.truck_recourse import (
+        TruckRecourseModelArtifacts,
+        solve_truck_recourse_model,
+    )
+    from barge_rerouting.optimization.highs_bridge import (
+        solve_truck_recourse_model_highs,
+    )
+
+    if not isinstance(
+        artifacts,
+        TruckRecourseModelArtifacts,
+    ):
+        raise TypeError("artifacts must be TruckRecourseModelArtifacts.")
+
+    resolved = resolve_solver_backend(
+        backend,
+        artifacts.model,
+    )
+
+    if resolved is SolverBackend.CPLEX:
+        return solve_truck_recourse_model(artifacts)
+
+    if resolved is SolverBackend.HIGHS:
+        return solve_truck_recourse_model_highs(artifacts)
+
+    raise ValueError(f"Unsupported resolved solver backend: {resolved}")
+
+
+def solve_dynamic_full_reroute_with_backend(
+    artifacts: DynamicFullRerouteModelArtifacts,
+    *,
+    backend: SolverBackend = SolverBackend.CPLEX,
+) -> DynamicFullRerouteSolution:
+    """Solve dynamic Full-Reroute with an explicit or CE-aware backend."""
+    from barge_rerouting.disruption.dynamic_full_reroute import (
+        DynamicFullRerouteModelArtifacts,
+        solve_dynamic_full_reroute_model,
+    )
+    from barge_rerouting.optimization.highs_bridge import (
+        solve_dynamic_full_reroute_model_highs,
+    )
+
+    if not isinstance(
+        artifacts,
+        DynamicFullRerouteModelArtifacts,
+    ):
+        raise TypeError("artifacts must be a DynamicFullRerouteModelArtifacts.")
+
+    resolved = resolve_solver_backend(
+        backend,
+        artifacts.model,
+    )
+
+    if resolved is SolverBackend.CPLEX:
+        return solve_dynamic_full_reroute_model(artifacts)
+
+    if resolved is SolverBackend.HIGHS:
+        return solve_dynamic_full_reroute_model_highs(artifacts)
 
     raise ValueError(f"Unsupported resolved solver backend: {resolved}")

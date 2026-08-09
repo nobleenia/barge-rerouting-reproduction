@@ -95,3 +95,35 @@ def test_ce_aware_selection_rejects_invalid_types(
             variables,
             constraints,
         )
+
+
+def test_disruption_ce_aware_imports_in_clean_process() -> None:
+    """Dynamic disruption runners must not depend on import order."""
+    import subprocess
+    import sys
+
+    code = (
+        "from barge_rerouting.disruption.partial_reroute "
+        "import run_partial_reroute; "
+        "from barge_rerouting.disruption.dynamic_full_reroute_run "
+        "import run_dynamic_full_reroute; "
+        "from barge_rerouting.optimization.solver_backend "
+        "import SolverBackend; "
+        "assert callable(run_partial_reroute); "
+        "assert callable(run_dynamic_full_reroute); "
+        "assert SolverBackend.CPLEX_CE_AWARE.value "
+        "== 'cplex_ce_aware'"
+    )
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            code,
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr

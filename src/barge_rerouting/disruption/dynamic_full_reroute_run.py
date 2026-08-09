@@ -4,6 +4,12 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from barge_rerouting.optimization.solver_backend import (
+        SolverBackend,
+    )
 
 from barge_rerouting.disruption.capacity import (
     ActualCapacityProfile,
@@ -12,7 +18,6 @@ from barge_rerouting.disruption.capacity import (
 from barge_rerouting.disruption.dynamic_full_reroute import (
     DynamicFullRerouteSolution,
     build_dynamic_full_reroute_model,
-    solve_dynamic_full_reroute_model,
 )
 from barge_rerouting.disruption.dynamic_full_reroute_transition import (
     DynamicFullRerouteTransitionResult,
@@ -47,7 +52,6 @@ from barge_rerouting.disruption.timeline import (
 from barge_rerouting.disruption.truck_recourse import (
     TruckRecourseSolution,
     build_truck_recourse_model,
-    solve_truck_recourse_model,
 )
 from barge_rerouting.instance import ExperimentInstance
 from barge_rerouting.rolling_horizon.state import (
@@ -358,6 +362,7 @@ def _status_result(
         ...,
     ],
     truck_penalties: Mapping[str, float],
+    solver_backend: SolverBackend,
 ) -> DynamicFullRerouteEventResult:
     """Process one status update under dynamic Full-Reroute."""
     status_event = entry.status_update
@@ -427,7 +432,14 @@ def _status_result(
     )
 
     try:
-        solution = solve_truck_recourse_model(artifacts)
+        from barge_rerouting.optimization.solver_backend import (
+            solve_truck_recourse_with_backend,
+        )
+
+        solution = solve_truck_recourse_with_backend(
+            artifacts,
+            backend=solver_backend,
+        )
 
         if not solution.is_solved:
             return DynamicFullRerouteEventResult(
@@ -467,6 +479,7 @@ def _booking_result(
         ...,
     ],
     truck_penalties: Mapping[str, float],
+    solver_backend: SolverBackend,
 ) -> DynamicFullRerouteEventResult:
     """Process one booking-triggered dynamic Full-Reroute."""
     booking_event = entry.booking_event
@@ -538,7 +551,14 @@ def _booking_result(
     )
 
     try:
-        solution = solve_dynamic_full_reroute_model(artifacts)
+        from barge_rerouting.optimization.solver_backend import (
+            solve_dynamic_full_reroute_with_backend,
+        )
+
+        solution = solve_dynamic_full_reroute_with_backend(
+            artifacts,
+            backend=solver_backend,
+        )
 
         if not solution.is_solved:
             return DynamicFullRerouteEventResult(
@@ -578,8 +598,21 @@ def run_dynamic_full_reroute(
         float,
     ],
     timeline: OperationalTimeline | None = None,
+    solver_backend: SolverBackend | None = None,
 ) -> DynamicFullRerouteRun:
     """Run dynamic Full-Reroute over all operational events."""
+
+    from barge_rerouting.optimization.solver_backend import (
+        SolverBackend,
+    )
+
+    if solver_backend is None:
+        solver_backend = SolverBackend.CPLEX
+    elif not isinstance(
+        solver_backend,
+        SolverBackend,
+    ):
+        raise TypeError("solver_backend must be a SolverBackend.")
     if not isinstance(instance, ExperimentInstance):
         raise TypeError("instance must be an ExperimentInstance.")
 
@@ -626,6 +659,7 @@ def run_dynamic_full_reroute(
                 entry,
                 tuple(known_updates),
                 truck_penalty_per_teu_by_demand,
+                solver_backend,
             )
         else:
             result = _booking_result(
@@ -634,6 +668,7 @@ def run_dynamic_full_reroute(
                 entry,
                 tuple(known_updates),
                 truck_penalty_per_teu_by_demand,
+                solver_backend,
             )
 
         results.append(result)

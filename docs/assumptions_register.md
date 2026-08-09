@@ -2192,3 +2192,70 @@ semantic tests and the first generated instance has been inspected.
 
 No seed search or post-hoc seed selection may be used to improve agreement
 with the published Table 5 values.
+
+---
+
+## A043 — CE-aware backend selection for Table 5 recovery models
+
+**Status:** Controlled computational substitution
+
+The deterministic CPLEX Community Edition-aware backend rule established in
+A037 is extended to the Phase-10 recovery models used by Phase 11B:
+
+1. status/forecast-triggered truck recourse;
+2. booking-triggered dynamic Full-Reroute.
+
+For every already-constructed optimisation model, solver selection occurs
+before optimisation.
+
+The rule is:
+
+\[
+\text{CPLEX}
+\quad\text{if}\quad
+n_{\mathrm{variables}}\leq1000
+\quad\text{and}\quad
+n_{\mathrm{constraints}}\leq1000.
+\]
+
+Otherwise:
+
+\[
+\text{HiGHS}.
+\]
+
+The rule does not depend on:
+
+- objective value;
+- incumbent quality;
+- runtime;
+- solver failure;
+- feasibility result;
+- policy outcome.
+
+There is no solve-then-fallback mechanism.
+
+The mathematical programme is constructed once and the selected backend
+solves that same exported formulation.
+
+Legacy Phase-10 callers continue to default to CPLEX.
+
+Phase 11B explicitly requests:
+
+`SolverBackend.CPLEX_CE_AWARE`
+
+for Partial-Reroute and dynamic Full-Reroute campaign execution.
+
+Explicit HiGHS cross-validation must demonstrate agreement with CPLEX on
+controlled truck-recourse and dynamic Full-Reroute instances using:
+
+- objective value;
+- acceptance fraction where applicable;
+- total truck volume;
+- total truck penalty;
+- independent solution validators.
+
+Exact arc-level equality is not required when alternative optimal flows
+exist.
+
+Solver runtimes remain non-comparable with those published in the paper.

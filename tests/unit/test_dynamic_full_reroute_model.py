@@ -192,3 +192,57 @@ def test_dynamic_fr_requires_explicit_penalties() -> None:
             )
     finally:
         example["recovery_artifacts"].model.end()
+
+
+def test_highs_matches_cplex_dynamic_full_reroute_solution() -> None:
+    """HiGHS must reproduce the validated CPLEX dynamic-FR optimum."""
+    from barge_rerouting.disruption.dynamic_full_reroute import (
+        validate_dynamic_full_reroute_solution,
+    )
+    from barge_rerouting.optimization.solver_backend import (
+        SolverBackend,
+        solve_dynamic_full_reroute_with_backend,
+    )
+
+    (
+        example,
+        artifacts,
+        cplex_solution,
+    ) = build_dynamic_fr_example()
+
+    try:
+        highs_solution = solve_dynamic_full_reroute_with_backend(
+            artifacts,
+            backend=SolverBackend.HIGHS,
+        )
+
+        assert cplex_solution.is_solved
+        assert highs_solution.is_solved
+
+        assert highs_solution.objective_value == pytest.approx(cplex_solution.objective_value)
+
+        assert highs_solution.acceptance_fraction == pytest.approx(
+            cplex_solution.acceptance_fraction
+        )
+
+        assert highs_solution.total_truck_volume == pytest.approx(cplex_solution.total_truck_volume)
+
+        assert highs_solution.total_truck_penalty == pytest.approx(
+            cplex_solution.total_truck_penalty
+        )
+
+        cplex_report = validate_dynamic_full_reroute_solution(
+            artifacts,
+            cplex_solution,
+        )
+
+        highs_report = validate_dynamic_full_reroute_solution(
+            artifacts,
+            highs_solution,
+        )
+
+        assert cplex_report.is_valid
+        assert highs_report.is_valid
+    finally:
+        artifacts.model.end()
+        example["recovery_artifacts"].model.end()

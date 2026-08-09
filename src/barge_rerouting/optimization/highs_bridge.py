@@ -24,9 +24,13 @@ from typing import TYPE_CHECKING, Any
 import highspy
 
 if TYPE_CHECKING:
-    from barge_rerouting.rerouting.optimization import (
-        DcaRerouteModelArtifacts,
-        DcaRerouteSolution,
+    from barge_rerouting.disruption.dynamic_full_reroute import (
+        DynamicFullRerouteModelArtifacts,
+        DynamicFullRerouteSolution,
+    )
+    from barge_rerouting.disruption.truck_recourse import (
+        TruckRecourseModelArtifacts,
+        TruckRecourseSolution,
     )
 
 from barge_rerouting.optimization.dca_rm import (
@@ -43,6 +47,8 @@ from barge_rerouting.optimization.dca_rrm import (
 )
 from barge_rerouting.rerouting.optimization import (
     CurrentDemandFlowResult,
+    DcaRerouteModelArtifacts,
+    DcaRerouteSolution,
     FragmentFlowResult,
 )
 
@@ -548,4 +554,190 @@ def solve_dca_reroute_model_highs(
         acceptance_fraction=float(acceptance),
         current_flows=current_flows,
         fragment_flows=fragment_flows,
+    )
+
+
+def solve_truck_recourse_model_highs(
+    artifacts: TruckRecourseModelArtifacts,
+) -> TruckRecourseSolution:
+    """Solve and extract one truck-recourse model using HiGHS."""
+    from barge_rerouting.disruption.truck_recourse import (
+        RecoveryBargeFlowResult,
+        TruckAllocationResult,
+        TruckRecourseModelArtifacts,
+        TruckRecourseSolution,
+    )
+
+    if not isinstance(
+        artifacts,
+        TruckRecourseModelArtifacts,
+    ):
+        raise TypeError("artifacts must be TruckRecourseModelArtifacts.")
+
+    result = solve_docplex_mip_with_highs(
+        artifacts.model,
+        time_limit_seconds=(artifacts.instance.config.solver.time_limit_seconds),
+        relative_mip_gap=(artifacts.instance.config.solver.relative_mip_gap),
+        log_output=(artifacts.instance.config.solver.log_output),
+    )
+
+    if not result.is_solved or result.objective_value is None:
+        return TruckRecourseSolution(
+            event_id=(artifacts.recovery_fragments.event_id),
+            is_solved=False,
+            solve_status=result.solve_status,
+            objective_value=None,
+            barge_flows=(),
+            truck_allocations=(),
+        )
+
+    values = result.values
+
+    barge_flows = tuple(
+        RecoveryBargeFlowResult(
+            fragment_id=fragment_id,
+            arc_id=arc_id,
+            volume=_value_of(
+                values,
+                variable,
+            ),
+        )
+        for (
+            fragment_id,
+            arc_id,
+        ), variable in sorted(artifacts.fragment_flow_variables.items())
+    )
+
+    truck_allocations = tuple(
+        TruckAllocationResult(
+            fragment_id=index.fragment_id,
+            demand_id=index.demand_id,
+            volume=_value_of(
+                values,
+                artifacts.truck_variables[index.fragment_id],
+            ),
+            penalty_per_teu=(artifacts.truck_penalty_per_teu_by_demand[index.demand_id]),
+        )
+        for index in artifacts.fragment_networks.indexes
+    )
+
+    return TruckRecourseSolution(
+        event_id=(artifacts.recovery_fragments.event_id),
+        is_solved=True,
+        solve_status=result.solve_status,
+        objective_value=float(result.objective_value),
+        barge_flows=barge_flows,
+        truck_allocations=truck_allocations,
+    )
+
+
+def solve_dynamic_full_reroute_model_highs(
+    artifacts: DynamicFullRerouteModelArtifacts,
+) -> DynamicFullRerouteSolution:
+    """Solve and extract one dynamic Full-Reroute model with HiGHS."""
+    from barge_rerouting.disruption.dynamic_full_reroute import (
+        DynamicFullRerouteModelArtifacts,
+        DynamicFullRerouteSolution,
+    )
+    from barge_rerouting.disruption.truck_recourse import (
+        TruckAllocationResult,
+    )
+    from barge_rerouting.rerouting.optimization import (
+        CurrentDemandFlowResult,
+        FragmentFlowResult,
+    )
+
+    if not isinstance(
+        artifacts,
+        DynamicFullRerouteModelArtifacts,
+    ):
+        raise TypeError("artifacts must be a DynamicFullRerouteModelArtifacts.")
+
+    result = solve_docplex_mip_with_highs(
+        artifacts.model,
+        time_limit_seconds=(artifacts.instance.config.solver.time_limit_seconds),
+        relative_mip_gap=(artifacts.instance.config.solver.relative_mip_gap),
+        log_output=(artifacts.instance.config.solver.log_output),
+    )
+
+    current_penalty = artifacts.truck_penalty_per_teu_by_demand[artifacts.event.demand_id]
+
+    if not result.is_solved or result.objective_value is None:
+        return DynamicFullRerouteSolution(
+            event_id=artifacts.event.event_id,
+            demand_id=artifacts.event.demand_id,
+            is_solved=False,
+            solve_status=result.solve_status,
+            objective_value=None,
+            acceptance_fraction=None,
+            current_flows=(),
+            current_truck_volume=None,
+            current_truck_penalty_per_teu=(current_penalty),
+            fragment_flows=(),
+            fragment_truck_allocations=(),
+        )
+
+    values = result.values
+
+    current_flows = tuple(
+        CurrentDemandFlowResult(
+            arc_id=arc_id,
+            volume=_value_of(
+                values,
+                variable,
+            ),
+        )
+        for arc_id, variable in sorted(artifacts.current_flow_variables.items())
+    )
+
+    fragment_flows = tuple(
+        FragmentFlowResult(
+            fragment_id=fragment_id,
+            arc_id=arc_id,
+            volume=_value_of(
+                values,
+                variable,
+            ),
+        )
+        for (
+            fragment_id,
+            arc_id,
+        ), variable in sorted(artifacts.fragment_flow_variables.items())
+    )
+
+    fragment_trucks = tuple(
+        TruckAllocationResult(
+            fragment_id=index.fragment_id,
+            demand_id=index.demand_id,
+            volume=_value_of(
+                values,
+                artifacts.fragment_truck_variables[index.fragment_id],
+            ),
+            penalty_per_teu=(artifacts.truck_penalty_per_teu_by_demand[index.demand_id]),
+        )
+        for index in artifacts.fragment_networks.indexes
+    )
+
+    return DynamicFullRerouteSolution(
+        event_id=artifacts.event.event_id,
+        demand_id=artifacts.event.demand_id,
+        is_solved=True,
+        solve_status=result.solve_status,
+        objective_value=float(result.objective_value),
+        acceptance_fraction=float(
+            _value_of(
+                values,
+                artifacts.acceptance_variable,
+            )
+        ),
+        current_flows=current_flows,
+        current_truck_volume=float(
+            _value_of(
+                values,
+                artifacts.current_truck_variable,
+            )
+        ),
+        current_truck_penalty_per_teu=(current_penalty),
+        fragment_flows=fragment_flows,
+        fragment_truck_allocations=(fragment_trucks),
     )
