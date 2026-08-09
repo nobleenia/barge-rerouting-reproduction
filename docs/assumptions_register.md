@@ -2304,3 +2304,151 @@ sensitivity analysis using alternative multipliers.
 
 No truck-penalty multiplier may be changed after observing Table 5 results
 merely to improve agreement with the publication.
+
+---
+
+## A045 — Phase 11 Table 5 A036 continuation for PR and FR
+
+**Status:** Controlled execution interpretation
+
+The validated Phase-10 Partial-Reroute and dynamic Full-Reroute result
+contracts require every processed booking to retain a genuine solved booking
+solution. Dynamic Full-Reroute additionally requires a genuine booking
+transition.
+
+Therefore an A036 Regular-demand feasibility rejection cannot be represented
+by falsifying or synthesising a successful Phase-10 result.
+
+Phase 11B instead uses an explicit experimental execution adapter.
+
+When a PR or FR booking model returns an explicitly solver-certified
+infeasible status for a Regular request:
+
+1. the unsolved Phase-10 core result is preserved;
+2. no booking commitment is created;
+3. the contractual booking state advances exactly once using the existing
+   A036 transition;
+4. the updated booking state is reinserted into the current
+   `RecoveryOperationalState`;
+5. existing recovered fragment plans remain unchanged;
+6. existing truck-transfer history remains unchanged;
+7. existing recovery-event identifiers remain unchanged;
+8. execution continues to the next operational event.
+
+A036 is not applied to:
+
+- Partially-spot requests;
+- Fully-spot requests;
+- time-limit terminations;
+- numerical failures;
+- unknown solver statuses;
+- infeasible-or-unbounded statuses;
+- unbounded statuses;
+- status/forecast recovery failures.
+
+Those cases terminate the corresponding experimental run and are reported as
+solver failures.
+
+This extension changes only Phase-11 experimental orchestration. The
+validated Phase-10 PR and FR core contracts remain unchanged.
+
+---
+
+## A046 — Pending truck allocations are persistent operational commitments
+
+**Status:** Derived controlled operational interpretation
+
+**Paper disclosure gap:**
+The paper permits accepted demand volume to be shifted from barge to
+truck under rerouting/recovery, but it does not fully specify whether a
+truck allocation may subsequently be cancelled or reassigned before the
+physical transfer time.
+
+**Existing implementation evidence:**
+Phase 10 persists every solved truck allocation in cumulative
+`truck_transfer_history`, records its truck penalty, and provides no
+cancellation or supersession transition for that allocation.
+
+**Controlled interpretation:**
+Once a recovery or Full-Reroute decision assigns accepted cargo to truck,
+that modal allocation is treated as irrevocable for subsequent decisions.
+
+If the effective truck-transfer node lies at a time later than the current
+operational epoch, the assigned volume is represented as
+`pending_truck_volume`.
+
+Therefore, before the transfer time:
+
+- the volume remains accepted but physically undelivered;
+- it contributes to remaining accepted volume;
+- it is excluded from the barge fragments available to later rerouting;
+- it is not counted as delivered-truck volume;
+- any immutable barge transport movement already used by that volume
+  remains part of physical capacity accounting.
+
+At the transfer time and afterward, the same volume moves from the pending
+truck bucket to delivered-truck volume.
+
+**Accounting identity:**
+
+\[
+V_k^{accepted}
+=
+V_k^{barge,remaining}
++
+V_k^{truck,pending}
++
+V_k^{barge,delivered}
++
+V_k^{truck,delivered}.
+\]
+
+**Reproduction classification:**
+This is a controlled operational interpretation required to make repeated
+dynamic Full-Reroute decisions temporally well-defined. It must not be
+reported as a numerical parameter or behavioral rule explicitly disclosed
+by the paper.
+
+**Validation requirement:**
+Regression testing must cover execution before a planned transfer, at the
+transfer time, repeated FR while truck cargo is pending, accepted-volume
+conservation, and preservation of immutable barge-capacity usage.
+
+---
+
+## A047 — Recovered execution follows the operational recovery lineage
+
+**Status:** Derived consistency interpretation
+
+Once accepted cargo has been rerouted, subsequent physical execution is
+derived from the persisted recovery lineage rather than from the future
+portion of the superseded original booking path.
+
+The original booking commitment remains authoritative for contractual
+acceptance, demand identity and revenue. It is not, however, allowed to
+contribute a second physical delivery after a recovery decision has
+replaced that future movement.
+
+For the latest recovery generation, accounting is reconstructed as:
+
+\[
+V^{accepted}
+=
+V^{barge,delivered\ before}
++
+V^{truck,prior}
++
+V^{remaining\ entering\ recovery}.
+\]
+
+The remaining recovery volume is then partitioned by the persisted
+recovery decision between barge and any new truck allocation.
+
+This interpretation prevents the original contractual route and the
+recovered operational route from counting the same accepted cargo twice.
+
+**Reproduction classification:**
+This is an internal consistency requirement of the rolling-horizon
+implementation. It is not reported as a rule explicitly specified by the
+paper.
+

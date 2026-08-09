@@ -271,3 +271,44 @@ def test_rejected_demand_does_not_create_accepted_state() -> None:
             demand,
             acceptance_fraction=0.0,
         )
+
+
+def test_pending_truck_volume_remains_undelivered() -> None:
+    """Committed future truck transfer remains unfinished cargo."""
+    demand = make_demand()
+
+    state = AcceptedDemandState(
+        demand=demand,
+        acceptance_fraction=1.0,
+        fragments=(
+            DemandFragment(
+                fragment_id="K001::barge::remaining",
+                demand_id="K001",
+                volume=6.0,
+                current_node=("A", 1),
+            ),
+        ),
+        pending_truck_volume=4.0,
+    )
+
+    assert state.accepted_volume == pytest.approx(10.0)
+    assert state.pending_truck_volume == pytest.approx(4.0)
+    assert state.remaining_volume == pytest.approx(10.0)
+    assert state.delivered_volume == pytest.approx(0.0)
+    assert not state.is_complete
+
+
+def test_pending_only_truck_state_is_not_complete() -> None:
+    """Cargo is incomplete until its truck-transfer time is reached."""
+    demand = make_demand()
+
+    state = AcceptedDemandState(
+        demand=demand,
+        acceptance_fraction=1.0,
+        fragments=(),
+        pending_truck_volume=10.0,
+    )
+
+    assert state.remaining_volume == pytest.approx(10.0)
+    assert state.delivered_volume == pytest.approx(0.0)
+    assert not state.is_complete

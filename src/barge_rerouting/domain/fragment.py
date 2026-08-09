@@ -174,7 +174,8 @@ class AcceptedDemandState:
 
         accepted volume
         =
-        remaining fragment volume
+        remaining barge-fragment volume
+        + pending-truck volume
         + barge-delivered volume
         + truck-delivered volume.
     """
@@ -184,6 +185,7 @@ class AcceptedDemandState:
     fragments: tuple[DemandFragment, ...]
     delivered_barge_volume: float = 0.0
     delivered_truck_volume: float = 0.0
+    pending_truck_volume: float = 0.0
 
     def __post_init__(self) -> None:
         """Validate the commitment and its volume accounting."""
@@ -208,6 +210,10 @@ class AcceptedDemandState:
             "delivered_truck_volume",
             self.delivered_truck_volume,
         )
+        pending_truck_volume = _validate_nonnegative_finite_number(
+            "pending_truck_volume",
+            self.pending_truck_volume,
+        )
 
         fragment_ids = [fragment.fragment_id for fragment in fragments]
 
@@ -227,7 +233,12 @@ class AcceptedDemandState:
         accepted_volume = self.demand.volume * acceptance_fraction
         remaining_volume = sum(fragment.volume for fragment in fragments)
 
-        accounted_volume = remaining_volume + delivered_barge_volume + delivered_truck_volume
+        accounted_volume = (
+            remaining_volume
+            + pending_truck_volume
+            + delivered_barge_volume
+            + delivered_truck_volume
+        )
 
         if abs(accounted_volume - accepted_volume) > VOLUME_TOLERANCE:
             raise ValueError(
@@ -250,6 +261,11 @@ class AcceptedDemandState:
             self,
             "delivered_truck_volume",
             delivered_truck_volume,
+        )
+        object.__setattr__(
+            self,
+            "pending_truck_volume",
+            pending_truck_volume,
         )
 
     @classmethod
@@ -303,7 +319,7 @@ class AcceptedDemandState:
         for fragment in self.fragments:
             total_volume += float(fragment.volume)
 
-        return total_volume
+        return total_volume + self.pending_truck_volume
 
     @property
     def delivered_volume(self) -> float:

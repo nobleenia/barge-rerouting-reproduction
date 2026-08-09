@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from dataclasses import replace
 from math import isfinite
 
 from barge_rerouting.disruption.recovery_transition import (
@@ -311,6 +312,15 @@ def _state_from_recovered_plans(
     if physical_time < recovery_time:
         raise ValueError("Operational execution cannot apply a recovery before its decision time.")
 
+    event_order = {
+        event_id: position for position, event_id in enumerate(operational_state.recovery_event_ids)
+    }
+
+    if recovery_event_id not in event_order:
+        raise ValueError("Latest recovery plan references an unknown recovery event.")
+
+    recovery_position = event_order[recovery_event_id]
+
     baseline = build_execution_snapshot(
         instance,
         operational_state.booking_state,
@@ -318,6 +328,100 @@ def _state_from_recovered_plans(
     )
 
     baseline_state = baseline.demand_state_for(demand_id)
+
+    # Contractual acceptance remains authoritative, but
+    # the original booking route is no longer authoritative
+    # for physical delivery after recovery.
+    accepted_volume = float(baseline_state.accepted_volume)
+
+    # Volume that physically entered the latest recovery
+    # generation. RecoveredFragmentPlan validates that each
+    # such volume is subsequently partitioned between barge
+    # and truck.
+    recovery_remaining_volume = float(sum(plan.original_remaining_volume for plan in plans))
+
+    # Truck allocations from earlier recovery generations are
+    # persistent commitments and therefore no longer belong to
+    # the volume entering the latest recovery generation.
+    prior_truck_volume = float(
+        sum(
+            transfer.volume
+            for transfer in operational_state.truck_transfer_history
+            if (
+                transfer.demand_id == demand_id
+                and event_order[transfer.event_id] < recovery_position
+            )
+        )
+    )
+
+    # A later truck allocation for this demand would contradict
+    # the claim that `plans` are its latest recovery generation.
+    later_truck_volume = float(
+        sum(
+            transfer.volume
+            for transfer in operational_state.truck_transfer_history
+            if (
+                transfer.demand_id == demand_id
+                and event_order[transfer.event_id] > recovery_position
+            )
+        )
+    )
+
+    if later_truck_volume > EXECUTION_TOLERANCE:
+        raise ValueError(
+            "Latest recovery generation is inconsistent "
+            "with later truck history: "
+            f"demand={demand_id}, "
+            f"later_truck={later_truck_volume}."
+        )
+
+    # Conservation at the instant immediately before the
+    # latest recovery:
+    #
+    # accepted
+    #   = previously barge-delivered
+    #   + previously truck-allocated
+    #   + volume entering latest recovery.
+    delivered_barge_before_recovery = float(
+        accepted_volume - prior_truck_volume - recovery_remaining_volume
+    )
+
+    if delivered_barge_before_recovery < -EXECUTION_TOLERANCE:
+        raise ValueError(
+            "Recovery-lineage accounting is inconsistent: "
+            f"demand={demand_id}, "
+            f"accepted={accepted_volume}, "
+            f"prior_truck={prior_truck_volume}, "
+            f"recovery_remaining="
+            f"{recovery_remaining_volume}, "
+            f"barge_delivered_before="
+            f"{delivered_barge_before_recovery}."
+        )
+
+    if abs(delivered_barge_before_recovery) <= EXECUTION_TOLERANCE:
+        delivered_barge_before_recovery = 0.0
+
+    # Cross-check persistence of the truck allocation belonging
+    # specifically to the latest recovery generation.
+    current_generation_truck_history = float(
+        sum(
+            transfer.volume
+            for transfer in operational_state.truck_transfer_history
+            if (transfer.demand_id == demand_id and transfer.event_id == recovery_event_id)
+        )
+    )
+
+    current_generation_truck_plans = float(sum(plan.truck_volume for plan in plans))
+
+    if abs(current_generation_truck_history - current_generation_truck_plans) > EXECUTION_TOLERANCE:
+        raise ValueError(
+            "Latest recovery plans disagree with "
+            "persisted truck history: "
+            f"demand={demand_id}, "
+            f"plans={current_generation_truck_plans}, "
+            f"history="
+            f"{current_generation_truck_history}."
+        )
 
     recovered_paths = tuple(
         path
@@ -368,34 +472,26 @@ def _state_from_recovered_plans(
     delivered_truck_volume = float(
         sum(
             transfer.volume
-            for transfer in (operational_state.truck_transfer_history)
-            if transfer.demand_id == demand_id and transfer.transfer_time <= physical_time
+            for transfer in operational_state.truck_transfer_history
+            if (transfer.demand_id == demand_id and transfer.transfer_time <= physical_time)
         )
     )
 
-    # Current Phase-10 truck recourse is immediate whenever the
-    # effective rerouting source has already been reached. A planned
-    # transfer after the requested execution epoch requires explicit
-    # pending-truck execution state, which is deliberately rejected
-    # here rather than silently mis-accounted.
-    pending_transfers = tuple(
-        transfer
-        for transfer in operational_state.truck_transfer_history
-        if transfer.demand_id == demand_id and transfer.transfer_time > physical_time
-    )
-
-    if pending_transfers:
-        raise ValueError(
-            "Operational execution before a planned truck-transfer "
-            "time requires pending-truck state handling."
+    pending_truck_volume = float(
+        sum(
+            transfer.volume
+            for transfer in operational_state.truck_transfer_history
+            if (transfer.demand_id == demand_id and transfer.transfer_time > physical_time)
         )
+    )
 
     demand_state = AcceptedDemandState(
         demand=baseline_state.demand,
         acceptance_fraction=(baseline_state.acceptance_fraction),
         fragments=tuple(fragments),
-        delivered_barge_volume=(baseline_state.delivered_barge_volume + delivered_after_recovery),
-        delivered_truck_volume=delivered_truck_volume,
+        delivered_barge_volume=(delivered_barge_before_recovery + delivered_after_recovery),
+        delivered_truck_volume=(delivered_truck_volume),
+        pending_truck_volume=(pending_truck_volume),
     )
 
     return demand_state, recovered_paths
@@ -473,19 +569,111 @@ def build_operational_execution_snapshot(
     )
 
 
+def _truck_immutable_transport_volume_by_arc(
+    instance: ExperimentInstance,
+    operational_state: RecoveryOperationalState,
+    physical_time: int,
+) -> dict[str, float]:
+    """Return truck-assigned volume that used immutable barge arcs.
+
+    A truck allocation removes the allocated volume from later
+    rerouting. Before the transfer, however, any transport movement
+    already completed or locked by the recovery decision remains a
+    real physical use of barge capacity.
+
+    Only persisted recovery decisions that already exist at the
+    requested physical time are considered.
+    """
+    volume_by_arc: dict[str, float] = defaultdict(float)
+
+    for plan in operational_state.active_fragment_plans:
+        if plan.recovery_time > physical_time:
+            continue
+
+        transfer = plan.truck_transfer
+
+        if transfer is None:
+            continue
+
+        for arc_id in plan.immutable_arc_ids:
+            arc = instance.arc_by_id(arc_id)
+
+            if not arc.is_transport:
+                continue
+
+            volume_by_arc[arc_id] += float(transfer.volume)
+
+    return dict(volume_by_arc)
+
+
 def build_operational_transport_capacity_snapshot(
     instance: ExperimentInstance,
     operational_state: RecoveryOperationalState,
     physical_time: int,
 ) -> TransportCapacitySnapshot:
-    """Build nominal capacity from the operational barge plan."""
+    """Build nominal capacity from the full operational cargo state."""
     execution = build_operational_execution_snapshot(
         instance,
         operational_state,
         physical_time,
     )
 
-    return build_transport_capacity_snapshot(
+    base_capacity = build_transport_capacity_snapshot(
         instance,
         execution,
+    )
+
+    truck_prefix_volume = _truck_immutable_transport_volume_by_arc(
+        instance,
+        operational_state,
+        physical_time,
+    )
+
+    if not truck_prefix_volume:
+        return base_capacity
+
+    adjusted_arc_states = []
+
+    for arc_state in base_capacity.arc_states:
+        extra_volume = truck_prefix_volume.get(
+            arc_state.arc_id,
+            0.0,
+        )
+
+        if extra_volume <= EXECUTION_TOLERANCE:
+            adjusted_arc_states.append(arc_state)
+            continue
+
+        arc = instance.arc_by_id(arc_state.arc_id)
+
+        committed_volume = arc_state.committed_volume + extra_volume
+
+        if arc.head[1] <= physical_time:
+            adjusted_arc_states.append(
+                replace(
+                    arc_state,
+                    committed_volume=(committed_volume),
+                    completed_volume=(arc_state.completed_volume + extra_volume),
+                )
+            )
+            continue
+
+        if arc.tail[1] < physical_time < arc.head[1]:
+            adjusted_arc_states.append(
+                replace(
+                    arc_state,
+                    committed_volume=(committed_volume),
+                    in_transit_volume=(arc_state.in_transit_volume + extra_volume),
+                )
+            )
+            continue
+
+        raise ValueError(
+            "A truck-assigned immutable transport arc cannot still be future-bookable."
+        )
+
+    return TransportCapacitySnapshot(
+        physical_time=(base_capacity.physical_time),
+        instance_fingerprint=(base_capacity.instance_fingerprint),
+        arc_states=tuple(adjusted_arc_states),
     )

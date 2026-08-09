@@ -70,13 +70,83 @@ def _create_highs() -> highspy.Highs:
     return highspy.Highs()  # type: ignore[no-untyped-call]
 
 
+def _export_docplex_lp_with_aliases(
+    model: Any,
+    directory: str,
+) -> tuple[Path, dict[str, str]]:
+    """Export a DOcplex LP with short lossless variable aliases.
+
+    Long recursively generated fragment identifiers can exceed the
+    reliable name round-trip boundary between the DOcplex LP writer
+    and the HiGHS LP reader. The mathematical model is unchanged:
+    only variable labels used in the temporary exported file differ.
+
+    Original DOcplex names are restored before this function returns.
+    """
+    variables = tuple(model.iter_variables())
+
+    original_names: list[str] = []
+
+    for variable in variables:
+        name = variable.name
+
+        if not isinstance(name, str) or not name:
+            raise RuntimeError("Every DOcplex variable must have a non-empty string name.")
+
+        original_names.append(name)
+
+    if len(set(original_names)) != len(original_names):
+        raise RuntimeError("DOcplex variable names must be unique.")
+
+    aliases = tuple(f"v_{index:08d}" for index in range(len(variables)))
+
+    alias_to_original = dict(
+        zip(
+            aliases,
+            original_names,
+            strict=True,
+        )
+    )
+
+    try:
+        for variable, alias in zip(
+            variables,
+            aliases,
+            strict=True,
+        ):
+            variable.set_name(alias)
+
+        exported_path = model.export_as_lp(
+            path=directory,
+            basename="model",
+        )
+
+    finally:
+        for variable, original_name in zip(
+            variables,
+            original_names,
+            strict=True,
+        ):
+            variable.set_name(original_name)
+
+    return (
+        Path(exported_path),
+        alias_to_original,
+    )
+
+
 def _read_highs_values(
     highs: highspy.Highs,
+    alias_to_original: dict[str, str],
 ) -> dict[str, float]:
-    """Return HiGHS primal values keyed by original LP variable name."""
+    """Return HiGHS primal values keyed by original DOcplex name."""
     solution = highs.getSolution()
 
+    if len(solution.col_value) != len(alias_to_original):
+        raise RuntimeError("HiGHS primal column count does not match the exported alias map.")
+
     values: dict[str, float] = {}
+    seen_aliases: set[str] = set()
 
     for index, raw_value in enumerate(solution.col_value):
         status, name = highs.getColName(index)
@@ -84,15 +154,32 @@ def _read_highs_values(
         if status != highspy.HighsStatus.kOk:
             raise RuntimeError(f"Could not retrieve HiGHS column name at index {index}: {status}")
 
-        selected_name = str(name)
+        alias = str(name)
 
-        if not selected_name:
+        if not alias:
             raise RuntimeError("HiGHS returned an empty variable name.")
 
-        if selected_name in values:
-            raise RuntimeError(f"Duplicate HiGHS variable name: {selected_name}")
+        if alias in seen_aliases:
+            raise RuntimeError(f"Duplicate HiGHS variable alias: {alias}")
 
-        values[selected_name] = float(raw_value)
+        if alias not in alias_to_original:
+            raise RuntimeError(f"HiGHS returned an unknown variable alias: {alias}")
+
+        seen_aliases.add(alias)
+
+        original_name = alias_to_original[alias]
+
+        if original_name in values:
+            raise RuntimeError(f"Duplicate reconstructed DOcplex variable name: {original_name}")
+
+        values[original_name] = float(raw_value)
+
+    expected_aliases = set(alias_to_original)
+
+    if seen_aliases != expected_aliases:
+        missing_aliases = tuple(sorted(expected_aliases - seen_aliases))
+
+        raise RuntimeError(f"HiGHS solution is missing exported aliases: {missing_aliases}")
 
     return values
 
@@ -119,12 +206,13 @@ def solve_docplex_mip_with_highs(
 ) -> HighsPrimalResult:
     """Solve one already-built DOcplex MILP with HiGHS."""
     with TemporaryDirectory(prefix="barge_rerouting_highs_") as temporary_directory:
-        exported_path = model.export_as_lp(
-            path=temporary_directory,
-            basename="model",
+        (
+            lp_path,
+            alias_to_original,
+        ) = _export_docplex_lp_with_aliases(
+            model,
+            temporary_directory,
         )
-
-        lp_path = Path(exported_path)
 
         highs = _create_highs()
 
@@ -146,6 +234,12 @@ def solve_docplex_mip_with_highs(
         if read_status != highspy.HighsStatus.kOk:
             raise RuntimeError(f"HiGHS could not read exported DOcplex LP: {read_status}")
 
+        if highs.getNumCol() != model.number_of_variables:
+            raise RuntimeError("HiGHS variable count does not match the exported DOcplex model.")
+
+        if highs.getNumCol() != len(alias_to_original):
+            raise RuntimeError("HiGHS variable count does not match the export alias map.")
+
         run_status = highs.run()
 
         if run_status != highspy.HighsStatus.kOk:
@@ -155,23 +249,28 @@ def solve_docplex_mip_with_highs(
 
         solve_status = f"HiGHS {highs.version()} {model_status}"
 
-        # During the first production integration we accept only
-        # proven optimal solutions. Time-limit incumbents can be
-        # supported later with an explicit reporting contract.
+        # Production integration accepts only proven
+        # optimal solutions. Time-limit incumbents retain
+        # the established unsolved reporting contract.
         if model_status.lower() != "optimal":
             return HighsPrimalResult(
                 is_solved=False,
                 solve_status=solve_status,
                 objective_value=None,
                 values={},
-                variable_count=highs.getNumCol(),
-                constraint_count=highs.getNumRow(),
+                variable_count=(highs.getNumCol()),
+                constraint_count=(highs.getNumRow()),
             )
 
-        values = _read_highs_values(highs)
+        values = _read_highs_values(
+            highs,
+            alias_to_original,
+        )
 
         if len(values) != model.number_of_variables:
-            raise RuntimeError("HiGHS variable count does not match the exported DOcplex model.")
+            raise RuntimeError(
+                "Reconstructed HiGHS values do not match the DOcplex variable count."
+            )
 
         return HighsPrimalResult(
             is_solved=True,
