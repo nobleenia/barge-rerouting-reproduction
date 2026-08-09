@@ -1971,3 +1971,54 @@ therefore refused the model with error 1016.
 
 The backend substitution changes neither the DCA-Reroute mathematical
 programme nor its state-transition semantics.
+
+---
+
+## A038 — Table 4 numerical discrepancy classification
+
+**Status:** Experimental validation outcome
+
+Phase 11A completed the full stable-capacity Table 4-style campaign:
+
+- 30 paired experimental cells;
+- 120 policy runs;
+- five paired demand sets;
+- two service families;
+- capacities 10, 15, and 20 TEU;
+- DCA, DCA-RM, DCA-Reroute, and DCA-RRM.
+
+All policy runs completed and no solver failure occurred.
+
+The controlled-substitute results do not numerically reproduce the published
+Table 4.
+
+In particular, Service Family 2 is effectively non-binding under the frozen
+controlled demand process: DCA already obtains the same realised revenue and
+volume at nominal capacities 10, 15, and 20 TEU, leaving approximately zero
+improvement opportunity for all advanced policies.
+
+The publication reports positive improvement ratios for Service Family 2 at
+all three capacities.
+
+Phase 11 will not modify the frozen Table 4 demand, forecast, fare, or service
+inputs after observing this discrepancy merely to improve numerical agreement.
+
+The outcome is classified as:
+
+`validated_computational_behavioural_reproduction`
+
+and not:
+
+`exact_numerical_reproduction`.
+
+The discrepancy is attributed to unresolved differences between the
+publication's unavailable simulation instance and the documented controlled
+substitute inputs unless later source evidence demonstrates an implementation
+error.
+
+The A036 feasibility-continuation assumption remains material: 110
+event-level A036 continuations occurred across the 120 campaign trajectories.
+
+See:
+
+`docs/phase11_table4_validation.md`
