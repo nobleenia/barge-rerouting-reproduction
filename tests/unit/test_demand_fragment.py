@@ -375,3 +375,65 @@ def test_state_still_rejects_material_volume_error() -> None:
                 ),
             ),
         )
+
+
+def test_state_accepts_one_teu_full_horizon_solver_residual() -> None:
+    """FR aggregate accounting tolerates observed 1-TEU solver residual."""
+    demand = Demand(
+        demand_id="KROUND1",
+        volume=1.0,
+        origin="A",
+        destination="C",
+        reservation_time=0,
+        availability_time=1,
+        due_time=5,
+        category=CustomerCategory.FULLY_SPOT,
+        fare_per_teu=20.0,
+    )
+
+    state = AcceptedDemandState(
+        demand=demand,
+        acceptance_fraction=1.0,
+        fragments=(
+            DemandFragment(
+                fragment_id="KROUND1::fragment",
+                demand_id="KROUND1",
+                volume=0.9999985554679997,
+                current_node=("A", 1),
+            ),
+        ),
+    )
+
+    assert state.accepted_volume == pytest.approx(1.0)
+
+
+def test_state_accounting_tolerance_does_not_hide_1e4_error() -> None:
+    """Aggregate solver tolerance must still reject material imbalance."""
+    demand = Demand(
+        demand_id="KROUNDFAIL",
+        volume=1.0,
+        origin="A",
+        destination="C",
+        reservation_time=0,
+        availability_time=1,
+        due_time=5,
+        category=CustomerCategory.FULLY_SPOT,
+        fare_per_teu=20.0,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="accounting is inconsistent",
+    ):
+        AcceptedDemandState(
+            demand=demand,
+            acceptance_fraction=1.0,
+            fragments=(
+                DemandFragment(
+                    fragment_id="KROUNDFAIL::fragment",
+                    demand_id="KROUNDFAIL",
+                    volume=0.9999,
+                    current_node=("A", 1),
+                ),
+            ),
+        )

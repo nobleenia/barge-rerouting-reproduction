@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from math import fsum, isclose, isfinite
+from math import fsum, isfinite
 
 from barge_rerouting.domain.demand import Demand
 from barge_rerouting.domain.network import (
@@ -13,7 +13,7 @@ from barge_rerouting.domain.network import (
 )
 
 VOLUME_TOLERANCE = 1e-6
-VOLUME_RELATIVE_TOLERANCE = 1e-6
+VOLUME_ACCOUNTING_TOLERANCE = 10.0 * VOLUME_TOLERANCE
 
 
 def _validate_nonnegative_finite_number(
@@ -243,12 +243,7 @@ class AcceptedDemandState:
             )
         )
 
-        if not isclose(
-            accounted_volume,
-            accepted_volume,
-            rel_tol=VOLUME_RELATIVE_TOLERANCE,
-            abs_tol=VOLUME_TOLERANCE,
-        ):
+        if abs(accounted_volume - accepted_volume) > VOLUME_ACCOUNTING_TOLERANCE:
             raise ValueError(
                 "Accepted-volume accounting is inconsistent: "
                 f"accepted={accepted_volume}, accounted={accounted_volume}."
