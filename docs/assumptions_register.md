@@ -2259,3 +2259,48 @@ Exact arc-level equality is not required when alternative optimal flows
 exist.
 
 Solver runtimes remain non-comparable with those published in the paper.
+
+---
+
+## A044 — Controlled Table 5 truck-penalty baseline
+
+**Status:** Controlled substitute input
+
+The publication states that shifting accepted barge cargo to truck incurs a
+penalty, but it does not disclose the numerical truck penalty or its
+calibration relative to booking fares.
+
+For the Phase 11B controlled baseline, the penalty for demand \(k\) is:
+
+\[
+c_k^{truck}
+=
+\alpha^{truck} f_k,
+\]
+
+where:
+
+\[
+\alpha^{truck}=1.0
+\]
+
+and \(f_k\) is the frozen fare per TEU of demand \(k\).
+
+Therefore:
+
+\[
+c_k^{truck}=f_k.
+\]
+
+This is not claimed to reproduce the authors' unpublished truck-cost
+parameter.
+
+The choice is made before Table 5 PR/FR results are observed and avoids
+introducing an arbitrary constant penalty unrelated to the frozen demand
+economics.
+
+The baseline will later be accompanied by an explicitly labelled truck-cost
+sensitivity analysis using alternative multipliers.
+
+No truck-penalty multiplier may be changed after observing Table 5 results
+merely to improve agreement with the publication.
