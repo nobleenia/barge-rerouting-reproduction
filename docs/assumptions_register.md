@@ -2157,3 +2157,38 @@ It must not be described as a water-level disruption.
 See:
 
 `docs/phase11_table5_contract.md`
+
+---
+
+## A042 — Table 5 controlled random seed and paired demand instance
+
+**Status:** Pre-registered controlled substitute input
+
+Phase 11B uses one deterministic realised demand instance across all
+Table 5 service-family, capacity, and policy combinations.
+
+The controlled seed is:
+
+\[
+12001.
+\]
+
+The structural request process and economic attributes are generated
+deterministically from that seed using the Phase 11 controlled-input
+machinery.
+
+The economic random stream continues to use the existing Phase 11 economic
+seed transformation rather than introducing a post-observation randomisation
+scheme.
+
+All 24 Table 5 policy/scenario rows must use the same realised 800-demand
+instance.
+
+Changing service family, nominal capacity, or policy must not regenerate the
+demand set.
+
+The realised demand fingerprint will be frozen after the generator passes its
+semantic tests and the first generated instance has been inspected.
+
+No seed search or post-hoc seed selection may be used to improve agreement
+with the published Table 5 values.
