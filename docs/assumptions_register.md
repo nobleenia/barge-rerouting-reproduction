@@ -2022,3 +2022,138 @@ event-level A036 continuations occurred across the 120 campaign trajectories.
 See:
 
 `docs/phase11_table4_validation.md`
+
+---
+
+## A039 — Table 5 demand horizon and trigger interpretation
+
+**Status:** Controlled interpretation derived from paper statements
+
+The Table 5 experiment states that:
+
+- 800 demand requests are used;
+- Partial-Reroute is triggered every two days;
+- two days equal four half-day model periods;
+- 40 demand requests occur during those four periods.
+
+The controlled Phase 11B interpretation therefore uses:
+
+\[
+10\text{ requests per half-day period}
+\]
+
+and:
+
+\[
+80\text{ request periods}
+\]
+
+to produce:
+
+\[
+800\text{ requests}.
+\]
+
+The 80-period horizon is inferred from the published demand count and request
+rate. It is not claimed to be an explicitly printed original horizon.
+
+Partial-Reroute trigger spacing is fixed at four model periods.
+
+Full-Reroute remains booking-triggered at every incoming request.
+
+The exact original demand-generation distributions and random seeds remain
+unavailable.
+
+Phase 11B will not tune these quantities after observing results merely to
+force numerical agreement with Table 5.
+
+See:
+
+`docs/phase11_table5_contract.md`
+
+---
+
+## A040 — Positive-volume interpretation of the 800 Table 5 demands
+
+**Status:** Controlled substitute input
+
+The publication describes the Table 5 experiment as containing 800 demand
+requests and states that approximately 40 requests occur in each four-period
+forecast interval.
+
+Phase 11A's controlled A032 economic process used the opportunity-volume
+distribution:
+
+\[
+P(Q=0)=0.40,\qquad
+P(Q=1)=0.40,\qquad
+P(Q=2)=0.20.
+\]
+
+In Phase 11A, zero-volume draws were removed before construction of `Demand`
+objects.
+
+Applying that process unchanged to only 800 Table 5 opportunities would
+therefore produce substantially fewer than 800 realised booking requests and
+would conflict with the publication-facing statement that 800 demands are
+processed.
+
+For Phase 11B, the 800 requests will therefore be positive-volume `Demand`
+objects.
+
+To preserve the relative positive-volume weighting of A032 without
+post-observation calibration, the controlled Table 5 volume distribution is
+the A032 distribution conditioned on positive volume:
+
+\[
+P(Q=1\mid Q>0)=\frac{0.40}{0.60}=\frac{2}{3},
+\]
+
+\[
+P(Q=2\mid Q>0)=\frac{0.20}{0.60}=\frac{1}{3}.
+\]
+
+No zero-volume requests are generated in the Table 5 campaign.
+
+This is a controlled substitute interpretation and is not claimed to be the
+unpublished original demand-volume distribution.
+
+---
+
+## A041 — Neutral operational encoding of Table 5 PR forecast updates
+
+**Status:** Controlled implementation interpretation
+
+The Phase-10 operational timeline currently represents forecast/status
+updates using `ServiceStatusUpdateEvent`.
+
+Table 5 requires Partial-Reroute to be triggered by forecast updates every
+four half-day periods while service capacity remains at standard water level.
+
+Phase 11B therefore encodes each PR forecast-update epoch as a neutral
+operational update with:
+
+\[
+\text{water-level factor}=1.0.
+\]
+
+The events occur at:
+
+\[
+t=0,4,8,\ldots,76.
+\]
+
+They are ordered before booking requests occurring at the same physical time,
+which makes the newly published forecast/update visible immediately.
+
+These events exist only to trigger the existing Partial-Reroute recovery
+mechanism. They do not intentionally reduce service capacity.
+
+This representation is necessary because Phase 10 does not currently expose
+a distinct forecast-update event class.
+
+It must not be described as a water-level disruption.
+
+See:
+
+`docs/phase11_table5_contract.md`
