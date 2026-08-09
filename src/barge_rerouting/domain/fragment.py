@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from math import isfinite
+from math import fsum, isclose, isfinite
 
 from barge_rerouting.domain.demand import Demand
 from barge_rerouting.domain.network import (
@@ -13,6 +13,7 @@ from barge_rerouting.domain.network import (
 )
 
 VOLUME_TOLERANCE = 1e-6
+VOLUME_RELATIVE_TOLERANCE = 1e-6
 
 
 def _validate_nonnegative_finite_number(
@@ -231,16 +232,23 @@ class AcceptedDemandState:
                 raise ValueError("A fragment cannot exist before the demand availability time.")
 
         accepted_volume = self.demand.volume * acceptance_fraction
-        remaining_volume = sum(fragment.volume for fragment in fragments)
+        remaining_volume = fsum(fragment.volume for fragment in fragments)
 
-        accounted_volume = (
-            remaining_volume
-            + pending_truck_volume
-            + delivered_barge_volume
-            + delivered_truck_volume
+        accounted_volume = fsum(
+            (
+                remaining_volume,
+                pending_truck_volume,
+                delivered_barge_volume,
+                delivered_truck_volume,
+            )
         )
 
-        if abs(accounted_volume - accepted_volume) > VOLUME_TOLERANCE:
+        if not isclose(
+            accounted_volume,
+            accepted_volume,
+            rel_tol=VOLUME_RELATIVE_TOLERANCE,
+            abs_tol=VOLUME_TOLERANCE,
+        ):
             raise ValueError(
                 "Accepted-volume accounting is inconsistent: "
                 f"accepted={accepted_volume}, accounted={accounted_volume}."

@@ -312,3 +312,66 @@ def test_pending_only_truck_state_is_not_complete() -> None:
     assert state.remaining_volume == pytest.approx(10.0)
     assert state.delivered_volume == pytest.approx(0.0)
     assert not state.is_complete
+
+
+def test_state_accepts_solver_scale_volume_roundoff() -> None:
+    """Solver-scale mass residuals must not invalidate a valid state."""
+    demand = Demand(
+        demand_id="KROUND",
+        volume=2.0,
+        origin="A",
+        destination="C",
+        reservation_time=0,
+        availability_time=1,
+        due_time=5,
+        category=CustomerCategory.PARTIALLY_SPOT,
+        fare_per_teu=20.0,
+    )
+
+    state = AcceptedDemandState(
+        demand=demand,
+        acceptance_fraction=1.0,
+        fragments=(
+            DemandFragment(
+                fragment_id="KROUND::fragment::0",
+                demand_id="KROUND",
+                volume=1.9999986295589995,
+                current_node=("A", 1),
+            ),
+        ),
+    )
+
+    assert state.accepted_volume == pytest.approx(2.0)
+    assert state.remaining_volume == pytest.approx(1.9999986295589995)
+
+
+def test_state_still_rejects_material_volume_error() -> None:
+    """Scale-aware tolerance must not conceal genuine mass imbalance."""
+    demand = Demand(
+        demand_id="KMATERIAL",
+        volume=2.0,
+        origin="A",
+        destination="C",
+        reservation_time=0,
+        availability_time=1,
+        due_time=5,
+        category=CustomerCategory.PARTIALLY_SPOT,
+        fare_per_teu=20.0,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="accounting is inconsistent",
+    ):
+        AcceptedDemandState(
+            demand=demand,
+            acceptance_fraction=1.0,
+            fragments=(
+                DemandFragment(
+                    fragment_id="KMATERIAL::fragment::0",
+                    demand_id="KMATERIAL",
+                    volume=1.99,
+                    current_node=("A", 1),
+                ),
+            ),
+        )
