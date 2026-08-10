@@ -33,9 +33,9 @@ from barge_rerouting.rolling_horizon.execution import (
 
 type FlowNode = TimeSpaceNode | str
 
-# Solver-derived recovery flows may retain arc-level numerical dust.
-# This tolerance is used only when reconstructing persisted barge paths.
-RECOVERY_DECOMPOSITION_TOLERANCE = 10.0 * EXECUTION_TOLERANCE
+# A whole recovered plan at this scale is treated as solver numerical dust.
+# The dust is removed from physical path reconstruction but retained in volume accounting.
+RECOVERY_NUMERICAL_DUST_TOLERANCE = 10.0 * EXECUTION_TOLERANCE
 
 
 def _validate_nonnegative_integer(
@@ -103,10 +103,13 @@ def _decompose_recovered_plan(
     plan: RecoveredFragmentPlan,
 ) -> tuple[PlannedDemandPath, ...]:
     """Decompose one persisted recovered barge flow into paths."""
+    if plan.original_remaining_volume <= RECOVERY_NUMERICAL_DUST_TOLERANCE:
+        return ()
+
     flow_by_arc = {
         flow.arc_id: float(flow.volume)
         for flow in plan.barge_arc_flows
-        if flow.volume > RECOVERY_DECOMPOSITION_TOLERANCE
+        if flow.volume > EXECUTION_TOLERANCE
     }
 
     if not flow_by_arc:
@@ -170,7 +173,7 @@ def _decompose_recovered_plan(
                 (),
             )
         )
-        > RECOVERY_DECOMPOSITION_TOLERANCE
+        > EXECUTION_TOLERANCE
     ):
         current_node = source
         selected_arc_ids: list[str] = []
@@ -187,7 +190,7 @@ def _decompose_recovered_plan(
                     arc_id,
                     0.0,
                 )
-                > RECOVERY_DECOMPOSITION_TOLERANCE
+                > EXECUTION_TOLERANCE
             ]
 
             if not candidates:
@@ -206,7 +209,7 @@ def _decompose_recovered_plan(
 
         path_volume = min(residual[arc_id] for arc_id in selected_arc_ids)
 
-        if not isfinite(path_volume) or path_volume <= RECOVERY_DECOMPOSITION_TOLERANCE:
+        if not isfinite(path_volume) or path_volume <= EXECUTION_TOLERANCE:
             raise ValueError("Recovered path volume must be positive and finite.")
 
         selected_sink_ids = tuple(arc_id for arc_id in selected_arc_ids if arc_id in sink_arc_by_id)
@@ -246,16 +249,10 @@ def _decompose_recovered_plan(
         for arc_id in selected_arc_ids:
             remaining = residual[arc_id] - path_volume
 
-            residual[arc_id] = (
-                0.0 if abs(remaining) <= RECOVERY_DECOMPOSITION_TOLERANCE else remaining
-            )
+            residual[arc_id] = 0.0 if abs(remaining) <= EXECUTION_TOLERANCE else remaining
 
     undecomposed = tuple(
-        sorted(
-            arc_id
-            for arc_id, volume in residual.items()
-            if volume > RECOVERY_DECOMPOSITION_TOLERANCE
-        )
+        sorted(arc_id for arc_id, volume in residual.items() if volume > EXECUTION_TOLERANCE)
     )
 
     if undecomposed:
@@ -298,6 +295,19 @@ def _delivery_time_for(
             return int(sink_arc.tail[1])
 
     raise ValueError(f"Could not reconstruct the recovered delivery time for {path.path_id}.")
+
+
+def _numerical_barge_closure_volume(
+    plans: tuple[RecoveredFragmentPlan, ...],
+) -> float:
+    """Return barge volume closed from numerical-dust recovery plans."""
+    return float(
+        sum(
+            plan.barge_delivered_volume
+            for plan in plans
+            if (plan.original_remaining_volume <= RECOVERY_NUMERICAL_DUST_TOLERANCE)
+        )
+    )
 
 
 def _state_from_recovered_plans(
@@ -443,7 +453,7 @@ def _state_from_recovered_plans(
     )
 
     fragments: list[DemandFragment] = []
-    delivered_after_recovery = 0.0
+    delivered_after_recovery = _numerical_barge_closure_volume(plans)
 
     for path in recovered_paths:
         delivery_time = _delivery_time_for(

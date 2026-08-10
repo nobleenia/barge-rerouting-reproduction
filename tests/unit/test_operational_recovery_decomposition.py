@@ -4,6 +4,7 @@ import pytest
 
 from barge_rerouting.disruption.operational_execution import (
     _decompose_recovered_plan,
+    _numerical_barge_closure_volume,
 )
 from barge_rerouting.disruption.recovery_transition import (
     RecoveredFragmentPlan,
@@ -96,3 +97,21 @@ def test_decomposition_still_rejects_material_disconnected_flow() -> None:
             instance,
             plan,
         )
+
+
+def test_numerical_dust_barge_volume_is_preserved() -> None:
+    """Discarding dust paths must not discard their barge mass."""
+    _, plan = _disconnected_plan(1.056901e-6)
+
+    closure = _numerical_barge_closure_volume((plan,))
+
+    assert closure == pytest.approx(1.056901e-6)
+
+
+def test_material_recovery_plan_is_not_numerically_closed() -> None:
+    """Material recovery volume must remain physical network flow."""
+    _, plan = _disconnected_plan(1.0e-4)
+
+    closure = _numerical_barge_closure_volume((plan,))
+
+    assert closure == pytest.approx(0.0)
