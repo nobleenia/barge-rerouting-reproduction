@@ -2452,3 +2452,106 @@ This is an internal consistency requirement of the rolling-horizon
 implementation. It is not reported as a rule explicitly specified by the
 paper.
 
+
+
+---
+
+## A048 — Numerical recovery dust is terminalised without losing accepted mass
+
+**Status:** Derived numerical consistency interpretation
+
+Repeated Full-Reroute optimisation can produce solver-scale residual recovery
+volumes whose magnitude is comparable to the numerical feasibility tolerance.
+
+A full-horizon diagnostic identified a recovered plan with:
+
+- original remaining volume approximately \(1.056901\times10^{-6}\) TEU;
+- barge-delivered volume of the same magnitude;
+- no truck allocation;
+- residual physical arcs disconnected from the declared rerouting source only
+  because upstream solver-scale flows had fallen below numerical significance.
+
+Such quantities are not interpreted as materially transportable cargo.
+
+For operational path reconstruction, a complete recovered plan with remaining
+volume no greater than:
+
+\[
+10 \times 10^{-6}\ {\rm TEU}
+\]
+
+is treated as numerical dust and no active physical path is reconstructed.
+
+However, its barge-delivered volume remains explicitly included in accepted
+volume accounting.
+
+Therefore numerical cleanup may remove a microscopic physical-network
+representation but may not remove contractual mass.
+
+The accounting invariant remains:
+
+\[
+V_k^{accepted}
+=
+V_k^{barge,remaining}
++
+V_k^{truck,pending}
++
+V_k^{barge,delivered}
++
+V_k^{truck,delivered}.
+\]
+
+Material disconnected recovery flows remain errors and are not hidden by this
+interpretation.
+
+**Reproduction classification:**
+This is a numerical implementation rule required for stable repeated
+rolling-horizon optimisation. It is not a behavioural rule reported by the
+paper.
+
+**Validation evidence:**
+Regression tests distinguish observed solver-scale residuals from materially
+disconnected recovery flow.
+
+
+---
+
+## A049 — Full-horizon FR pilot validation gate
+
+**Status:** Computational validation result
+
+The frozen Phase-11 Table-5 Full-Reroute pilot was executed over all 800
+incoming demands.
+
+The successful run:
+
+- processed 800 of 800 bookings;
+- triggered Full-Reroute at every incoming booking;
+- completed with zero solver failures;
+- completed with zero A036 feasibility continuations;
+- exercised persistent recovery lineage and truck recourse;
+- crossed all previously identified long-horizon numerical failure regions.
+
+The final pilot produced approximately:
+
+- accepted volume: 818.980183 TEU;
+- gross booking revenue: 206987.189353;
+- truck volume: 439.957581 TEU;
+- truck penalty: 89093.231860;
+- net realised value: 117893.957493;
+- runtime: 11419.6 seconds.
+
+These values are validation outputs for the controlled frozen reproduction
+instance.
+
+They are not claimed to reproduce the published Table 5 values exactly.
+
+**Scientific implication:**
+The Phase-11 operational Full-Reroute implementation is considered sufficiently
+stable to proceed from execution debugging to performance-indicator
+construction and campaign execution.
+
+A successful full-horizon trajectory validates computational consistency; it
+does not resolve unpublished paper parameters or the indicator-denominator
+ambiguity recorded in A012.
