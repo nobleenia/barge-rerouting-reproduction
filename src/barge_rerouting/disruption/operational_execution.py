@@ -33,6 +33,10 @@ from barge_rerouting.rolling_horizon.execution import (
 
 type FlowNode = TimeSpaceNode | str
 
+# Solver-derived recovery flows may retain arc-level numerical dust.
+# This tolerance is used only when reconstructing persisted barge paths.
+RECOVERY_DECOMPOSITION_TOLERANCE = 10.0 * EXECUTION_TOLERANCE
+
 
 def _validate_nonnegative_integer(
     name: str,
@@ -102,7 +106,7 @@ def _decompose_recovered_plan(
     flow_by_arc = {
         flow.arc_id: float(flow.volume)
         for flow in plan.barge_arc_flows
-        if flow.volume > EXECUTION_TOLERANCE
+        if flow.volume > RECOVERY_DECOMPOSITION_TOLERANCE
     }
 
     if not flow_by_arc:
@@ -166,7 +170,7 @@ def _decompose_recovered_plan(
                 (),
             )
         )
-        > EXECUTION_TOLERANCE
+        > RECOVERY_DECOMPOSITION_TOLERANCE
     ):
         current_node = source
         selected_arc_ids: list[str] = []
@@ -183,7 +187,7 @@ def _decompose_recovered_plan(
                     arc_id,
                     0.0,
                 )
-                > EXECUTION_TOLERANCE
+                > RECOVERY_DECOMPOSITION_TOLERANCE
             ]
 
             if not candidates:
@@ -202,7 +206,7 @@ def _decompose_recovered_plan(
 
         path_volume = min(residual[arc_id] for arc_id in selected_arc_ids)
 
-        if not isfinite(path_volume) or path_volume <= EXECUTION_TOLERANCE:
+        if not isfinite(path_volume) or path_volume <= RECOVERY_DECOMPOSITION_TOLERANCE:
             raise ValueError("Recovered path volume must be positive and finite.")
 
         selected_sink_ids = tuple(arc_id for arc_id in selected_arc_ids if arc_id in sink_arc_by_id)
@@ -242,10 +246,16 @@ def _decompose_recovered_plan(
         for arc_id in selected_arc_ids:
             remaining = residual[arc_id] - path_volume
 
-            residual[arc_id] = 0.0 if abs(remaining) <= EXECUTION_TOLERANCE else remaining
+            residual[arc_id] = (
+                0.0 if abs(remaining) <= RECOVERY_DECOMPOSITION_TOLERANCE else remaining
+            )
 
     undecomposed = tuple(
-        sorted(arc_id for arc_id, volume in residual.items() if volume > EXECUTION_TOLERANCE)
+        sorted(
+            arc_id
+            for arc_id, volume in residual.items()
+            if volume > RECOVERY_DECOMPOSITION_TOLERANCE
+        )
     )
 
     if undecomposed:
