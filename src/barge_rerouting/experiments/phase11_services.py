@@ -281,20 +281,40 @@ def _validate_time_periods(
     return time_periods
 
 
-def _validate_capacity_teu(
+def _validate_capacity_teu_for(
     capacity_teu: object,
+    *,
+    allowed_capacities_teu: tuple[int, ...],
+    capacity_context: str,
 ) -> int:
-    """Validate one Table 4 nominal service capacity."""
+    """Validate one experiment-specific nominal service capacity."""
     if isinstance(capacity_teu, bool) or not isinstance(
         capacity_teu,
         int,
     ):
         raise TypeError("capacity_teu must be an integer.")
 
-    if capacity_teu not in TABLE4_CAPACITIES_TEU:
-        raise ValueError(f"Table 4 capacity must be one of {TABLE4_CAPACITIES_TEU}.")
+    if not allowed_capacities_teu:
+        raise ValueError("allowed_capacities_teu cannot be empty.")
+
+    if not capacity_context:
+        raise ValueError("capacity_context cannot be empty.")
+
+    if capacity_teu not in allowed_capacities_teu:
+        raise ValueError(f"{capacity_context} capacity must be one of {allowed_capacities_teu}.")
 
     return capacity_teu
+
+
+def _validate_capacity_teu(
+    capacity_teu: object,
+) -> int:
+    """Validate one frozen Table 4 nominal service capacity."""
+    return _validate_capacity_teu_for(
+        capacity_teu,
+        allowed_capacities_teu=TABLE4_CAPACITIES_TEU,
+        capacity_context="Table 4",
+    )
 
 
 def _service_id(
@@ -339,6 +359,8 @@ def build_periodic_corridor_transport_legs(
     time_periods: tuple[int, ...],
     service_family: str,
     capacity_teu: int,
+    allowed_capacities_teu: tuple[int, ...] | None = None,
+    capacity_context: str = "Table 4",
 ) -> tuple[ScheduledTransportLeg, ...]:
     """Build recurring A--E corridor services over a time horizon.
 
@@ -350,7 +372,16 @@ def build_periodic_corridor_transport_legs(
     movement fits inside the configured horizon.
     """
     periods = _validate_time_periods(time_periods)
-    capacity = _validate_capacity_teu(capacity_teu)
+
+    if allowed_capacities_teu is None:
+        capacity = _validate_capacity_teu(capacity_teu)
+    else:
+        capacity = _validate_capacity_teu_for(
+            capacity_teu,
+            allowed_capacities_teu=(allowed_capacities_teu),
+            capacity_context=capacity_context,
+        )
+
     spec = table4_service_family_spec(service_family)
 
     horizon_start = periods[0]
@@ -423,14 +454,16 @@ def build_periodic_corridor_transport_legs(
     )
 
 
-def build_table4_network_config(
+def build_periodic_corridor_network_config(
     *,
     time_periods: tuple[int, ...],
     service_family: str,
     capacity_teu: int,
+    allowed_capacities_teu: tuple[int, ...],
+    capacity_context: str,
     add_holding_arcs: bool = True,
 ) -> NetworkConfig:
-    """Build one publication-facing Table 4 network config."""
+    """Build a corridor network under an explicit capacity domain."""
     if not isinstance(add_holding_arcs, bool):
         raise TypeError("add_holding_arcs must be a boolean.")
 
@@ -440,11 +473,31 @@ def build_table4_network_config(
         time_periods=periods,
         service_family=service_family,
         capacity_teu=capacity_teu,
+        allowed_capacities_teu=(allowed_capacities_teu),
+        capacity_context=capacity_context,
     )
 
     return NetworkConfig(
         terminals=TABLE4_TERMINALS,
         time_periods=periods,
         transport_legs=legs,
+        add_holding_arcs=add_holding_arcs,
+    )
+
+
+def build_table4_network_config(
+    *,
+    time_periods: tuple[int, ...],
+    service_family: str,
+    capacity_teu: int,
+    add_holding_arcs: bool = True,
+) -> NetworkConfig:
+    """Build one publication-facing Table 4 network config."""
+    return build_periodic_corridor_network_config(
+        time_periods=time_periods,
+        service_family=service_family,
+        capacity_teu=capacity_teu,
+        allowed_capacities_teu=(TABLE4_CAPACITIES_TEU),
+        capacity_context="Table 4",
         add_holding_arcs=add_holding_arcs,
     )
