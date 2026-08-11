@@ -30,7 +30,7 @@ def _nonnegative(
     if value < -ALLOCATION_TOLERANCE:
         raise ValueError(f"{name} cannot be negative: {value}.")
 
-    if abs(value) <= ALLOCATION_TOLERANCE:
+    if value < 0.0:
         return 0.0
 
     return value
