@@ -7,6 +7,7 @@ to reconstruct reporting quantities later.
 
 from __future__ import annotations
 
+from pathlib import Path
 from time import perf_counter
 
 from barge_rerouting.experiments.phase11_policy_execution import (
@@ -16,6 +17,9 @@ from barge_rerouting.experiments.phase11_table5_campaign import (
     Table5CampaignCellInputs,
     Table5CampaignRunSpec,
 )
+from barge_rerouting.experiments.phase11_table5_checkpoint import (
+    write_table5_prevalidation_artifact,
+)
 from barge_rerouting.experiments.phase11_table5_execution import (
     run_phase11_table5_fr,
     run_phase11_table5_pr,
@@ -23,6 +27,7 @@ from barge_rerouting.experiments.phase11_table5_execution import (
 from barge_rerouting.reporting.table5_campaign_record import (
     Table5CampaignPolicyRecord,
     build_table5_campaign_policy_record,
+    build_table5_campaign_prevalidation_payload,
 )
 from barge_rerouting.reporting.table5_service_capacity import (
     build_table5_service_capacity_snapshot,
@@ -32,6 +37,8 @@ from barge_rerouting.reporting.table5_service_capacity import (
 def execute_table5_campaign_policy(
     inputs: Table5CampaignCellInputs,
     run_spec: Table5CampaignRunSpec,
+    *,
+    prevalidation_path: str | Path | None = None,
 ) -> Table5CampaignPolicyRecord:
     """Execute one frozen Table-5 policy and capture rich evidence."""
     if run_spec.cell_key != inputs.cell.cell_key:
@@ -85,7 +92,29 @@ def execute_table5_campaign_policy(
         status_updates=reporting_updates,
     )
 
-    return build_table5_campaign_policy_record(
+    prevalidation_payload: dict[str, object] | None = None
+
+    if prevalidation_path is not None:
+        prevalidation_payload = build_table5_campaign_prevalidation_payload(
+            run_key=run_spec.run_key,
+            cell_key=run_spec.cell_key,
+            service_family=run_spec.service_family,
+            capacity_teu=run_spec.capacity_teu,
+            configuration_fingerprint=(inputs.configuration_fingerprint),
+            demand_fingerprint=(inputs.demand_fingerprint),
+            requested_booking_count=(inputs.requested_booking_count),
+            requested_volume=(inputs.requested_volume),
+            runtime_seconds=runtime_seconds,
+            service_capacity_snapshot=(service_capacity_snapshot),
+            run=run,
+        )
+
+        write_table5_prevalidation_artifact(
+            prevalidation_payload,
+            prevalidation_path,
+        )
+
+    record = build_table5_campaign_policy_record(
         run_key=run_spec.run_key,
         cell_key=run_spec.cell_key,
         service_family=run_spec.service_family,
@@ -98,3 +127,19 @@ def execute_table5_campaign_policy(
         service_capacity_snapshot=(service_capacity_snapshot),
         run=run,
     )
+
+    if prevalidation_path is not None:
+        if prevalidation_payload is None:
+            raise AssertionError(
+                "Pre-validation payload was not built for a persisted campaign run."
+            )
+
+        validated_payload = dict(prevalidation_payload)
+        validated_payload["status"] = "validated"
+
+        write_table5_prevalidation_artifact(
+            validated_payload,
+            prevalidation_path,
+        )
+
+    return record

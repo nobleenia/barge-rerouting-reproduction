@@ -371,9 +371,12 @@ def run_table5_campaign(
             flush=True,
         )
 
+        prevalidation_path = directory / "prevalidation" / f"{run_spec.run_key}.json"
+
         record = execute_table5_campaign_policy(
             inputs,
             run_spec,
+            prevalidation_path=(prevalidation_path),
         )
 
         if record.run_key != run_spec.run_key:

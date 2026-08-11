@@ -175,6 +175,8 @@ def _install_fake_executor(
     def fake_execute(
         inputs,
         run_spec,
+        *,
+        prevalidation_path=None,
     ):
         calls.append(run_spec.run_key)
 
@@ -484,6 +486,8 @@ def test_failed_next_run_preserves_previous_checkpoint(
     def fail_next(
         inputs,
         run_spec,
+        *,
+        prevalidation_path=None,
     ):
         raise RuntimeError(f"synthetic failure: {run_spec.run_key}")
 

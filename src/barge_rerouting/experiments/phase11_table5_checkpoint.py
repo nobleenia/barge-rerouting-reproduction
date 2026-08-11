@@ -15,6 +15,7 @@ from barge_rerouting.reporting.table5_allocations import (
     Table5OriginalArcAllocation,
 )
 from barge_rerouting.reporting.table5_campaign_record import (
+    TABLE5_CAMPAIGN_PREVALIDATION_SCHEMA,
     TABLE5_CAMPAIGN_RECORD_SCHEMA,
     Table5CampaignPolicyRecord,
 )
@@ -390,6 +391,30 @@ def _atomic_json_write(
     )
 
     temporary.replace(path)
+
+
+def write_table5_prevalidation_artifact(
+    payload: dict[str, object],
+    artifact_path: str | Path,
+) -> Path:
+    """Atomically persist completed-run evidence before strict validation."""
+    if payload.get("prevalidation_schema_version") != TABLE5_CAMPAIGN_PREVALIDATION_SCHEMA:
+        raise RuntimeError("Unsupported Table-5 pre-validation schema.")
+
+    if payload.get("status") not in {
+        "completed_pending_validation",
+        "validated",
+    }:
+        raise RuntimeError("Unsupported Table-5 pre-validation status.")
+
+    path = Path(artifact_path)
+
+    _atomic_json_write(
+        payload,
+        path,
+    )
+
+    return path
 
 
 def load_table5_campaign_checkpoint(

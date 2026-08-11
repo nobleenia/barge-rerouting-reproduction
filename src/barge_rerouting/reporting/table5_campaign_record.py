@@ -30,6 +30,7 @@ from barge_rerouting.reporting.table5_service_capacity import (
 )
 
 TABLE5_CAMPAIGN_RECORD_SCHEMA = "table5-rich-v2"
+TABLE5_CAMPAIGN_PREVALIDATION_SCHEMA = "table5-prevalidation-v1"
 
 
 @dataclass(frozen=True, slots=True)
@@ -197,6 +198,91 @@ def _solver_backend_name(
     )
 
     return str(enum_value)
+
+
+def build_table5_campaign_prevalidation_payload(
+    *,
+    run_key: str,
+    cell_key: str,
+    service_family: str,
+    capacity_teu: int,
+    configuration_fingerprint: str,
+    demand_fingerprint: str,
+    requested_booking_count: int,
+    requested_volume: float,
+    runtime_seconds: float,
+    service_capacity_snapshot: Table5ServiceCapacitySnapshot,
+    run: (Phase11PolicyRun | Table5OperationalPolicyRun),
+) -> dict[str, Any]:
+    """Capture raw completed-run evidence before strict cross-validation."""
+    allocation_snapshot = build_table5_allocation_snapshot(run.final_state)
+
+    if isinstance(
+        run,
+        Table5OperationalPolicyRun,
+    ):
+        truck_penalty = float(run.total_truck_penalty)
+
+        processed_booking_count = run.processed_booking_count
+
+        processed_status_count = run.processed_status_count
+
+        feasibility_rejection_count = run.feasibility_rejection_count
+
+    else:
+        truck_penalty = 0.0
+
+        processed_booking_count = run.processed_event_count
+
+        processed_status_count = 0
+
+        feasibility_rejection_count = run.feasibility_rejection_count
+
+    volume_ledger = build_table5_volume_ledger(
+        final_state=run.final_state,
+        gross_revenue=float(run.total_revenue),
+        truck_penalty=truck_penalty,
+    )
+
+    residuals = {
+        "requested_booking_count": (
+            volume_ledger.requested_request_count - requested_booking_count
+        ),
+        "requested_volume": (volume_ledger.requested_volume - float(requested_volume)),
+        "accepted_volume": (allocation_snapshot.accepted_volume - volume_ledger.accepted_volume),
+        "truck_volume": (allocation_snapshot.truck_volume - volume_ledger.truck_volume),
+        "truck_penalty": (allocation_snapshot.truck_penalty - volume_ledger.truck_penalty),
+        "final_barge_volume": (
+            allocation_snapshot.final_barge_volume - volume_ledger.final_barge_volume
+        ),
+    }
+
+    return {
+        "prevalidation_schema_version": (TABLE5_CAMPAIGN_PREVALIDATION_SCHEMA),
+        "status": ("completed_pending_validation"),
+        "reporting_schema_version": (TABLE5_CAMPAIGN_RECORD_SCHEMA),
+        "run_key": run_key,
+        "cell_key": cell_key,
+        "service_family": service_family,
+        "capacity_teu": capacity_teu,
+        "policy_key": run.policy_key,
+        "configuration_fingerprint": (configuration_fingerprint),
+        "demand_fingerprint": (demand_fingerprint),
+        "solver_backend": (_solver_backend_name(run)),
+        "completed": run.completed,
+        "requested_booking_count": (requested_booking_count),
+        "requested_volume": float(requested_volume),
+        "processed_booking_count": (processed_booking_count),
+        "processed_status_count": (processed_status_count),
+        "feasibility_rejection_count": (feasibility_rejection_count),
+        "ordinary_rejection_count": (run.ordinary_rejection_count),
+        "solver_failure_count": (run.solver_failure_count),
+        "runtime_seconds": float(runtime_seconds),
+        "volume_ledger": asdict(volume_ledger),
+        "allocation_snapshot": asdict(allocation_snapshot),
+        "service_capacity_snapshot": asdict(service_capacity_snapshot),
+        "cross_validation_residuals": (residuals),
+    }
 
 
 def build_table5_campaign_policy_record(

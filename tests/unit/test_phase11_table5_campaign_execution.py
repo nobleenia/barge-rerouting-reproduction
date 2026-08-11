@@ -328,3 +328,85 @@ def test_unknown_policy_is_rejected_before_execution(
         )
 
     assert not called
+
+
+def test_prevalidation_artifact_survives_strict_validation_failure(
+    tmp_path,
+    monkeypatch,
+) -> None:
+    """Completed expensive evidence must survive later record rejection."""
+    import json
+
+    inputs = _inputs()
+
+    run_result = SimpleNamespace(
+        final_state=object(),
+    )
+
+    def fake_dca(
+        instance,
+        *,
+        timeline=None,
+    ):
+        assert instance is inputs.instance
+        return run_result
+
+    monkeypatch.setattr(
+        execution,
+        "run_phase11_dca",
+        fake_dca,
+    )
+
+    service_sentinel = object()
+
+    monkeypatch.setattr(
+        execution,
+        "build_table5_service_capacity_snapshot",
+        lambda **kwargs: service_sentinel,
+    )
+
+    payload = {
+        "prevalidation_schema_version": ("table5-prevalidation-v1"),
+        "status": ("completed_pending_validation"),
+        "run_key": ("service_family_1__capacity_10__dca"),
+        "cross_validation_residuals": {
+            "final_barge_volume": 1.2e-5,
+        },
+    }
+
+    monkeypatch.setattr(
+        execution,
+        "build_table5_campaign_prevalidation_payload",
+        lambda **kwargs: dict(payload),
+    )
+
+    def fail_strict_builder(**kwargs):
+        raise ValueError("synthetic strict validation failure")
+
+    monkeypatch.setattr(
+        execution,
+        "build_table5_campaign_policy_record",
+        fail_strict_builder,
+    )
+
+    artifact = tmp_path / "prevalidation" / "service_family_1__capacity_10__dca.json"
+
+    with pytest.raises(
+        ValueError,
+        match="synthetic strict validation failure",
+    ):
+        execution.execute_table5_campaign_policy(
+            inputs,
+            _run_spec("dca"),
+            prevalidation_path=artifact,
+        )
+
+    assert artifact.exists()
+
+    persisted = json.loads(artifact.read_text(encoding="utf-8"))
+
+    assert persisted["status"] == "completed_pending_validation"
+
+    assert persisted["run_key"] == "service_family_1__capacity_10__dca"
+
+    assert persisted["cross_validation_residuals"]["final_barge_volume"] == pytest.approx(1.2e-5)
