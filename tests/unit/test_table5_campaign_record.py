@@ -69,22 +69,34 @@ def _service_snapshot(
     fingerprint: str = DEMAND_FINGERPRINT,
     final_load: float = 1.5,
 ) -> Table5ServiceCapacitySnapshot:
+    legs = (
+        ("a", "A", "B"),
+        ("b", "B", "C"),
+        ("c", "C", "D"),
+        ("d", "D", "E"),
+    )
+
     return Table5ServiceCapacitySnapshot(
         reporting_time=98,
         instance_fingerprint=fingerprint,
-        arcs=(
+        arcs=tuple(
             Table5TransportArcEvidence(
-                arc_id="transport::a",
+                arc_id=f"transport::{letter}",
                 service_id="service::slot01",
-                origin="A",
-                destination="B",
-                departure_time=0,
-                arrival_time=1,
+                origin=origin,
+                destination=destination,
+                departure_time=index,
+                arrival_time=index + 1,
                 nominal_capacity=10.0,
                 actual_capacity=10.0,
                 original_load=2.0,
                 final_load=final_load,
-            ),
+            )
+            for index, (
+                letter,
+                origin,
+                destination,
+            ) in enumerate(legs)
         ),
     )
 
@@ -133,7 +145,7 @@ def test_campaign_record_accepts_consistent_evidence() -> None:
 
     assert record.allocation_snapshot.final_barge_volume == pytest.approx(1.5)
 
-    assert record.service_capacity_snapshot.transport_arc_count == 1
+    assert record.service_capacity_snapshot.transport_arc_count == 4
 
 
 def test_campaign_record_serialises_all_nested_evidence() -> None:
@@ -268,3 +280,46 @@ def test_campaign_record_rejects_unknown_schema() -> None:
             allocation_snapshot=_allocation_snapshot(),
             service_capacity_snapshot=_service_snapshot(),
         )
+
+
+def test_campaign_record_derives_indicator_snapshot_from_raw_evidence() -> None:
+    record = _record()
+
+    indicators = record.indicator_snapshot
+
+    assert indicators.standard_water
+
+    assert indicators.gross_revenue == pytest.approx(500.0)
+
+    assert indicators.truck_penalty == pytest.approx(50.0)
+
+    assert indicators.net_realised_value == pytest.approx(450.0)
+
+    assert indicators.solving_time_seconds == pytest.approx(10.0)
+
+    assert indicators.volume_indicator_candidates.vob_requested_volume_pct == pytest.approx(100.0)
+
+    assert indicators.volume_indicator_candidates.vfb_requested_volume_pct == pytest.approx(75.0)
+
+    assert indicators.volume_indicator_candidates.vtr_requested_volume_pct == pytest.approx(25.0)
+
+
+def test_campaign_record_mapping_persists_derived_indicator_snapshot() -> None:
+    mapping = _record().to_mapping()
+
+    indicators = mapping["indicator_snapshot"]
+
+    assert isinstance(
+        indicators,
+        dict,
+    )
+
+    assert indicators["indicator_schema_version"] == "table5-indicators-v1"
+
+    assert indicators["gross_revenue"] == pytest.approx(500.0)
+
+    assert indicators["solving_time_seconds"] == pytest.approx(10.0)
+
+    volume_candidates = indicators["volume_indicator_candidates"]
+
+    assert volume_candidates["vob_requested_volume_pct"] == pytest.approx(100.0)

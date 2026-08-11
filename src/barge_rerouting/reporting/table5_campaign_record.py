@@ -16,6 +16,10 @@ from barge_rerouting.reporting.table5_allocations import (
     Table5AllocationSnapshot,
     build_table5_allocation_snapshot,
 )
+from barge_rerouting.reporting.table5_indicators import (
+    Table5IndicatorSnapshot,
+    build_table5_indicator_snapshot,
+)
 from barge_rerouting.reporting.table5_ledger import (
     LEDGER_TOLERANCE,
     Table5VolumeLedger,
@@ -25,7 +29,7 @@ from barge_rerouting.reporting.table5_service_capacity import (
     Table5ServiceCapacitySnapshot,
 )
 
-TABLE5_CAMPAIGN_RECORD_SCHEMA = "table5-rich-v1"
+TABLE5_CAMPAIGN_RECORD_SCHEMA = "table5-rich-v2"
 
 
 @dataclass(frozen=True, slots=True)
@@ -161,9 +165,24 @@ class Table5CampaignPolicyRecord:
             runtime,
         )
 
+    @property
+    def indicator_snapshot(
+        self,
+    ) -> Table5IndicatorSnapshot:
+        """Reconstruct publication-facing indicators from raw evidence."""
+        return build_table5_indicator_snapshot(
+            volume_ledger=self.volume_ledger,
+            service_capacity_snapshot=(self.service_capacity_snapshot),
+            solving_time_seconds=(self.runtime_seconds),
+        )
+
     def to_mapping(self) -> dict[str, Any]:
-        """Return JSON-serialisable nested campaign evidence."""
-        return asdict(self)
+        """Return JSON-serialisable raw and derived campaign evidence."""
+        payload = asdict(self)
+
+        payload["indicator_snapshot"] = asdict(self.indicator_snapshot)
+
+        return payload
 
 
 def _solver_backend_name(
@@ -248,7 +267,7 @@ def build_table5_campaign_policy_record(
         capacity_teu=capacity_teu,
         policy_key=run.policy_key,
         configuration_fingerprint=(configuration_fingerprint),
-        demand_fingerprint=demand_fingerprint,
+        demand_fingerprint=(demand_fingerprint),
         solver_backend=(_solver_backend_name(run)),
         completed=run.completed,
         requested_booking_count=(requested_booking_count),

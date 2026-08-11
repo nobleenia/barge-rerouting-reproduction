@@ -74,22 +74,34 @@ def _record(
         net_value=500.0,
     )
 
+    legs = (
+        ("a", "A", "B"),
+        ("b", "B", "C"),
+        ("c", "C", "D"),
+        ("d", "D", "E"),
+    )
+
     service_snapshot = Table5ServiceCapacitySnapshot(
         reporting_time=98,
         instance_fingerprint=(DEMAND_FINGERPRINT),
-        arcs=(
+        arcs=tuple(
             Table5TransportArcEvidence(
-                arc_id="transport::a",
+                arc_id=f"transport::{letter}",
                 service_id="service::slot01",
-                origin="A",
-                destination="B",
-                departure_time=0,
-                arrival_time=1,
+                origin=origin,
+                destination=destination,
+                departure_time=index,
+                arrival_time=index + 1,
                 nominal_capacity=float(capacity_teu),
                 actual_capacity=float(capacity_teu),
                 original_load=2.0,
                 final_load=2.0,
-            ),
+            )
+            for index, (
+                letter,
+                origin,
+                destination,
+            ) in enumerate(legs)
         ),
     )
 
@@ -268,5 +280,65 @@ def test_wrong_checkpoint_schema_is_rejected(
     with pytest.raises(
         RuntimeError,
         match="Unsupported Table-5",
+    ):
+        load_table5_campaign_checkpoint(path)
+
+
+def test_checkpoint_round_trip_validates_persisted_indicator_snapshot(
+    tmp_path,
+) -> None:
+    path = tmp_path / "campaign_checkpoint.json"
+
+    record = _record()
+
+    write_table5_campaign_checkpoint(
+        [record],
+        {},
+        path,
+    )
+
+    payload = json.loads(path.read_text(encoding="utf-8"))
+
+    persisted = payload["records"][0]["indicator_snapshot"]
+
+    assert persisted["indicator_schema_version"] == "table5-indicators-v1"
+
+    restored, _ = load_table5_campaign_checkpoint(path)
+
+    assert len(restored) == 1
+
+    assert restored[0].indicator_snapshot == record.indicator_snapshot
+
+
+def test_checkpoint_rejects_indicator_snapshot_drift(
+    tmp_path,
+) -> None:
+    path = tmp_path / "campaign_checkpoint.json"
+
+    write_table5_campaign_checkpoint(
+        [_record()],
+        {},
+        path,
+    )
+
+    payload = json.loads(path.read_text(encoding="utf-8"))
+
+    payload["records"][0]["indicator_snapshot"]["volume_indicator_candidates"][
+        "voa_request_count_pct"
+    ] = 99.0
+
+    path.write_text(
+        json.dumps(
+            payload,
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(
+        RuntimeError,
+        match=("indicator snapshot disagrees with raw campaign evidence"),
     ):
         load_table5_campaign_checkpoint(path)

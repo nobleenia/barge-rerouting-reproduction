@@ -18,12 +18,21 @@ from barge_rerouting.reporting.table5_campaign_record import (
     TABLE5_CAMPAIGN_RECORD_SCHEMA,
     Table5CampaignPolicyRecord,
 )
+from barge_rerouting.reporting.table5_fill_rates import (
+    Table5FillRateCandidates,
+)
+from barge_rerouting.reporting.table5_indicators import (
+    Table5IndicatorSnapshot,
+)
 from barge_rerouting.reporting.table5_ledger import (
     Table5VolumeLedger,
 )
 from barge_rerouting.reporting.table5_service_capacity import (
     Table5ServiceCapacitySnapshot,
     Table5TransportArcEvidence,
+)
+from barge_rerouting.reporting.table5_volume_indicators import (
+    Table5VolumeIndicatorCandidates,
 )
 
 TABLE5_CAMPAIGN_CHECKPOINT_SCHEMA_VERSION: Final = 1
@@ -177,10 +186,72 @@ def _restore_service_capacity_snapshot(
     )
 
 
+def _restore_fill_rate_candidates(
+    payload: dict[str, Any],
+) -> Table5FillRateCandidates:
+    return Table5FillRateCandidates(
+        transport_arc_count=payload["transport_arc_count"],
+        sailing_occurrence_count=payload["sailing_occurrence_count"],
+        mean_arc_actual_pct=payload["mean_arc_actual_pct"],
+        mean_arc_nominal_pct=payload["mean_arc_nominal_pct"],
+        capacity_weighted_actual_pct=payload["capacity_weighted_actual_pct"],
+        capacity_weighted_nominal_pct=payload["capacity_weighted_nominal_pct"],
+        mean_sailing_peak_actual_pct=payload["mean_sailing_peak_actual_pct"],
+        mean_sailing_peak_nominal_pct=payload["mean_sailing_peak_nominal_pct"],
+    )
+
+
+def _restore_volume_indicator_candidates(
+    payload: dict[str, Any],
+) -> Table5VolumeIndicatorCandidates:
+    return Table5VolumeIndicatorCandidates(
+        requested_volume=payload["requested_volume"],
+        accepted_volume=payload["accepted_volume"],
+        truck_volume=payload["truck_volume"],
+        final_barge_volume=payload["final_barge_volume"],
+        requested_request_count=payload["requested_request_count"],
+        accepted_request_count=payload["accepted_request_count"],
+        vtr_requested_volume_pct=payload["vtr_requested_volume_pct"],
+        vfb_requested_volume_pct=payload["vfb_requested_volume_pct"],
+        vob_requested_volume_pct=payload["vob_requested_volume_pct"],
+        voa_request_count_pct=payload["voa_request_count_pct"],
+        voa_requested_volume_pct=payload["voa_requested_volume_pct"],
+    )
+
+
+def _restore_indicator_snapshot(
+    payload: dict[str, Any],
+) -> Table5IndicatorSnapshot:
+    return Table5IndicatorSnapshot(
+        indicator_schema_version=payload["indicator_schema_version"],
+        fill_rate_candidates=(
+            _restore_fill_rate_candidates(
+                _as_mapping(
+                    payload["fill_rate_candidates"],
+                    "indicator_snapshot.fill_rate_candidates",
+                )
+            )
+        ),
+        volume_indicator_candidates=(
+            _restore_volume_indicator_candidates(
+                _as_mapping(
+                    payload["volume_indicator_candidates"],
+                    "indicator_snapshot.volume_indicator_candidates",
+                )
+            )
+        ),
+        gross_revenue=payload["gross_revenue"],
+        truck_penalty=payload["truck_penalty"],
+        net_realised_value=payload["net_realised_value"],
+        solving_time_seconds=payload["solving_time_seconds"],
+        standard_water=payload["standard_water"],
+    )
+
+
 def _restore_record(
     payload: dict[str, Any],
 ) -> Table5CampaignPolicyRecord:
-    return Table5CampaignPolicyRecord(
+    record = Table5CampaignPolicyRecord(
         reporting_schema_version=payload["reporting_schema_version"],
         run_key=payload["run_key"],
         cell_key=payload["cell_key"],
@@ -221,6 +292,20 @@ def _restore_record(
             )
         ),
     )
+
+    persisted_indicator_snapshot = _restore_indicator_snapshot(
+        _as_mapping(
+            payload["indicator_snapshot"],
+            "indicator_snapshot",
+        )
+    )
+
+    if persisted_indicator_snapshot != record.indicator_snapshot:
+        raise RuntimeError(
+            "Persisted Table-5 indicator snapshot disagrees with raw campaign evidence."
+        )
+
+    return record
 
 
 def _ordered_records(
