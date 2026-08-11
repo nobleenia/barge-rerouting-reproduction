@@ -42,12 +42,15 @@ from barge_rerouting.instance import (
     ExperimentInstance,
     assemble_experiment_instance,
 )
+from barge_rerouting.reporting.table5_campaign_record import (
+    TABLE5_CAMPAIGN_RECORD_SCHEMA,
+)
 from barge_rerouting.rolling_horizon import (
     BookingTimeline,
     build_booking_timeline,
 )
 
-TABLE5_REPORTING_SCHEMA_VERSION = "table5-rich-v1"
+TABLE5_REPORTING_SCHEMA_VERSION = TABLE5_CAMPAIGN_RECORD_SCHEMA
 
 
 @dataclass(frozen=True, slots=True)
