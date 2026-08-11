@@ -2,8 +2,8 @@
 
 ## 1. Purpose
 
-This document defines the raw quantities from which the Phase-11 Table-5
-performance indicators will be reconstructed.
+This document freezes the Phase-11B reporting contract used to reconstruct
+Table-5 performance indicators from controlled computational evidence.
 
 The publication reports:
 
@@ -16,28 +16,34 @@ The publication reports:
 - TR — Total Revenue;
 - ST — Solving Time.
 
-The publication does not disclose complete mathematical numerator and
-denominator definitions for all volume-rate indicators.
+The publication provides abbreviated verbal definitions but does not disclose
+complete mathematical numerator, denominator, aggregation, or accounting
+definitions for all indicators.
 
-Therefore the implementation first records raw physical quantities and only
-then constructs candidate percentage definitions.
+A012 therefore remains unresolved at source level.
 
-No denominator is selected merely to improve agreement with the published
-table.
+Phase 11B does not silently replace that missing information. It stores raw
+evidence first and derives explicitly named controlled candidate indicators
+from that evidence.
+
+No indicator definition may be changed after observing campaign results merely
+to improve agreement with the publication.
 
 ---
 
-## 2. Frozen Table-5 demand population
+## 2. Frozen Table-5 population
 
 The controlled Table-5 demand realisation contains:
 
 - 800 requests;
 - 1076 TEU requested in total.
 
-Define
+Define:
 
 \[
-Q^{req} = \sum_k q_k^{req}.
+Q^{req}
+=
+\sum_k q_k^{req}.
 \]
 
 For the frozen instance:
@@ -46,26 +52,30 @@ For the frozen instance:
 Q^{req}=1076\ {\rm TEU}.
 \]
 
+All service-family, capacity and policy combinations use the same realised
+demand instance.
+
 ---
 
-## 3. Contractual acceptance quantities
+## 3. Authoritative raw demand quantities
 
-For every demand \(k\), the original booking decision records:
+For every booking request \(k\), the reporting state preserves:
 
 - requested volume;
 - acceptance fraction;
 - accepted volume;
-- original planned arc flows.
+- booking decision time and sequence;
+- original planned barge allocations.
 
-Define
+Define:
 
 \[
 q_k^{acc}
 =
-q_k^{req} e_k
+q_k^{req}e_k
 \]
 
-and
+and:
 
 \[
 Q^{acc}
@@ -73,50 +83,41 @@ Q^{acc}
 \sum_k q_k^{acc}.
 \]
 
-This quantity is retained independently of subsequent PR/FR recovery
-decisions.
+The raw ledger also preserves:
 
-The raw ledger also records:
+\[
+N^{req}
+\]
 
-- total request count;
-- positively accepted request count;
-- rejected request count.
+and:
 
-These quantities permit both volume-based and request-count-based candidate
-interpretations of VOA to be evaluated without changing the underlying
-experiment.
+\[
+N^{acc},
+\]
+
+where \(N^{acc}\) counts positively accepted requests.
+
+These raw values remain authoritative even when PR or FR subsequently changes
+the physical transport plan.
 
 ---
 
-## 4. Truck and final-barge quantities
+## 4. Truck and final-barge accounting
 
-For PR and FR, cumulative truck allocations are persisted in
-`RecoveryOperationalState.truck_transfer_history`.
+For PR and FR, cumulative truck allocations are reconstructed from the
+persisted operational recovery state.
 
 Define:
 
 \[
 Q^{truck}
 =
-\sum_{\tau \in H^{truck}} q_\tau.
+\sum_\tau q_\tau^{truck}.
 \]
 
-The contractual accepted-volume conservation identity is:
+Accepted-volume conservation is enforced independently of reporting labels.
 
-\[
-Q^{acc}
-=
-Q^{barge,remaining}
-+
-Q^{truck,pending}
-+
-Q^{barge,delivered}
-+
-Q^{truck,delivered}.
-\]
-
-At the terminal reporting horizon, define total cargo that remains allocated
-to barge as:
+At the final reporting horizon:
 
 \[
 Q^{final,barge}
@@ -126,108 +127,285 @@ Q^{acc}
 Q^{truck}.
 \]
 
-This identity is an implementation accounting relationship.
+Therefore:
 
-It must not by itself be presented as the publication's undisclosed VFB
-formula until the denominator interpretation is frozen.
+\[
+Q^{acc}
+=
+Q^{final,barge}
++
+Q^{truck}.
+\]
+
+This is an implementation accounting identity.
+
+It is not presented as an equation explicitly disclosed by the publication.
 
 ---
 
-## 5. Original-barge quantity
+## 5. Original barge allocation
 
-The booking state preserves the original `DemandCommitment` and its
-`planned_arc_flows`.
+The original booking commitment is preserved separately from later recovery
+decisions.
 
-A separate raw quantity will therefore be reconstructed from the booking-time
-commitments:
+Within the Phase-11B Table-5 execution contract, truck recourse occurs after a
+booking has been accepted into the barge transportation plan.
 
-\[
-Q^{original,barge}.
-\]
-
-This quantity must be measured from the original commitments rather than
-inferred from the final recovered state.
-
-This distinction matters because Full-Reroute may subsequently replace
-future barge movements and create truck allocations.
-
----
-
-## 6. Published conservation clue
-
-The published Table-5 and Table-6 values strongly support the relationship:
-
-\[
-VOB \approx VFB + VTR
-\]
-
-up to published integer rounding.
-
-Therefore the reproduction will require the corresponding raw-volume
-relationship:
+Therefore the controlled original-barge cargo quantity is:
 
 \[
 Q^{original,barge}
-\approx
-Q^{final,barge}
-+
-Q^{rerouted,truck}
+=
+Q^{acc}.
 \]
 
-under whichever common denominator is eventually adopted.
+Original physical arc allocations are nevertheless persisted independently in
+the allocation snapshot so that this relationship is auditable rather than
+inferred from the final recovered state.
 
-Failure of this relationship is a reporting-contract failure and must not be
-hidden through denominator tuning.
+Transport-arc flow sums must not be confused with cargo TEU because one cargo
+unit may occupy several successive service legs.
 
 ---
 
-## 7. VOA ambiguity
+## 6. Controlled VTR, VFB and VOB candidates
 
-The publication defines VOA verbally as "Volume rate of demand Originally
-Accepted" but does not disclose the denominator.
-
-The reproduction will retain at least:
+For Phase 11B, the common requested-volume denominator candidate is frozen as:
 
 \[
-VOA_{volume,candidate}
-=
-100 \frac{Q^{acc}}{Q^{req}}
-\]
-
-and
-
-\[
-VOA_{request,candidate}
+VTR_c
 =
 100
-\frac{N^{accepted}}{N^{requested}}.
+\frac{Q^{truck}}
+     {Q^{req}},
 \]
 
-Neither candidate is labelled as the reproduced publication indicator until
-the published table structure and implementation evidence support that
-choice.
+\[
+VFB_c
+=
+100
+\frac{Q^{final,barge}}
+     {Q^{req}},
+\]
+
+and:
+
+\[
+VOB_c
+=
+100
+\frac{Q^{original,barge}}
+     {Q^{req}}
+=
+100
+\frac{Q^{acc}}
+     {Q^{req}}.
+\]
+
+These definitions imply:
+
+\[
+VOB_c
+=
+VFB_c
++
+VTR_c
+\]
+
+up to floating-point tolerance.
+
+This identity is also strongly consistent with the numerical structure visible
+in the publication's Table 5, but it remains a controlled reconstruction
+because the publication does not give the underlying equations.
+
+No denominator will be tuned after the campaign.
 
 ---
 
-## 8. Revenue
+## 7. VOA ambiguity and controlled comparison candidates
 
-The raw economic quantities are:
+The publication distinguishes original barge acceptance from overall
+acceptance but does not disclose the exact VOA equation.
+
+Phase 11B therefore preserves two candidates.
+
+### Request-count candidate
+
+\[
+VOA_{count,c}
+=
+100
+\frac{N^{acc}}
+     {N^{req}}.
+\]
+
+### Requested-volume candidate
+
+\[
+VOA_{volume,c}
+=
+100
+\frac{Q^{acc}}
+     {Q^{req}}.
+\]
+
+The request-count candidate is the primary Phase-11B comparison candidate for
+"overall acceptance" because it provides a conceptually distinct acceptance
+measure from VOB.
+
+However, this choice is a controlled interpretation and is not claimed to be
+the publication's undisclosed formula.
+
+The volume-based alternative remains persisted and reportable.
+
+A012 therefore remains unresolved.
+
+---
+
+## 8. Service-capacity evidence
+
+Every completed campaign record preserves transport-arc evidence containing:
+
+- transport arc identifier;
+- recurring service identifier;
+- terminal pair;
+- departure and arrival time;
+- nominal capacity;
+- actual capacity;
+- original load;
+- final operational load;
+- source status-update identifier where applicable.
+
+For the frozen Table-5 network:
+
+- 112 physical transport arcs are present;
+- they reconstruct into 28 physical sailing occurrences;
+- every occurrence contains four connected transport legs.
+
+A recurring `service_id` therefore identifies a periodic service pattern and
+must not be treated as one unique physical sailing.
+
+---
+
+## 9. AFR and NFR candidates
+
+The publication describes AFR and NFR as average service fill rates but does
+not provide the aggregation equation.
+
+Phase 11B therefore preserves three explicit candidate pairs.
+
+### Candidate 1 — mean transport-leg utilisation
+
+\[
+AFR_{arc}
+=
+100
+\frac{1}{|A_L|}
+\sum_{a\in A_L}
+\frac{L_a^{final}}
+     {C_a^{actual}},
+\]
+
+\[
+NFR_{arc}
+=
+100
+\frac{1}{|A_L|}
+\sum_{a\in A_L}
+\frac{L_a^{final}}
+     {C_a^{nominal}}.
+\]
+
+This is the primary Phase-11B Table-5 comparison candidate.
+
+Because every reconstructed sailing occurrence contains the same four
+transport legs, it is also equivalent to taking the mean leg utilisation
+within each sailing and then averaging those sailing means.
+
+### Candidate 2 — capacity-weighted utilisation
+
+\[
+AFR_{weighted}
+=
+100
+\frac{\sum_a L_a^{final}}
+     {\sum_a C_a^{actual}},
+\]
+
+\[
+NFR_{weighted}
+=
+100
+\frac{\sum_a L_a^{final}}
+     {\sum_a C_a^{nominal}}.
+\]
+
+### Candidate 3 — mean sailing peak utilisation
+
+For sailing occurrence \(s\):
+
+\[
+u_s^{actual}
+=
+\max_{a\in s}
+\frac{L_a^{final}}
+     {C_a^{actual}},
+\]
+
+with an analogous nominal-capacity definition.
+
+The candidate indicator is the arithmetic mean of these occurrence-level
+peak utilisations.
+
+No candidate is selected because it numerically fits the published table
+better.
+
+---
+
+## 10. Standard-water invariant
+
+Table 5 uses standard water conditions.
+
+Therefore:
+
+\[
+C_a^{actual}
+=
+C_a^{nominal}
+\]
+
+for every transport arc.
+
+Every retained AFR/NFR candidate must consequently satisfy:
+
+\[
+AFR=NFR
+\]
+
+within numerical tolerance.
+
+A candidate violating this invariant is invalid for the standard-water
+campaign.
+
+---
+
+## 11. Revenue
+
+The reporting ledger preserves separately:
 
 \[
 TR^{gross}
 =
-\sum_k r_k^{booking}
+\sum_k r_k^{booking},
 \]
 
-and, for PR/FR,
+truck penalty:
 
 \[
-C^{truck}
-=
-\sum_\tau c_\tau^{truck}.
+C^{truck},
 \]
 
-The controlled implementation additionally records:
+and:
 
 \[
 TR^{net}
@@ -237,52 +415,100 @@ TR^{gross}
 C^{truck}.
 \]
 
-The publication's `TR` must be compared against the appropriate gross/net
-interpretation only after its treatment of truck penalties is established.
+The publication reports `TR` but the available source does not unambiguously
+establish whether the reported quantity corresponds exactly to the controlled
+gross or net accounting quantity.
+
+Phase 11B therefore preserves both.
+
+Neither is silently renamed as the publication's exact TR until the
+comparison evidence is evaluated.
 
 ---
 
-## 9. Solving time
+## 12. Solving time
 
-The implementation records wall-clock runtime for each policy experiment.
+`ST` is represented in the reproduction by measured wall-clock runtime for the
+complete policy execution.
 
-Runtime is useful for within-reproduction comparison but is not claimed to
-replicate the paper's hardware-specific solving times.
+Runtime is:
+
+- finite;
+- non-negative;
+- persisted with each policy result.
+
+Because the reproduction uses different hardware and a CE-aware
+CPLEX/HiGHS backend strategy, its runtime is not claimed to numerically
+replicate the publication's solving times.
 
 ---
 
-## 10. AFR and NFR
+## 13. Indicator snapshot
 
-The frozen pilot network contains:
+The reporting layer constructs:
 
-- 112 transport arcs;
-- four recurring service-pattern identifiers;
-- 28 transport arcs associated with each recurring service pattern.
+`Table5IndicatorSnapshot`
 
-The recurring `service_id` is therefore not treated automatically as one
-unique physical sailing.
+from:
 
-AFR and NFR will be constructed only after the unique scheduled-sailing
-aggregation is identified.
+- `Table5VolumeLedger`;
+- `Table5ServiceCapacitySnapshot`;
+- policy wall-clock runtime.
 
-At standard water level the mandatory validation invariant is:
+The snapshot contains:
+
+- all AFR/NFR candidates;
+- all VTR/VFB/VOB/VOA candidates;
+- gross revenue;
+- truck penalty;
+- net realised value;
+- solving time;
+- standard-water status.
+
+The raw evidence remains authoritative.
+
+---
+
+## 14. Checkpoint integrity
+
+Campaign checkpoint schema `table5-rich-v2` persists both:
+
+1. raw reporting evidence; and
+2. the derived indicator snapshot.
+
+On reload, the indicator snapshot is independently reconstructed from the raw
+evidence.
+
+The checkpoint is rejected when:
 
 \[
-AFR=NFR.
+I^{persisted}
+\neq
+f(
+\text{ledger},
+\text{service-capacity evidence},
+ST
+).
 \]
 
-No fill-rate implementation will be accepted unless this invariant holds on
-the standard-water experiment.
+This prevents derived percentages from silently drifting away from their raw
+computational evidence.
 
 ---
 
-## 11. Reporting principle
+## 15. Publication-comparison rule
 
-Raw quantities are authoritative.
+The publication-facing comparison must distinguish three categories:
 
-Published indicator labels are attached only after numerator and denominator
-interpretations have been explicitly documented.
+1. **raw reproduced quantities** — directly reconstructed from computational
+   state;
+2. **controlled indicator interpretations** — equations frozen in this
+   document before the production campaign;
+3. **publication values** — reproduced exactly as printed, including apparent
+   inconsistencies such as the Table-5 `855` AFR entry.
 
-No indicator denominator, truck penalty, demand realisation, or capacity
-definition may be retrospectively changed merely to improve numerical
-agreement with the publication.
+No controlled parameter, denominator, demand realisation, truck penalty,
+capacity rule or indicator definition may be retrospectively modified merely
+to improve numerical agreement with Table 5.
+
+A012 and A013 remain active source-level limitations.

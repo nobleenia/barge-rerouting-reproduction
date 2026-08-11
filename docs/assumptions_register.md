@@ -2555,3 +2555,212 @@ construction and campaign execution.
 A successful full-horizon trajectory validates computational consistency; it
 does not resolve unpublished paper parameters or the indicator-denominator
 ambiguity recorded in A012.
+
+---
+
+## A050 — Frozen Phase-11B Table-5 indicator reconstruction
+
+**Status:** Controlled reporting interpretation
+
+**Paper evidence:**
+
+The publication reports AFR, NFR, VTR, VFB, VOB, VOA, TR and ST.
+
+It describes:
+
+- AFR as the average Actual Fill Rate of services;
+- NFR as the average Nominal Fill Rate of services;
+- VTR as the volume rate placed on truck due to rerouting;
+- VFB as the volume rate finally allocated on barge;
+- VOB as the volume rate originally accepted on barge;
+- VOA as the volume rate originally accepted.
+
+The publication also treats each barge as a distinct scheduled service.
+
+However, it does not disclose complete equations for the service aggregation
+or the exact denominators of VTR, VFB, VOB and VOA.
+
+Therefore A012 remains unresolved at publication-source level.
+
+**Frozen Phase-11B implementation:**
+
+The authoritative raw quantities are:
+
+\[
+Q^{req},
+\quad
+Q^{acc},
+\quad
+Q^{truck},
+\quad
+Q^{final,barge},
+\quad
+N^{req},
+\quad
+N^{acc}.
+\]
+
+For the controlled Table-5 reporting comparison:
+
+\[
+VTR_c
+=
+100\frac{Q^{truck}}{Q^{req}},
+\]
+
+\[
+VFB_c
+=
+100\frac{Q^{final,barge}}{Q^{req}},
+\]
+
+and:
+
+\[
+VOB_c
+=
+100\frac{Q^{acc}}{Q^{req}}.
+\]
+
+The accounting identity is required:
+
+\[
+VOB_c
+=
+VFB_c+VTR_c.
+\]
+
+Two VOA candidates remain persisted:
+
+\[
+VOA_{count,c}
+=
+100\frac{N^{acc}}{N^{req}}
+\]
+
+and:
+
+\[
+VOA_{volume,c}
+=
+100\frac{Q^{acc}}{Q^{req}}.
+\]
+
+The request-count candidate is used as the primary Phase-11B comparison
+candidate for overall acceptance because it remains conceptually distinct from
+the original-barge volume measure.
+
+This does not establish that the publication used the same equation.
+
+**AFR/NFR interpretation:**
+
+The frozen Table-5 network contains 112 transport arcs reconstructing into 28
+physical sailing occurrences of four connected legs each.
+
+The primary standard-water comparison candidate is mean transport-leg
+utilisation:
+
+\[
+AFR_c
+=
+100
+\frac{1}{|A_L|}
+\sum_{a\in A_L}
+\frac{L_a^{final}}{C_a^{actual}},
+\]
+
+\[
+NFR_c
+=
+100
+\frac{1}{|A_L|}
+\sum_{a\in A_L}
+\frac{L_a^{final}}{C_a^{nominal}}.
+\]
+
+Capacity-weighted and mean-sailing-peak alternatives are also retained.
+
+Under Table-5 standard-water conditions every retained candidate must satisfy:
+
+\[
+AFR=NFR.
+\]
+
+**Scientific rule:**
+
+These definitions are frozen before the 24-run production campaign.
+
+They may not be changed after observing campaign results merely to improve
+agreement with the publication.
+
+Alternative candidate values may be reported as sensitivity or interpretation
+evidence, but they must retain explicit labels.
+
+**Code impact:**
+
+- `reporting/table5_sailing_occurrences.py`;
+- `reporting/table5_fill_rates.py`;
+- `reporting/table5_volume_indicators.py`;
+- `reporting/table5_indicators.py`;
+- `reporting/table5_campaign_record.py`.
+
+---
+
+## A051 — Table-5 derived-indicator checkpoint integrity
+
+**Status:** Computational reproducibility rule
+
+A completed Table-5 campaign policy record preserves raw reporting evidence
+before the live optimisation state is discarded.
+
+The persisted evidence includes:
+
+- raw volume ledger;
+- per-demand allocation snapshot;
+- transport-arc service-capacity snapshot;
+- runtime;
+- derived indicator snapshot.
+
+The derived indicator snapshot is not treated as an independent source of
+truth.
+
+On checkpoint reload it is reconstructed independently from:
+
+\[
+I
+=
+f(
+\text{volume ledger},
+\text{service-capacity snapshot},
+ST
+).
+\]
+
+The persisted indicator snapshot must equal the independently reconstructed
+snapshot.
+
+A disagreement is treated as checkpoint corruption or reporting drift and the
+checkpoint is rejected.
+
+This prevents derived percentages from being manually altered or becoming
+inconsistent with the computational evidence from which they were produced.
+
+The Table-5 rich reporting schema carrying this contract is:
+
+`table5-rich-v2`.
+
+**Validation evidence:**
+
+Regression tests cover:
+
+- nested indicator serialisation;
+- checkpoint round-trip;
+- independent reconstruction;
+- deliberate indicator tampering;
+- rejection of persisted/raw-evidence disagreement.
+
+**Scientific implication:**
+
+An expensive completed PR or FR run preserves enough evidence for indicator
+reconstruction and validation without rerunning the optimisation solely for
+reporting purposes.
