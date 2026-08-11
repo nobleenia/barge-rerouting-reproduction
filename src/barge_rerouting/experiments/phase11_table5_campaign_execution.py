@@ -24,6 +24,9 @@ from barge_rerouting.reporting.table5_campaign_record import (
     Table5CampaignPolicyRecord,
     build_table5_campaign_policy_record,
 )
+from barge_rerouting.reporting.table5_service_capacity import (
+    build_table5_service_capacity_snapshot,
+)
 
 
 def execute_table5_campaign_policy(
@@ -59,9 +62,6 @@ def execute_table5_campaign_policy(
         )
 
     elif run_spec.policy_key == "fr":
-        # A041/A042 contract:
-        # Full reroute reacts to every incoming booking request.
-        # It must not inherit PR's neutral periodic status updates.
         run = run_phase11_table5_fr(
             inputs.instance,
             truck_penalty_per_teu_by_demand=(inputs.truck_penalty_per_teu_by_demand),
@@ -73,6 +73,18 @@ def execute_table5_campaign_policy(
 
     runtime_seconds = perf_counter() - started
 
+    if run_spec.policy_key == "pr":
+        reporting_updates = inputs.pr_updates
+    else:
+        reporting_updates = ()
+
+    service_capacity_snapshot = build_table5_service_capacity_snapshot(
+        instance=inputs.instance,
+        final_state=run.final_state,
+        reporting_time=(inputs.spec.horizon_end),
+        status_updates=reporting_updates,
+    )
+
     return build_table5_campaign_policy_record(
         run_key=run_spec.run_key,
         cell_key=run_spec.cell_key,
@@ -83,5 +95,6 @@ def execute_table5_campaign_policy(
         requested_booking_count=(inputs.requested_booking_count),
         requested_volume=(inputs.requested_volume),
         runtime_seconds=runtime_seconds,
+        service_capacity_snapshot=(service_capacity_snapshot),
         run=run,
     )

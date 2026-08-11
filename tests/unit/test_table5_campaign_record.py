@@ -14,6 +14,12 @@ from barge_rerouting.reporting.table5_campaign_record import (
 from barge_rerouting.reporting.table5_ledger import (
     Table5VolumeLedger,
 )
+from barge_rerouting.reporting.table5_service_capacity import (
+    Table5ServiceCapacitySnapshot,
+    Table5TransportArcEvidence,
+)
+
+DEMAND_FINGERPRINT = "d" * 64
 
 
 def _allocation_snapshot() -> Table5AllocationSnapshot:
@@ -58,10 +64,36 @@ def _volume_ledger() -> Table5VolumeLedger:
     )
 
 
+def _service_snapshot(
+    *,
+    fingerprint: str = DEMAND_FINGERPRINT,
+    final_load: float = 1.5,
+) -> Table5ServiceCapacitySnapshot:
+    return Table5ServiceCapacitySnapshot(
+        reporting_time=98,
+        instance_fingerprint=fingerprint,
+        arcs=(
+            Table5TransportArcEvidence(
+                arc_id="transport::a",
+                service_id="service::slot01",
+                origin="A",
+                destination="B",
+                departure_time=0,
+                arrival_time=1,
+                nominal_capacity=10.0,
+                actual_capacity=10.0,
+                original_load=2.0,
+                final_load=final_load,
+            ),
+        ),
+    )
+
+
 def _record(
     *,
     volume_ledger: Table5VolumeLedger | None = None,
     allocation_snapshot: Table5AllocationSnapshot | None = None,
+    service_capacity_snapshot: Table5ServiceCapacitySnapshot | None = None,
     runtime_seconds: float = 10.0,
 ) -> Table5CampaignPolicyRecord:
     return Table5CampaignPolicyRecord(
@@ -72,7 +104,7 @@ def _record(
         capacity_teu=10,
         policy_key="fr",
         configuration_fingerprint="config-fingerprint",
-        demand_fingerprint="demand-fingerprint",
+        demand_fingerprint=DEMAND_FINGERPRINT,
         solver_backend="cplex_ce_aware",
         completed=True,
         requested_booking_count=1,
@@ -86,6 +118,9 @@ def _record(
         allocation_snapshot=(
             _allocation_snapshot() if allocation_snapshot is None else allocation_snapshot
         ),
+        service_capacity_snapshot=(
+            _service_snapshot() if service_capacity_snapshot is None else service_capacity_snapshot
+        ),
     )
 
 
@@ -93,11 +128,15 @@ def test_campaign_record_accepts_consistent_evidence() -> None:
     record = _record()
 
     assert record.policy_key == "fr"
+
     assert record.volume_ledger.accepted_volume == pytest.approx(2.0)
+
     assert record.allocation_snapshot.final_barge_volume == pytest.approx(1.5)
 
+    assert record.service_capacity_snapshot.transport_arc_count == 1
 
-def test_campaign_record_serialises_nested_evidence() -> None:
+
+def test_campaign_record_serialises_all_nested_evidence() -> None:
     mapping = _record().to_mapping()
 
     assert mapping["reporting_schema_version"] == TABLE5_CAMPAIGN_RECORD_SCHEMA
@@ -121,7 +160,17 @@ def test_campaign_record_serialises_nested_evidence() -> None:
     demands = snapshot["demands"]
 
     assert demands[0]["demand_id"] == "K0001"
-    assert demands[0]["truck_volume"] == pytest.approx(0.5)
+
+    service_snapshot = mapping["service_capacity_snapshot"]
+
+    assert isinstance(
+        service_snapshot,
+        dict,
+    )
+
+    assert service_snapshot["reporting_time"] == 98
+
+    assert service_snapshot["arcs"][0]["arc_id"] == "transport::a"
 
 
 def test_campaign_record_rejects_cross_ledger_volume_mismatch() -> None:
@@ -164,6 +213,26 @@ def test_campaign_record_rejects_request_count_mismatch() -> None:
         _record(volume_ledger=inconsistent_ledger)
 
 
+def test_campaign_record_rejects_service_fingerprint_mismatch() -> None:
+    foreign = _service_snapshot(fingerprint="e" * 64)
+
+    with pytest.raises(
+        ValueError,
+        match="snapshot fingerprint disagrees",
+    ):
+        _record(service_capacity_snapshot=foreign)
+
+
+def test_campaign_record_rejects_material_capacity_overload() -> None:
+    overloaded = _service_snapshot(final_load=11.0)
+
+    with pytest.raises(
+        ValueError,
+        match="material actual-capacity overload",
+    ):
+        _record(service_capacity_snapshot=overloaded)
+
+
 def test_campaign_record_rejects_negative_runtime() -> None:
     with pytest.raises(
         ValueError,
@@ -185,7 +254,7 @@ def test_campaign_record_rejects_unknown_schema() -> None:
             capacity_teu=10,
             policy_key="fr",
             configuration_fingerprint="config",
-            demand_fingerprint="demand",
+            demand_fingerprint=DEMAND_FINGERPRINT,
             solver_backend="cplex_ce_aware",
             completed=True,
             requested_booking_count=1,
@@ -197,4 +266,5 @@ def test_campaign_record_rejects_unknown_schema() -> None:
             runtime_seconds=1.0,
             volume_ledger=_volume_ledger(),
             allocation_snapshot=_allocation_snapshot(),
+            service_capacity_snapshot=_service_snapshot(),
         )

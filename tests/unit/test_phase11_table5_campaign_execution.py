@@ -22,6 +22,7 @@ def _inputs():
                 "pr",
                 "fr",
             ),
+            horizon_end=98,
         ),
         instance=object(),
         booking_timeline=object(),
@@ -64,11 +65,31 @@ def _capture_record_builder(
     return captured
 
 
+def _capture_service_builder(
+    monkeypatch,
+):
+    captured = {}
+    sentinel = object()
+
+    def fake_builder(**kwargs):
+        captured.update(kwargs)
+        return sentinel
+
+    monkeypatch.setattr(
+        execution,
+        "build_table5_service_capacity_snapshot",
+        fake_builder,
+    )
+
+    return captured, sentinel
+
+
 def test_dca_uses_booking_timeline(
     monkeypatch,
 ) -> None:
     inputs = _inputs()
-    run_result = object()
+
+    run_result = SimpleNamespace(final_state=object())
 
     def fake_dca(
         instance,
@@ -77,6 +98,7 @@ def test_dca_uses_booking_timeline(
     ):
         assert instance is inputs.instance
         assert timeline is inputs.booking_timeline
+
         return run_result
 
     monkeypatch.setattr(
@@ -85,7 +107,9 @@ def test_dca_uses_booking_timeline(
         fake_dca,
     )
 
-    captured = _capture_record_builder(monkeypatch)
+    record_capture = _capture_record_builder(monkeypatch)
+
+    service_capture, service_sentinel = _capture_service_builder(monkeypatch)
 
     result = execution.execute_table5_campaign_policy(
         inputs,
@@ -93,16 +117,22 @@ def test_dca_uses_booking_timeline(
     )
 
     assert result == "campaign-record"
-    assert captured["run"] is run_result
-    assert captured["requested_booking_count"] == 800
-    assert captured["requested_volume"] == pytest.approx(1076.0)
+
+    assert record_capture["run"] is run_result
+
+    assert record_capture["service_capacity_snapshot"] is service_sentinel
+
+    assert service_capture["status_updates"] == ()
+
+    assert service_capture["reporting_time"] == 98
 
 
 def test_pr_uses_periodic_updates_and_pr_timeline(
     monkeypatch,
 ) -> None:
     inputs = _inputs()
-    run_result = object()
+
+    run_result = SimpleNamespace(final_state=object())
 
     def fake_pr(
         instance,
@@ -112,8 +142,11 @@ def test_pr_uses_periodic_updates_and_pr_timeline(
         timeline=None,
     ):
         assert instance is inputs.instance
+
         assert status_updates is inputs.pr_updates
+
         assert truck_penalty_per_teu_by_demand is inputs.truck_penalty_per_teu_by_demand
+
         assert timeline is inputs.pr_timeline
 
         return run_result
@@ -124,7 +157,9 @@ def test_pr_uses_periodic_updates_and_pr_timeline(
         fake_pr,
     )
 
-    captured = _capture_record_builder(monkeypatch)
+    record_capture = _capture_record_builder(monkeypatch)
+
+    service_capture, service_sentinel = _capture_service_builder(monkeypatch)
 
     result = execution.execute_table5_campaign_policy(
         inputs,
@@ -132,14 +167,18 @@ def test_pr_uses_periodic_updates_and_pr_timeline(
     )
 
     assert result == "campaign-record"
-    assert captured["run"] is run_result
+
+    assert record_capture["service_capacity_snapshot"] is service_sentinel
+
+    assert service_capture["status_updates"] is inputs.pr_updates
 
 
 def test_fr_does_not_receive_pr_status_updates(
     monkeypatch,
 ) -> None:
     inputs = _inputs()
-    run_result = object()
+
+    run_result = SimpleNamespace(final_state=object())
 
     def fake_fr(
         instance,
@@ -154,8 +193,6 @@ def test_fr_does_not_receive_pr_status_updates(
 
         assert status_updates == ()
 
-        # The campaign executor deliberately allows the
-        # FR runner to construct its own no-update timeline.
         assert timeline is None
 
         return run_result
@@ -166,7 +203,9 @@ def test_fr_does_not_receive_pr_status_updates(
         fake_fr,
     )
 
-    captured = _capture_record_builder(monkeypatch)
+    record_capture = _capture_record_builder(monkeypatch)
+
+    service_capture, service_sentinel = _capture_service_builder(monkeypatch)
 
     result = execution.execute_table5_campaign_policy(
         inputs,
@@ -174,7 +213,10 @@ def test_fr_does_not_receive_pr_status_updates(
     )
 
     assert result == "campaign-record"
-    assert captured["run"] is run_result
+
+    assert record_capture["service_capacity_snapshot"] is service_sentinel
+
+    assert service_capture["status_updates"] == ()
 
 
 def test_foreign_cell_is_rejected_before_execution(

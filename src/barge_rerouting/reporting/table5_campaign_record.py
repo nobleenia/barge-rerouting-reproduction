@@ -21,6 +21,9 @@ from barge_rerouting.reporting.table5_ledger import (
     Table5VolumeLedger,
     build_table5_volume_ledger,
 )
+from barge_rerouting.reporting.table5_service_capacity import (
+    Table5ServiceCapacitySnapshot,
+)
 
 TABLE5_CAMPAIGN_RECORD_SCHEMA = "table5-rich-v1"
 
@@ -56,6 +59,7 @@ class Table5CampaignPolicyRecord:
 
     volume_ledger: Table5VolumeLedger
     allocation_snapshot: Table5AllocationSnapshot
+    service_capacity_snapshot: Table5ServiceCapacitySnapshot
 
     def __post_init__(self) -> None:
         """Validate persisted campaign evidence."""
@@ -141,6 +145,16 @@ class Table5CampaignPolicyRecord:
             if abs(snapshot_value - ledger_value) > LEDGER_TOLERANCE:
                 raise ValueError(f"{name} disagrees between allocation snapshot and volume ledger.")
 
+        if self.service_capacity_snapshot.instance_fingerprint != self.demand_fingerprint:
+            raise ValueError(
+                "Service-capacity snapshot fingerprint disagrees with campaign demand fingerprint."
+            )
+
+        if self.service_capacity_snapshot.max_final_actual_capacity_violation > LEDGER_TOLERANCE:
+            raise ValueError(
+                "Final service-capacity snapshot contains a material actual-capacity overload."
+            )
+
         object.__setattr__(
             self,
             "runtime_seconds",
@@ -177,6 +191,7 @@ def build_table5_campaign_policy_record(
     requested_booking_count: int,
     requested_volume: float,
     runtime_seconds: float,
+    service_capacity_snapshot: Table5ServiceCapacitySnapshot,
     run: (Phase11PolicyRun | Table5OperationalPolicyRun),
 ) -> Table5CampaignPolicyRecord:
     """Capture rich evidence before the live policy run is discarded."""
@@ -245,4 +260,5 @@ def build_table5_campaign_policy_record(
         runtime_seconds=runtime_seconds,
         volume_ledger=volume_ledger,
         allocation_snapshot=(allocation_snapshot),
+        service_capacity_snapshot=(service_capacity_snapshot),
     )

@@ -21,6 +21,10 @@ from barge_rerouting.reporting.table5_campaign_record import (
 from barge_rerouting.reporting.table5_ledger import (
     Table5VolumeLedger,
 )
+from barge_rerouting.reporting.table5_service_capacity import (
+    Table5ServiceCapacitySnapshot,
+    Table5TransportArcEvidence,
+)
 
 TABLE5_CAMPAIGN_CHECKPOINT_SCHEMA_VERSION: Final = 1
 TABLE5_CAMPAIGN_EXPERIMENT_KEY: Final = "phase11_table5_campaign"
@@ -59,7 +63,6 @@ def _as_list(
 def _restore_original_arc_allocation(
     payload: dict[str, Any],
 ) -> Table5OriginalArcAllocation:
-    """Restore one original booking-time arc-flow record."""
     return Table5OriginalArcAllocation(
         arc_id=payload["arc_id"],
         volume=payload["volume"],
@@ -69,20 +72,9 @@ def _restore_original_arc_allocation(
 def _restore_demand_allocation(
     payload: dict[str, Any],
 ) -> Table5DemandAllocation:
-    """Restore one accepted demand's reporting evidence."""
     raw_arcs = _as_list(
         payload["original_arc_allocations"],
         "original_arc_allocations",
-    )
-
-    arc_allocations = tuple(
-        _restore_original_arc_allocation(
-            _as_mapping(
-                raw,
-                "original_arc_allocation",
-            )
-        )
-        for raw in raw_arcs
     )
 
     return Table5DemandAllocation(
@@ -92,7 +84,15 @@ def _restore_demand_allocation(
         accepted_volume=payload["accepted_volume"],
         decision_sequence=payload["decision_sequence"],
         decision_time=payload["decision_time"],
-        original_arc_allocations=arc_allocations,
+        original_arc_allocations=tuple(
+            _restore_original_arc_allocation(
+                _as_mapping(
+                    raw,
+                    "original_arc_allocation",
+                )
+            )
+            for raw in raw_arcs
+        ),
         truck_volume=payload["truck_volume"],
         truck_penalty=payload["truck_penalty"],
         final_barge_volume=payload["final_barge_volume"],
@@ -102,7 +102,6 @@ def _restore_demand_allocation(
 def _restore_allocation_snapshot(
     payload: dict[str, Any],
 ) -> Table5AllocationSnapshot:
-    """Restore the per-demand allocation snapshot."""
     raw_demands = _as_list(
         payload["demands"],
         "allocation_snapshot.demands",
@@ -124,7 +123,6 @@ def _restore_allocation_snapshot(
 def _restore_volume_ledger(
     payload: dict[str, Any],
 ) -> Table5VolumeLedger:
-    """Restore the aggregate Table-5 volume ledger."""
     return Table5VolumeLedger(
         requested_request_count=payload["requested_request_count"],
         accepted_request_count=payload["accepted_request_count"],
@@ -138,10 +136,50 @@ def _restore_volume_ledger(
     )
 
 
+def _restore_transport_arc_evidence(
+    payload: dict[str, Any],
+) -> Table5TransportArcEvidence:
+    return Table5TransportArcEvidence(
+        arc_id=payload["arc_id"],
+        service_id=payload["service_id"],
+        origin=payload["origin"],
+        destination=payload["destination"],
+        departure_time=payload["departure_time"],
+        arrival_time=payload["arrival_time"],
+        nominal_capacity=payload["nominal_capacity"],
+        actual_capacity=payload["actual_capacity"],
+        original_load=payload["original_load"],
+        final_load=payload["final_load"],
+        source_update_event_id=payload.get("source_update_event_id"),
+    )
+
+
+def _restore_service_capacity_snapshot(
+    payload: dict[str, Any],
+) -> Table5ServiceCapacitySnapshot:
+    raw_arcs = _as_list(
+        payload["arcs"],
+        "service_capacity_snapshot.arcs",
+    )
+
+    return Table5ServiceCapacitySnapshot(
+        reporting_time=payload["reporting_time"],
+        instance_fingerprint=payload["instance_fingerprint"],
+        arcs=tuple(
+            _restore_transport_arc_evidence(
+                _as_mapping(
+                    raw,
+                    "transport_arc_evidence",
+                )
+            )
+            for raw in raw_arcs
+        ),
+    )
+
+
 def _restore_record(
     payload: dict[str, Any],
 ) -> Table5CampaignPolicyRecord:
-    """Restore one rich Table-5 campaign record."""
     return Table5CampaignPolicyRecord(
         reporting_schema_version=payload["reporting_schema_version"],
         run_key=payload["run_key"],
@@ -174,6 +212,14 @@ def _restore_record(
                 )
             )
         ),
+        service_capacity_snapshot=(
+            _restore_service_capacity_snapshot(
+                _as_mapping(
+                    payload["service_capacity_snapshot"],
+                    "service_capacity_snapshot",
+                )
+            )
+        ),
     )
 
 
@@ -183,7 +229,6 @@ def _ordered_records(
     Table5CampaignPolicyRecord,
     ...,
 ]:
-    """Return records in canonical 24-run order."""
     run_plan = build_default_table5_run_plan()
 
     order = {run.run_key: index for index, run in enumerate(run_plan)}
@@ -242,7 +287,6 @@ def _atomic_json_write(
     payload: dict[str, object],
     path: Path,
 ) -> None:
-    """Atomically replace one JSON output."""
     path.parent.mkdir(
         parents=True,
         exist_ok=True,
@@ -269,7 +313,6 @@ def load_table5_campaign_checkpoint(
     list[Table5CampaignPolicyRecord],
     dict[str, dict[str, object]],
 ]:
-    """Load validated Table-5 campaign state."""
     path = Path(checkpoint_path)
 
     if not path.exists():
@@ -348,7 +391,6 @@ def write_table5_campaign_checkpoint(
     ],
     checkpoint_path: str | Path,
 ) -> Path:
-    """Atomically persist resumable Table-5 campaign state."""
     validate_table5_checkpoint_records(records)
 
     ordered = _ordered_records(records)

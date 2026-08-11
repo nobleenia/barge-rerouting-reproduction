@@ -23,6 +23,12 @@ from barge_rerouting.reporting.table5_campaign_record import (
 from barge_rerouting.reporting.table5_ledger import (
     Table5VolumeLedger,
 )
+from barge_rerouting.reporting.table5_service_capacity import (
+    Table5ServiceCapacitySnapshot,
+    Table5TransportArcEvidence,
+)
+
+DEMAND_FINGERPRINT = "d" * 64
 
 
 def _record(
@@ -68,6 +74,25 @@ def _record(
         net_value=500.0,
     )
 
+    service_snapshot = Table5ServiceCapacitySnapshot(
+        reporting_time=98,
+        instance_fingerprint=(DEMAND_FINGERPRINT),
+        arcs=(
+            Table5TransportArcEvidence(
+                arc_id="transport::a",
+                service_id="service::slot01",
+                origin="A",
+                destination="B",
+                departure_time=0,
+                arrival_time=1,
+                nominal_capacity=float(capacity_teu),
+                actual_capacity=float(capacity_teu),
+                original_load=2.0,
+                final_load=2.0,
+            ),
+        ),
+    )
+
     return Table5CampaignPolicyRecord(
         reporting_schema_version=(TABLE5_CAMPAIGN_RECORD_SCHEMA),
         run_key=run_key,
@@ -76,7 +101,7 @@ def _record(
         capacity_teu=capacity_teu,
         policy_key=policy_key,
         configuration_fingerprint="config",
-        demand_fingerprint="demand",
+        demand_fingerprint=DEMAND_FINGERPRINT,
         solver_backend="cplex",
         completed=True,
         requested_booking_count=1,
@@ -88,6 +113,7 @@ def _record(
         runtime_seconds=1.5,
         volume_ledger=ledger,
         allocation_snapshot=snapshot,
+        service_capacity_snapshot=(service_snapshot),
     )
 
 
@@ -110,7 +136,7 @@ def test_checkpoint_round_trip_preserves_rich_evidence(
     metadata = {
         record.cell_key: {
             "capacity_teu": 10,
-            "demand_fingerprint": "demand",
+            "demand_fingerprint": (DEMAND_FINGERPRINT),
         }
     }
 
@@ -134,6 +160,10 @@ def test_checkpoint_round_trip_preserves_rich_evidence(
         result.allocation_snapshot.demands[0].original_arc_allocations[0].arc_id == "transport::a"
     )
 
+    assert result.service_capacity_snapshot.arcs[0].arc_id == "transport::a"
+
+    assert result.service_capacity_snapshot.arcs[0].actual_capacity == pytest.approx(10.0)
+
     assert restored_metadata == metadata
 
 
@@ -153,6 +183,8 @@ def test_checkpoint_uses_expected_schema(
     assert payload["schema_version"] == TABLE5_CAMPAIGN_CHECKPOINT_SCHEMA_VERSION
 
     assert payload["reporting_schema_version"] == TABLE5_CAMPAIGN_RECORD_SCHEMA
+
+    assert payload["records"][0]["service_capacity_snapshot"]["arcs"][0]["arc_id"] == "transport::a"
 
 
 def test_duplicate_run_keys_are_rejected() -> None:
