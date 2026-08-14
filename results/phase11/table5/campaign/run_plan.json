@@ -1,0 +1,215 @@
+{
+  "capacities_teu": [
+    10,
+    20,
+    30,
+    40
+  ],
+  "experiment": "phase11_table5",
+  "policy_keys": [
+    "dca",
+    "pr",
+    "fr"
+  ],
+  "policy_run_count": 24,
+  "reproduction_class": "controlled_substitute_input",
+  "run_plan": [
+    {
+      "capacity_teu": 10,
+      "cell_key": "service_family_1__capacity_10",
+      "policy_key": "dca",
+      "reproduction_class": "controlled_substitute_input",
+      "run_key": "service_family_1__capacity_10__dca",
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 10,
+      "cell_key": "service_family_1__capacity_10",
+      "policy_key": "pr",
+      "reproduction_class": "controlled_substitute_input",
+      "run_key": "service_family_1__capacity_10__pr",
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 10,
+      "cell_key": "service_family_1__capacity_10",
+      "policy_key": "fr",
+      "reproduction_class": "controlled_substitute_input",
+      "run_key": "service_family_1__capacity_10__fr",
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 20,
+      "cell_key": "service_family_1__capacity_20",
+      "policy_key": "dca",
+      "reproduction_class": "controlled_substitute_input",
+      "run_key": "service_family_1__capacity_20__dca",
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 20,
+      "cell_key": "service_family_1__capacity_20",
+      "policy_key": "pr",
+      "reproduction_class": "controlled_substitute_input",
+      "run_key": "service_family_1__capacity_20__pr",
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 20,
+      "cell_key": "service_family_1__capacity_20",
+      "policy_key": "fr",
+      "reproduction_class": "controlled_substitute_input",
+      "run_key": "service_family_1__capacity_20__fr",
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 30,
+      "cell_key": "service_family_1__capacity_30",
+      "policy_key": "dca",
+      "reproduction_class": "controlled_substitute_input",
+      "run_key": "service_family_1__capacity_30__dca",
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 30,
+      "cell_key": "service_family_1__capacity_30",
+      "policy_key": "pr",
+      "reproduction_class": "controlled_substitute_input",
+      "run_key": "service_family_1__capacity_30__pr",
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 30,
+      "cell_key": "service_family_1__capacity_30",
+      "policy_key": "fr",
+      "reproduction_class": "controlled_substitute_input",
+      "run_key": "service_family_1__capacity_30__fr",
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 40,
+      "cell_key": "service_family_1__capacity_40",
+      "policy_key": "dca",
+      "reproduction_class": "controlled_substitute_input",
+      "run_key": "service_family_1__capacity_40__dca",
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 40,
+      "cell_key": "service_family_1__capacity_40",
+      "policy_key": "pr",
+      "reproduction_class": "controlled_substitute_input",
+      "run_key": "service_family_1__capacity_40__pr",
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 40,
+      "cell_key": "service_family_1__capacity_40",
+      "policy_key": "fr",
+      "reproduction_class": "controlled_substitute_input",
+      "run_key": "service_family_1__capacity_40__fr",
+      "service_family": "service_family_1"
+    },
+    {
+      "capacity_teu": 10,
+      "cell_key": "service_family_2__capacity_10",
+      "policy_key": "dca",
+      "reproduction_class": "controlled_substitute_input",
+      "run_key": "service_family_2__capacity_10__dca",
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 10,
+      "cell_key": "service_family_2__capacity_10",
+      "policy_key": "pr",
+      "reproduction_class": "controlled_substitute_input",
+      "run_key": "service_family_2__capacity_10__pr",
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 10,
+      "cell_key": "service_family_2__capacity_10",
+      "policy_key": "fr",
+      "reproduction_class": "controlled_substitute_input",
+      "run_key": "service_family_2__capacity_10__fr",
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 20,
+      "cell_key": "service_family_2__capacity_20",
+      "policy_key": "dca",
+      "reproduction_class": "controlled_substitute_input",
+      "run_key": "service_family_2__capacity_20__dca",
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 20,
+      "cell_key": "service_family_2__capacity_20",
+      "policy_key": "pr",
+      "reproduction_class": "controlled_substitute_input",
+      "run_key": "service_family_2__capacity_20__pr",
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 20,
+      "cell_key": "service_family_2__capacity_20",
+      "policy_key": "fr",
+      "reproduction_class": "controlled_substitute_input",
+      "run_key": "service_family_2__capacity_20__fr",
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 30,
+      "cell_key": "service_family_2__capacity_30",
+      "policy_key": "dca",
+      "reproduction_class": "controlled_substitute_input",
+      "run_key": "service_family_2__capacity_30__dca",
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 30,
+      "cell_key": "service_family_2__capacity_30",
+      "policy_key": "pr",
+      "reproduction_class": "controlled_substitute_input",
+      "run_key": "service_family_2__capacity_30__pr",
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 30,
+      "cell_key": "service_family_2__capacity_30",
+      "policy_key": "fr",
+      "reproduction_class": "controlled_substitute_input",
+      "run_key": "service_family_2__capacity_30__fr",
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 40,
+      "cell_key": "service_family_2__capacity_40",
+      "policy_key": "dca",
+      "reproduction_class": "controlled_substitute_input",
+      "run_key": "service_family_2__capacity_40__dca",
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 40,
+      "cell_key": "service_family_2__capacity_40",
+      "policy_key": "pr",
+      "reproduction_class": "controlled_substitute_input",
+      "run_key": "service_family_2__capacity_40__pr",
+      "service_family": "service_family_2"
+    },
+    {
+      "capacity_teu": 40,
+      "cell_key": "service_family_2__capacity_40",
+      "policy_key": "fr",
+      "reproduction_class": "controlled_substitute_input",
+      "run_key": "service_family_2__capacity_40__fr",
+      "service_family": "service_family_2"
+    }
+  ],
+  "service_families": [
+    "service_family_1",
+    "service_family_2"
+  ],
+  "structural_cell_count": 8
+}

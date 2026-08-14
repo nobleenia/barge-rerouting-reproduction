@@ -47,3 +47,10 @@ results/model_exports/*
 .env.*
 *.key
 *.pem
+
+# Phase 11 heavy operational / diagnostic evidence
+results/phase11/table4/campaign/campaign_checkpoint.json
+results/phase11/table5/campaign/campaign_checkpoint.json
+results/phase11/table5/campaign/prevalidation/
+results/phase11/table5/campaign/logs/
+results/phase11/table5/pilot/
