@@ -54,3 +54,8 @@ results/phase11/table5/campaign/campaign_checkpoint.json
 results/phase11/table5/campaign/prevalidation/
 results/phase11/table5/campaign/logs/
 results/phase11/table5/pilot/
+
+# Phase 11 Table 6 heavy operational evidence
+results/phase11/table6/campaign/records/
+results/phase11/table6/campaign/prevalidation/
+results/phase11/table6/campaign/logs/

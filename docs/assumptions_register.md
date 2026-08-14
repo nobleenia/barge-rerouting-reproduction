@@ -2764,3 +2764,80 @@ Regression tests cover:
 An expensive completed PR or FR run preserves enough evidence for indicator
 reconstruction and validation without rerunning the optimisation solely for
 reporting purposes.
+
+## A052 — Phase-11C Table-6 constant water-factor reconstruction
+
+**Status:** controlled interpretation frozen before Table-6 production.
+
+The publication defines Table 6 as a Partial-Reroute experiment over water
+factors:
+
+\[
+\lambda \in \{1.0,0.9,0.8,0.7\}.
+\]
+
+The source does not disclose the exact realised water-level forecast sequence.
+
+For the controlled reproduction, one Table-6 scenario therefore uses one
+constant water factor \(\lambda\) across all 20 PR forecast-update epochs:
+
+\[
+t=0,4,8,\ldots,76.
+\]
+
+The update validity windows remain those already frozen for Table 5:
+
+\[
+[0,4),[4,8),\ldots,[72,76),[76,99).
+\]
+
+The final interval reaches beyond the controlled horizon end \(98\), so
+late service departures do not silently return to standard water.
+
+Updates are unscoped and therefore apply uniformly to all recurring
+services.
+
+Actual service capacity is:
+
+\[
+C_a^{actual}
+=
+\lambda C_a^{nominal}.
+\]
+
+No integer TEU rounding is introduced.
+
+Operational execution continues to use the validated Phase-10 rule that
+already-departed service legs are immutable.
+
+For publication-facing historical reporting, however, the actual capacity
+of each physical transport arc is reconstructed at that arc's departure
+time. This prevents a reduced-water sailing from being reported later with
+nominal capacity merely because the final reporting horizon occurs after
+departure.
+
+Under one uniform scenario factor, the controlled AFR/NFR candidates must
+therefore satisfy:
+
+\[
+NFR
+=
+\lambda AFR
+\]
+
+within numerical tolerance.
+
+The eight \(\lambda=1.0\) Partial-Reroute rows are reused directly from the
+validated Phase-11B Table-5 campaign. They are not recomputed.
+
+Only the 24 new rows for:
+
+\[
+\lambda\in\{0.9,0.8,0.7\}
+\]
+
+require new optimisation.
+
+This interpretation is not claimed to reproduce an undisclosed realised
+water-level sequence from the authors' implementation and will not be
+changed after observing Table-6 results.

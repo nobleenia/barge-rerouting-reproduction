@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from math import fsum, isfinite
 
 from barge_rerouting.disruption.capacity import (
+    ActualCapacityProfile,
     build_actual_capacity_profile,
 )
 from barge_rerouting.disruption.operational_execution import (
@@ -382,6 +383,7 @@ def build_table5_service_capacity_snapshot(
     final_state: (RollingBookingState | RecoveryOperationalState),
     reporting_time: int,
     status_updates: Sequence[ServiceStatusUpdateEvent] = (),
+    historical_actual_capacity: bool = False,
 ) -> Table5ServiceCapacitySnapshot:
     """Build raw final transport-load and capacity evidence."""
     booking_state = _booking_state(final_state)
@@ -398,18 +400,17 @@ def build_table5_service_capacity_snapshot(
         reporting_time,
     )
 
-    actual_profile = build_actual_capacity_profile(
-        instance,
-        physical_time=reporting_time,
-        status_updates=status_updates,
-    )
+    if not isinstance(
+        historical_actual_capacity,
+        bool,
+    ):
+        raise TypeError("historical_actual_capacity must be a boolean.")
 
     fingerprint = instance.demand_fingerprint
 
     for snapshot in (
         original_execution,
         final_execution,
-        actual_profile,
     ):
         if snapshot.instance_fingerprint != fingerprint:
             raise ValueError("Reporting snapshots belong to different instances.")
@@ -417,9 +418,56 @@ def build_table5_service_capacity_snapshot(
         if snapshot.physical_time != reporting_time:
             raise ValueError("Reporting snapshots must use the reporting horizon.")
 
+    if historical_actual_capacity:
+        profiles_by_departure: dict[
+            int,
+            ActualCapacityProfile,
+        ] = {}
+
+        historical_states = []
+
+        for arc in instance.arcs:
+            if not arc.is_transport:
+                continue
+
+            departure_time = int(arc.tail[1])
+
+            profile = profiles_by_departure.get(departure_time)
+
+            if profile is None:
+                profile = build_actual_capacity_profile(
+                    instance,
+                    physical_time=departure_time,
+                    status_updates=status_updates,
+                )
+
+                if profile.instance_fingerprint != fingerprint:
+                    raise ValueError("Historical capacity profile belongs to a different instance.")
+
+                profiles_by_departure[departure_time] = profile
+
+            historical_states.append(profile.state_for(arc.arc_id))
+
+        capacity_states = tuple(historical_states)
+
+    else:
+        actual_profile = build_actual_capacity_profile(
+            instance,
+            physical_time=reporting_time,
+            status_updates=status_updates,
+        )
+
+        if actual_profile.instance_fingerprint != fingerprint:
+            raise ValueError("Actual-capacity profile belongs to a different instance.")
+
+        if actual_profile.physical_time != reporting_time:
+            raise ValueError("Actual-capacity profile must use the reporting horizon.")
+
+        capacity_states = actual_profile.arc_states
+
     records: list[Table5TransportArcEvidence] = []
 
-    for capacity in actual_profile.arc_states:
+    for capacity in capacity_states:
         tail_terminal, tail_time = capacity.tail
         head_terminal, head_time = capacity.head
 

@@ -173,3 +173,46 @@ def test_duplicate_arc_ids_are_rejected() -> None:
                 arc,
             ),
         )
+
+
+def test_historical_reduced_water_preserves_departure_capacity() -> None:
+    """Reduced-water reporting must not revert past arcs to nominal capacity."""
+    from dataclasses import replace
+
+    spec = default_table5_experiment_spec()
+
+    inputs = build_table5_campaign_cell_inputs(
+        Table5CampaignCell(
+            service_family="service_family_1",
+            capacity_teu=10,
+            reproduction_class=spec.reproduction_class,
+        ),
+        spec=spec,
+    )
+
+    reduced_updates = tuple(
+        replace(
+            update,
+            water_level_factor=0.8,
+        )
+        for update in inputs.pr_updates
+    )
+
+    state = RollingBookingState.empty(inputs.instance)
+
+    snapshot = build_table5_service_capacity_snapshot(
+        instance=inputs.instance,
+        final_state=state,
+        reporting_time=spec.horizon_end,
+        status_updates=reduced_updates,
+        historical_actual_capacity=True,
+    )
+
+    assert snapshot.transport_arc_count == 112
+    assert not snapshot.standard_water
+
+    assert {arc.nominal_capacity for arc in snapshot.arcs} == {10.0}
+
+    assert {arc.actual_capacity for arc in snapshot.arcs} == {8.0}
+
+    assert all(arc.water_level_factor == pytest.approx(0.8) for arc in snapshot.arcs)
