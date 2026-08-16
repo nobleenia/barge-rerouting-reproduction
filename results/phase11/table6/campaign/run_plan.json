@@ -1,0 +1,294 @@
+{
+  "row_count": 32,
+  "rows": [
+    {
+      "capacity_teu": 10,
+      "policy_key": "pr",
+      "position": 1,
+      "service_family": "service_family_1",
+      "source_kind": "table5_reused_standard_water",
+      "source_run_key": "service_family_1__capacity_10__pr",
+      "water_factor": 1.0
+    },
+    {
+      "capacity_teu": 10,
+      "policy_key": "pr",
+      "position": 2,
+      "service_family": "service_family_1",
+      "source_kind": "table6_new_reduced_water",
+      "source_run_key": "service_family_1__capacity_10__water_0p9__pr",
+      "water_factor": 0.9
+    },
+    {
+      "capacity_teu": 10,
+      "policy_key": "pr",
+      "position": 3,
+      "service_family": "service_family_1",
+      "source_kind": "table6_new_reduced_water",
+      "source_run_key": "service_family_1__capacity_10__water_0p8__pr",
+      "water_factor": 0.8
+    },
+    {
+      "capacity_teu": 10,
+      "policy_key": "pr",
+      "position": 4,
+      "service_family": "service_family_1",
+      "source_kind": "table6_new_reduced_water",
+      "source_run_key": "service_family_1__capacity_10__water_0p7__pr",
+      "water_factor": 0.7
+    },
+    {
+      "capacity_teu": 20,
+      "policy_key": "pr",
+      "position": 5,
+      "service_family": "service_family_1",
+      "source_kind": "table5_reused_standard_water",
+      "source_run_key": "service_family_1__capacity_20__pr",
+      "water_factor": 1.0
+    },
+    {
+      "capacity_teu": 20,
+      "policy_key": "pr",
+      "position": 6,
+      "service_family": "service_family_1",
+      "source_kind": "table6_new_reduced_water",
+      "source_run_key": "service_family_1__capacity_20__water_0p9__pr",
+      "water_factor": 0.9
+    },
+    {
+      "capacity_teu": 20,
+      "policy_key": "pr",
+      "position": 7,
+      "service_family": "service_family_1",
+      "source_kind": "table6_new_reduced_water",
+      "source_run_key": "service_family_1__capacity_20__water_0p8__pr",
+      "water_factor": 0.8
+    },
+    {
+      "capacity_teu": 20,
+      "policy_key": "pr",
+      "position": 8,
+      "service_family": "service_family_1",
+      "source_kind": "table6_new_reduced_water",
+      "source_run_key": "service_family_1__capacity_20__water_0p7__pr",
+      "water_factor": 0.7
+    },
+    {
+      "capacity_teu": 30,
+      "policy_key": "pr",
+      "position": 9,
+      "service_family": "service_family_1",
+      "source_kind": "table5_reused_standard_water",
+      "source_run_key": "service_family_1__capacity_30__pr",
+      "water_factor": 1.0
+    },
+    {
+      "capacity_teu": 30,
+      "policy_key": "pr",
+      "position": 10,
+      "service_family": "service_family_1",
+      "source_kind": "table6_new_reduced_water",
+      "source_run_key": "service_family_1__capacity_30__water_0p9__pr",
+      "water_factor": 0.9
+    },
+    {
+      "capacity_teu": 30,
+      "policy_key": "pr",
+      "position": 11,
+      "service_family": "service_family_1",
+      "source_kind": "table6_new_reduced_water",
+      "source_run_key": "service_family_1__capacity_30__water_0p8__pr",
+      "water_factor": 0.8
+    },
+    {
+      "capacity_teu": 30,
+      "policy_key": "pr",
+      "position": 12,
+      "service_family": "service_family_1",
+      "source_kind": "table6_new_reduced_water",
+      "source_run_key": "service_family_1__capacity_30__water_0p7__pr",
+      "water_factor": 0.7
+    },
+    {
+      "capacity_teu": 40,
+      "policy_key": "pr",
+      "position": 13,
+      "service_family": "service_family_1",
+      "source_kind": "table5_reused_standard_water",
+      "source_run_key": "service_family_1__capacity_40__pr",
+      "water_factor": 1.0
+    },
+    {
+      "capacity_teu": 40,
+      "policy_key": "pr",
+      "position": 14,
+      "service_family": "service_family_1",
+      "source_kind": "table6_new_reduced_water",
+      "source_run_key": "service_family_1__capacity_40__water_0p9__pr",
+      "water_factor": 0.9
+    },
+    {
+      "capacity_teu": 40,
+      "policy_key": "pr",
+      "position": 15,
+      "service_family": "service_family_1",
+      "source_kind": "table6_new_reduced_water",
+      "source_run_key": "service_family_1__capacity_40__water_0p8__pr",
+      "water_factor": 0.8
+    },
+    {
+      "capacity_teu": 40,
+      "policy_key": "pr",
+      "position": 16,
+      "service_family": "service_family_1",
+      "source_kind": "table6_new_reduced_water",
+      "source_run_key": "service_family_1__capacity_40__water_0p7__pr",
+      "water_factor": 0.7
+    },
+    {
+      "capacity_teu": 10,
+      "policy_key": "pr",
+      "position": 17,
+      "service_family": "service_family_2",
+      "source_kind": "table5_reused_standard_water",
+      "source_run_key": "service_family_2__capacity_10__pr",
+      "water_factor": 1.0
+    },
+    {
+      "capacity_teu": 10,
+      "policy_key": "pr",
+      "position": 18,
+      "service_family": "service_family_2",
+      "source_kind": "table6_new_reduced_water",
+      "source_run_key": "service_family_2__capacity_10__water_0p9__pr",
+      "water_factor": 0.9
+    },
+    {
+      "capacity_teu": 10,
+      "policy_key": "pr",
+      "position": 19,
+      "service_family": "service_family_2",
+      "source_kind": "table6_new_reduced_water",
+      "source_run_key": "service_family_2__capacity_10__water_0p8__pr",
+      "water_factor": 0.8
+    },
+    {
+      "capacity_teu": 10,
+      "policy_key": "pr",
+      "position": 20,
+      "service_family": "service_family_2",
+      "source_kind": "table6_new_reduced_water",
+      "source_run_key": "service_family_2__capacity_10__water_0p7__pr",
+      "water_factor": 0.7
+    },
+    {
+      "capacity_teu": 20,
+      "policy_key": "pr",
+      "position": 21,
+      "service_family": "service_family_2",
+      "source_kind": "table5_reused_standard_water",
+      "source_run_key": "service_family_2__capacity_20__pr",
+      "water_factor": 1.0
+    },
+    {
+      "capacity_teu": 20,
+      "policy_key": "pr",
+      "position": 22,
+      "service_family": "service_family_2",
+      "source_kind": "table6_new_reduced_water",
+      "source_run_key": "service_family_2__capacity_20__water_0p9__pr",
+      "water_factor": 0.9
+    },
+    {
+      "capacity_teu": 20,
+      "policy_key": "pr",
+      "position": 23,
+      "service_family": "service_family_2",
+      "source_kind": "table6_new_reduced_water",
+      "source_run_key": "service_family_2__capacity_20__water_0p8__pr",
+      "water_factor": 0.8
+    },
+    {
+      "capacity_teu": 20,
+      "policy_key": "pr",
+      "position": 24,
+      "service_family": "service_family_2",
+      "source_kind": "table6_new_reduced_water",
+      "source_run_key": "service_family_2__capacity_20__water_0p7__pr",
+      "water_factor": 0.7
+    },
+    {
+      "capacity_teu": 30,
+      "policy_key": "pr",
+      "position": 25,
+      "service_family": "service_family_2",
+      "source_kind": "table5_reused_standard_water",
+      "source_run_key": "service_family_2__capacity_30__pr",
+      "water_factor": 1.0
+    },
+    {
+      "capacity_teu": 30,
+      "policy_key": "pr",
+      "position": 26,
+      "service_family": "service_family_2",
+      "source_kind": "table6_new_reduced_water",
+      "source_run_key": "service_family_2__capacity_30__water_0p9__pr",
+      "water_factor": 0.9
+    },
+    {
+      "capacity_teu": 30,
+      "policy_key": "pr",
+      "position": 27,
+      "service_family": "service_family_2",
+      "source_kind": "table6_new_reduced_water",
+      "source_run_key": "service_family_2__capacity_30__water_0p8__pr",
+      "water_factor": 0.8
+    },
+    {
+      "capacity_teu": 30,
+      "policy_key": "pr",
+      "position": 28,
+      "service_family": "service_family_2",
+      "source_kind": "table6_new_reduced_water",
+      "source_run_key": "service_family_2__capacity_30__water_0p7__pr",
+      "water_factor": 0.7
+    },
+    {
+      "capacity_teu": 40,
+      "policy_key": "pr",
+      "position": 29,
+      "service_family": "service_family_2",
+      "source_kind": "table5_reused_standard_water",
+      "source_run_key": "service_family_2__capacity_40__pr",
+      "water_factor": 1.0
+    },
+    {
+      "capacity_teu": 40,
+      "policy_key": "pr",
+      "position": 30,
+      "service_family": "service_family_2",
+      "source_kind": "table6_new_reduced_water",
+      "source_run_key": "service_family_2__capacity_40__water_0p9__pr",
+      "water_factor": 0.9
+    },
+    {
+      "capacity_teu": 40,
+      "policy_key": "pr",
+      "position": 31,
+      "service_family": "service_family_2",
+      "source_kind": "table6_new_reduced_water",
+      "source_run_key": "service_family_2__capacity_40__water_0p8__pr",
+      "water_factor": 0.8
+    },
+    {
+      "capacity_teu": 40,
+      "policy_key": "pr",
+      "position": 32,
+      "service_family": "service_family_2",
+      "source_kind": "table6_new_reduced_water",
+      "source_run_key": "service_family_2__capacity_40__water_0p7__pr",
+      "water_factor": 0.7
+    }
+  ],
+  "schema_version": "table6-run-plan-v1"
+}

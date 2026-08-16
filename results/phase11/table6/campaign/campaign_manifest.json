@@ -1,0 +1,68 @@
+{
+  "all_required_runs_completed": true,
+  "campaign_source_commit": "01f7b80e4104b5c3fda2b06f7be65fe9033d9cc9",
+  "capacities_teu": [
+    10,
+    20,
+    30,
+    40
+  ],
+  "classification": "controlled_substitute_input",
+  "controlled_table6_row_count": 32,
+  "demand_fingerprint": "9987096abb4c217cd2dca3c307599e4d231c47a2e02c416a6b0ee28128626944",
+  "evidence_sha256_entry_count": 49,
+  "indicator_contract": {
+    "primary_afr": "mean transport-arc actual utilisation",
+    "primary_nfr": "mean transport-arc nominal utilisation",
+    "reduced_water_identity": "NFR = water_factor * AFR",
+    "vfb": "final barge volume / requested volume",
+    "vob": "accepted volume / requested volume",
+    "vtr": "truck volume / requested volume"
+  },
+  "new_campaign_runtime_hours": 36.115252790498324,
+  "new_campaign_runtime_seconds": 130014.91004579398,
+  "new_prevalidation_artifact_count": 24,
+  "new_reduced_water_row_count": 24,
+  "outputs": {
+    "controlled_rows": "results/phase11/table6/campaign/table6_policy_rows.csv",
+    "evidence_sha256": "results/phase11/table6/campaign/audit/evidence_sha256.txt",
+    "global_audit": "results/phase11/table6/campaign/audit/global_campaign_audit.txt",
+    "published_comparison": "results/phase11/table6/campaign/table6_published_comparison.csv",
+    "run_plan": "results/phase11/table6/campaign/run_plan.json",
+    "water_effects": "results/phase11/table6/campaign/table6_water_effects.csv"
+  },
+  "policy_key": "pr",
+  "published_table6_row_count": 32,
+  "requested_booking_count": 800,
+  "requested_volume_teu": 1076.0,
+  "reused_standard_water_row_count": 8,
+  "runtime_hours_by_service": {
+    "service_family_1": 16.0167999666136,
+    "service_family_2": 20.098452823884728
+  },
+  "runtime_hours_by_water": {
+    "0.7": 12.032715855397822,
+    "0.8": 12.034836005331632,
+    "0.9": 12.047700929768874
+  },
+  "schema_version": "table6-campaign-manifest-v1",
+  "service_families": [
+    "service_family_1",
+    "service_family_2"
+  ],
+  "table5_reused_source_commit": "88e4d945be8a31da021004050f5b3fa48153706b",
+  "table6_printed_anomaly": {
+    "capacity_teu": 40,
+    "indicator": "NFR",
+    "note": "Retained literally. No silent correction.",
+    "printed_value": 8,
+    "service_family": "service_family_1",
+    "water_factor": 0.9
+  },
+  "water_factors": [
+    1.0,
+    0.9,
+    0.8,
+    0.7
+  ]
+}

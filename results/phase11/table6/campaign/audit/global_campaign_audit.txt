@@ -1,0 +1,80 @@
+==============================================================================================================
+TABLE 6 — GLOBAL CAMPAIGN AUDIT
+==============================================================================================================
+
+Reduced-water rich records: 24
+Reduced-water prevalidations: 24
+Standard-water rows reused from Table 5: 8
+Complete controlled Table-6 rows: 32
+Coverage: PASS
+Unique reduced-water run keys: PASS
+Single campaign source commit: PASS
+Single frozen demand fingerprint: PASS
+All prevalidations validated: PASS
+800 booking events per reduced run: PASS
+20 status updates per reduced run: PASS
+Zero solver failures: PASS
+Accepted = final barge + truck: PASS
+Gross revenue - truck penalty = net revenue: PASS
+Historical actual capacity = water factor * nominal capacity: PASS
+No material actual-capacity violations: PASS
+Independent mean-arc AFR/NFR reconstruction: PASS
+Independent weighted AFR/NFR reconstruction: PASS
+NFR = water factor * AFR for all three retained candidates: PASS
+
+==============================================================================================================
+CANONICAL CONTROLLED TABLE 6
+==============================================================================================================
+SF  Cap Water   AccTEU    Barge    Truck     AFR%     NFR%     VTR%     VFB%     VOB%     Time(s) Source
+--------------------------------------------------------------------------------------------------------------------------------------------
+ 1   10   1.0   453.000  453.000    0.000   82.857   82.857    0.000   42.100   42.100    1973.983 table5_reused_standard_water
+ 1   10   0.9   442.000  396.000   46.000   83.631   75.268    4.275   36.803   41.078    1607.629 table6_new_reduced_water
+ 1   10   0.8   434.000  343.000   91.000   85.045   68.036    8.457   31.877   40.335    1532.076 table6_new_reduced_water
+ 1   10   0.7   437.000  299.000  138.000   85.714   60.000   12.825   27.788   40.613    1575.113 table6_new_reduced_water
+ 1   20   1.0   793.000  793.000    0.000   75.848   75.848    0.000   73.699   73.699    4482.010 table5_reused_standard_water
+ 1   20   0.9   783.000  732.000   51.000   78.274   70.446    4.740   68.030   72.770    4373.306 table6_new_reduced_water
+ 1   20   0.8   773.000  651.000  122.000   80.022   64.018   11.338   60.502   71.840    4287.395 table6_new_reduced_water
+ 1   20   0.7   769.000  576.000  193.000   81.952   57.366   17.937   53.532   71.468    4307.092 table6_new_reduced_water
+ 1   30   1.0  1018.000 1018.000    0.000   64.256   64.256    0.000   94.610   94.610    6435.621 table5_reused_standard_water
+ 1   30   0.9  1000.000  983.000   17.000   68.155   61.339    1.580   91.357   92.937    6398.377 table6_new_reduced_water
+ 1   30   0.8   998.000  922.000   76.000   73.475   58.780    7.063   85.688   92.751    6401.847 table6_new_reduced_water
+ 1   30   0.7   986.000  825.000  161.000   76.276   53.393   14.963   76.673   91.636    6305.738 table6_new_reduced_water
+ 1   40   1.0  1061.000 1061.000    0.000   50.290   50.290    0.000   98.606   98.606    6963.239 table5_reused_standard_water
+ 1   40   0.9  1064.000 1064.000    0.000   56.399   50.759    0.000   98.885   98.885    6957.888 table6_new_reduced_water
+ 1   40   0.8  1061.000 1054.000    7.000   63.449   50.759    0.651   97.955   98.606    6960.278 table6_new_reduced_water
+ 1   40   0.7  1057.000 1002.000   55.000   67.411   47.188    5.112   93.123   98.234    6953.743 table6_new_reduced_water
+ 2   10   1.0   794.000  794.000    0.000   83.036   83.036    0.000   73.792   73.792    4599.560 table5_reused_standard_water
+ 2   10   0.9   774.000  722.000   52.000   82.887   74.598    4.833   67.100   71.933    4527.457 table6_new_reduced_water
+ 2   10   0.8   757.000  646.000  111.000   83.315   66.652   10.316   60.037   70.353    4383.179 table6_new_reduced_water
+ 2   10   0.7   749.000  564.000  185.000   84.247   58.973   17.193   52.416   69.610    4276.040 table6_new_reduced_water
+ 2   20   1.0  1075.000 1075.000    0.000   64.978   64.978    0.000   99.907   99.907    6562.022 table5_reused_standard_water
+ 2   20   0.9  1074.000 1074.000    0.000   70.461   63.415    0.000   99.814   99.814    6727.044 table6_new_reduced_water
+ 2   20   0.8  1071.000 1056.000   15.000   75.335   60.268    1.394   98.141   99.535    6839.977 table6_new_reduced_water
+ 2   20   0.7  1062.000 1001.000   61.000   77.423   54.196    5.669   93.030   98.699    6920.166 table6_new_reduced_water
+ 2   30   1.0  1076.000 1076.000    0.000   43.676   43.676    0.000  100.000  100.000    6308.242 table5_reused_standard_water
+ 2   30   0.9  1076.000 1076.000    0.000   45.800   41.220    0.000  100.000  100.000    6391.503 table6_new_reduced_water
+ 2   30   0.8  1076.000 1076.000    0.000   54.371   43.497    0.000  100.000  100.000    6523.206 table6_new_reduced_water
+ 2   30   0.7  1076.000 1076.000    0.000   61.331   42.932    0.000  100.000  100.000    6508.316 table6_new_reduced_water
+ 2   40   1.0  1076.000 1076.000    0.000   30.502   30.502    0.000  100.000  100.000    6277.495 table5_reused_standard_water
+ 2   40   0.9  1076.000 1076.000    0.000   34.040   30.636    0.000  100.000  100.000    6388.520 table6_new_reduced_water
+ 2   40   0.8  1076.000 1076.000    0.000   39.997   31.998    0.000  100.000  100.000    6397.452 table6_new_reduced_water
+ 2   40   0.7  1076.000 1076.000    0.000   45.775   32.042    0.000  100.000  100.000    6471.570 table6_new_reduced_water
+
+==============================================================================================================
+RUNTIME SUMMARY — NEW REDUCED-WATER RUNS
+==============================================================================================================
+Total: 130014.910s = 36.115h
+Water 0.9: 43371.723s = 12.048h
+Water 0.8: 43325.410s = 12.035h
+Water 0.7: 43317.777s = 12.033h
+service_family_1: 57660.480s = 16.017h
+service_family_2: 72354.430s = 20.098h
+
+==============================================================================================================
+PUBLICATION ANOMALY
+==============================================================================================================
+Service 1 / capacity 40 / water 0.9: Table 6 prints NFR = 8. This value is retained literally in comparison output.
+
+==============================================================================================================
+TABLE 6 GLOBAL CAMPAIGN AUDIT: PASS
+==============================================================================================================
