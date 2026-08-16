@@ -1,0 +1,36 @@
+cff-version: 1.2.0
+message: "If you use this reproduction software, please cite this repository and the original Cui et al. paper."
+title: "Computational Reproduction of Demand Rerouting and Revenue Management for Intermodal Barge Transportation Networks"
+type: software
+authors:
+  - family-names: "Eluwah"
+    given-names: "Noble"
+version: 1.0.0
+date-released: 2026-08-16
+license: MIT
+keywords:
+  - intermodal transportation
+  - inland waterways
+  - barge transportation
+  - revenue management
+  - demand rerouting
+  - operations research
+  - mixed integer programming
+  - reproducibility
+references:
+  - type: article
+    authors:
+      - family-names: "Cui"
+        given-names: "Yaheng"
+      - family-names: "Bilegan"
+        given-names: "Ioana C."
+      - family-names: "Duchenne"
+        given-names: "Eric"
+      - family-names: "Duvivier"
+        given-names: "David"
+    title: "Demand rerouting mechanisms with revenue management for intermodal barge transportation networks"
+    journal: "Transportmetrica B: Transport Dynamics"
+    volume: 12
+    issue: 1
+    year: 2024
+    doi: "10.1080/21680566.2024.2416182"
