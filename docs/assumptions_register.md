@@ -30,7 +30,8 @@ Each entry contains:
 
 ## A001 — Exact service schedules
 
-**Status:** Unresolved
+**Status:** Unresolved  
+- Operationally superseded by the detailed schedule reconstruction in A028; exact schedule still open.  
 
 **Paper evidence:**
 Services have fixed routes, schedules, capacities, and periodic operation.
@@ -67,7 +68,8 @@ service families be provided?
 
 ## A002 — Destination-time interpretation
 
-**Status:** Assumed
+**Status:** Assumed  
+(Arrival at any destination-time node with \(t^{arrival}(k)\) ≤ \(t^{due}(k)\))
 
 **Paper evidence:**
 Each demand has a physical destination \(d(k)\) and a due time
@@ -106,7 +108,8 @@ Demand-feasible subgraphs, super-sink construction, flow conservation.
 
 ## A003 — State of partially executed demands
 
-**Status:** Assumed operational interpretation
+**Status:** Assumed operational interpretation  
+(Only unfinished fragments are rerouted; departed and in-transit arcs are immutable.)
 
 **Paper evidence:**
 Previously accepted but undelivered demands may have their itineraries
@@ -194,7 +197,8 @@ During rerouting:
 - `src/barge_rerouting/rerouting/run.py`
 ## A004 — Construction of the future-demand set
 
-**Status:** Unresolved
+**Status:** Assumed operational interpretation  
+Future demand is selected through shared feasible transport arcs with the current request; forecasts are non-oracle.
 
 **Paper evidence:**
 \(K(\tilde{k})\) contains potential future demands having direct possible
@@ -248,7 +252,8 @@ Forecast generation, policy input construction, model size.
 
 ## A005 — Future-demand expected-revenue expression
 
-**Status:** Explicit baseline with sensitivity alternative
+**Status:** Explicit baseline with sensitivity alternative, Assumed operational interpretation  
+Printed prefix expression used as baseline; capped expectation implemented as sensitivity.
 
 **Paper evidence:**
 For protected level \(j\), the printed future-demand contribution uses:
@@ -297,7 +302,8 @@ Future-demand value tables, objective coefficients, sensitivity experiments.
 
 ## A006 — Splittable demand
 
-**Status:** Derived
+**Status:** Derived  
+- Continuous arc-flow variables support splittable TEU flows. This is a reasonable derived reading of the printed formulation.  
 
 **Paper evidence:**
 Demand arc-flow variables are continuous.
@@ -324,7 +330,8 @@ Variable domains, path interpretation, model size.
 
 ## A007 — Holding-arc capacities and costs
 
-**Status:** Assumed
+**Status:** Assumed operational interpretation   
+Holding arcs are unlimited and costless.
 
 **Paper evidence:**
 Holding arcs allow cargo to wait at origins or intermediate terminals.
@@ -354,7 +361,8 @@ Network parameters and objective function.
 
 ## A008 — Truck recourse representation
 
-**Status:** Assumed
+**Status:** Assumed  
+- Refined by A025, A026, A044 and A046.  
 
 **Paper evidence:**
 Truck transport is available as an alternative mode and penalties are incurred
@@ -403,7 +411,8 @@ Disruption model, recourse variables, objective, performance indicators.
 
 ## A009 — Water-level capacity transformation
 
-**Status:** Explicit scenario rule with modelling simplification
+**Status:** Explicit scenario rule with modelling simplification  
+- Refined by A023 and A052.  
 
 **Paper evidence:**
 Actual service capacity is reduced under lower water levels using scenario
@@ -442,7 +451,8 @@ Capacity-update events, dynamic scenarios, AFR and NFR calculations.
 
 ## A010 — Synthetic demand generation
 
-**Status:** Partly explicit, partly unresolved
+**Status:** Partly explicit, partly unresolved  
+- Refined by A029–A033, A040 and A042.  
 
 **Paper evidence:**
 The experiments use synthetic demands with attributes including volume,
@@ -479,7 +489,8 @@ Demand generator, configurations, reproducibility metadata.
 
 ## A011 — Customer-category acceptance domains
 
-**Status:** Explicit
+**Status:** Explicit  
+- The acceptance domains for Regular, Partially-spot and Fully-spot demand are explicit and implemented.  
 
 **Paper evidence:**
 
@@ -516,7 +527,8 @@ Decision-variable domains and policy-equivalence tests.
 
 ## A012 — Performance-indicator denominators
 
-**Status:** Unresolved
+**Status:** Unresolved  
+- Operational definitions supplied by A050 and validated through A051, but the paper-level ambiguity remains open.  
 
 **Paper evidence:**
 The experiments report AFR, NFR, VTR, VFB, VOB, VOA, TR, and ST.
@@ -571,7 +583,8 @@ Validation report and result-comparison tables.
 
 ## A014 — Sustainability interpretation
 
-**Status:** Explicit limitation
+**Status:** Explicit limitation  
+- Sustainability is a motivation, not an explicit optimisation objective. This is a confirmed scope limitation.  
 
 **Paper evidence:**
 The research is motivated partly by the environmental advantages of inland
@@ -606,7 +619,8 @@ Interpretation of disruption results and future research section.
 
 ## A015 — Software-environment difference
 
-**Status:** Explicit reproduction difference
+**Status:** Explicit reproduction difference  
+- The software/solver environment difference is fully documented.  
 
 **Paper environment:**
 
@@ -687,7 +701,8 @@ Future-selector construction, solution uniqueness, and model size.
 
 ## A017 — Parallel scheduled transport arcs
 
-**Status:** Derived implementation requirement
+**Status:** Derived implementation requirement  
+- A directed multigraph is necessary to preserve parallel scheduled services.  
 
 **Paper evidence:**
 The transportation system contains multiple scheduled services and service
@@ -718,7 +733,8 @@ constraints.
 
 ## A018 — Interpretation of future-demand value
 
-**Status:** Baseline plus sensitivity analysis
+**Status:** Baseline plus sensitivity analysis  
+- Substantially duplicates A005 and should be consolidated with it.
 
 **Paper evidence:**
 The printed revenue-management expression contains:
@@ -868,7 +884,8 @@ and future Phase 10 sensitivity experiments.
 
 ## A021 — Rerouting-aware capacity-transition diagnostics
 
-**Status:** Derived implementation requirement
+**Status:** Derived implementation requirement  
+- Rerouting may legitimately release capacity on an arc; the separate transition diagnostic was implemented and validated.  
 
 **Implementation issue:**
 The original rolling-horizon capacity-transition diagnostic was designed
@@ -925,7 +942,8 @@ and DCA-RRM run tests.
 
 ## A022 — Phase 9 stable-capacity and truck-disabled boundary
 
-**Status:** Explicit experimental scope plus implementation boundary
+**Status:** Explicit experimental scope plus implementation boundary  
+- Stable-capacity Phase 9 is truck-disabled; Phase 10 introduced disruption and truck recourse.  
 
 **Paper evidence:**
 The stable-capacity experiment applies Full-Reroute without allowing demand
@@ -974,7 +992,8 @@ stable-capacity, truck-disabled core.
 
 ## A023 — Proportional water-adjusted actual capacity
 
-**Status:** Baseline operational assumption
+**Status:** Baseline operational assumption  
+- Proportional capacity, no TEU rounding, status-before-booking and immutable execution.
 
 **Paper evidence:**
 The service-status-change experiment states that vessel capacity changes
@@ -1018,7 +1037,8 @@ and Phase 10 dynamic experiments.
 
 ## A024 — Same-time status precedence and immutable execution
 
-**Status:** Baseline operational assumption
+**Status:** Baseline operational assumption  
+- Proportional capacity, no TEU rounding, status-before-booking and immutable execution.  
 
 **Missing information:**
 The publication does not specify the ordering when a new service-status
@@ -1060,7 +1080,8 @@ and `disruption/dynamic_full_reroute_run.py`.
 
 ## A025 — Explicit direct truck recourse
 
-**Status:** Transparent operationalisation of an under-specified paper term
+**Status:** Transparent operationalisation of an under-specified paper term  
+- Direct terminal truck recourse for prior unfinished cargo; no immediate trucking of the new request.  
 
 **Paper evidence:**
 The printed general objective contains a penalty for demand volume shifted
@@ -1126,7 +1147,8 @@ and dynamic PR/FR orchestration.
 
 ## A026 — Current-request trucking boundary in production dynamic FR
 
-**Status:** Baseline implementation boundary
+**Status:** Baseline implementation boundary  
+- Direct terminal truck recourse for prior unfinished cargo; no immediate trucking of the new request.  
 
 **Paper ambiguity:**
 The printed general penalty expression may be read as permitting truck
@@ -1169,7 +1191,8 @@ and `disruption/dynamic_full_reroute_run.py`.
 
 ## A027 — Repeated recovery uses incremental terminal truck history
 
-**Status:** Derived implementation requirement
+**Status:** Derived implementation requirement  
+- Repeated truck allocations are incremental, not repeatedly counted. The 3+1=4 example and full-horizon tests validate this.  
 
 **Operational issue:**
 The same accepted demand may be rerouted more than once, for example:
@@ -1372,7 +1395,8 @@ layer.
 
 ## A030 — Phase 11 horizon and demand-count interpretation
 
-**Status:** Unresolved publication ambiguity
+**Status:** Unresolved publication ambiguity  
+- Table 5 uses 80 request periods, 800 positive bookings, PR every four periods and FR every booking.  
 
 **Paper evidence:**
 Section 4.1 states a simulated rolling-time horizon of `400/800` time
@@ -1783,7 +1807,8 @@ the determinism comparison.
 
 ## A035 — HiGHS solver substitution for unrestricted MILP execution
 
-**Status:** Controlled computational substitution
+**Status:** Controlled computational substitution  
+- The HiGHS bridge and CE-aware selection rule were implemented and cross-solver validated.  
 
 The publication reports IBM CPLEX as its optimisation solver. The local
 reproduction environment provides CPLEX Community Edition, whose model-size
@@ -1829,7 +1854,8 @@ bit-for-bit route equality.
 
 ## A036 — Infeasible incoming Regular demand during controlled experiments
 
-**Status:** Controlled experimental interpretation
+**Status:** Controlled experimental interpretation  
+- Solver-certified infeasible Regular demand is rejected by the experiment adapter and execution continues.  
 
 **Paper evidence:**
 
@@ -1901,7 +1927,9 @@ feasible time-space itinerary remained under the selected booking policy.
 
 ## A037 — Deterministic CPLEX Community Edition-aware solver selection
 
-**Status:** Controlled computational-environment rule
+**Status:** Controlled computational-environment rule  
+- The HiGHS bridge and CE-aware selection rule were implemented and cross-solver validated.
+- Extended to recovery models by A043.  
 
 The publication reports CPLEX as its optimisation solver. The local
 reproduction environment contains CPLEX Community Edition, which imposes
@@ -1976,7 +2004,8 @@ programme nor its state-transition semantics.
 
 ## A038 — Table 4 numerical discrepancy classification
 
-**Status:** Experimental validation outcome
+**Status:** Experimental validation outcome  
+- Table 4’s final classification is resolved: validated behavioural/computational reproduction, not exact numerical replication.  
 
 Phase 11A completed the full stable-capacity Table 4-style campaign:
 
@@ -2027,7 +2056,8 @@ See:
 
 ## A039 — Table 5 demand horizon and trigger interpretation
 
-**Status:** Controlled interpretation derived from paper statements
+**Status:** Controlled interpretation derived from paper statements  
+- Table 5 uses 80 request periods, 800 positive bookings, PR every four periods and FR every booking.  
 
 The Table 5 experiment states that:
 
@@ -2197,7 +2227,8 @@ with the published Table 5 values.
 
 ## A043 — CE-aware backend selection for Table 5 recovery models
 
-**Status:** Controlled computational substitution
+**Status:** Controlled computational substitution  
+- The HiGHS bridge and CE-aware selection rule were implemented and cross-solver validated.  
 
 The deterministic CPLEX Community Edition-aware backend rule established in
 A037 is extended to the Phase-10 recovery models used by Phase 11B:
@@ -2309,7 +2340,8 @@ merely to improve agreement with the publication.
 
 ## A045 — Phase 11 Table 5 A036 continuation for PR and FR
 
-**Status:** Controlled execution interpretation
+**Status:** Controlled execution interpretation  
+- Solver-certified infeasible Regular demand is rejected by the experiment adapter and execution continues.  
 
 The validated Phase-10 Partial-Reroute and dynamic Full-Reroute result
 contracts require every processed booking to retain a genuine solved booking
@@ -2356,7 +2388,8 @@ validated Phase-10 PR and FR core contracts remain unchanged.
 
 ## A046 — Pending truck allocations are persistent operational commitments
 
-**Status:** Derived controlled operational interpretation
+**Status:** Derived controlled operational interpretation  
+- A truck assignment is persistent and cannot later return to barge.  
 
 **Paper disclosure gap:**
 The paper permits accepted demand volume to be shifted from barge to
@@ -2418,7 +2451,8 @@ conservation, and preservation of immutable barge-capacity usage.
 
 ## A047 — Recovered execution follows the operational recovery lineage
 
-**Status:** Derived consistency interpretation
+**Status:** Derived consistency interpretation  
+- Recovery lineage and numerical-dust treatment are validated internal consistency rules.  
 
 Once accepted cargo has been rerouted, subsequent physical execution is
 derived from the persisted recovery lineage rather than from the future
@@ -2458,7 +2492,8 @@ paper.
 
 ## A048 — Numerical recovery dust is terminalised without losing accepted mass
 
-**Status:** Derived numerical consistency interpretation
+**Status:** Derived numerical consistency interpretation  
+- Recovery lineage and numerical-dust treatment are validated internal consistency rules.  
 
 Repeated Full-Reroute optimisation can produce solver-scale residual recovery
 volumes whose magnitude is comparable to the numerical feasibility tolerance.
@@ -2519,7 +2554,8 @@ disconnected recovery flow.
 
 ## A049 — Full-horizon FR pilot validation gate
 
-**Status:** Computational validation result
+**Status:** Computational validation result  
+- The 800-booking FR validation gate was passed. It is now a historical validation result.  
 
 The frozen Phase-11 Table-5 Full-Reroute pilot was executed over all 800
 incoming demands.
@@ -2560,7 +2596,8 @@ ambiguity recorded in A012.
 
 ## A050 — Frozen Phase-11B Table-5 indicator reconstruction
 
-**Status:** Controlled reporting interpretation
+**Status:** Controlled reporting interpretation  
+- Our indicator equations were frozen before results and independently reconstructed.  
 
 **Paper evidence:**
 
@@ -2708,7 +2745,8 @@ evidence, but they must retain explicit labels.
 
 ## A051 — Table-5 derived-indicator checkpoint integrity
 
-**Status:** Computational reproducibility rule
+**Status:** Computational reproducibility rule  
+- Checkpoint reconstruction and tamper detection are implemented and tested.  
 
 A completed Table-5 campaign policy record preserves raw reporting evidence
 before the live optimisation state is discarded.
@@ -2767,7 +2805,8 @@ reporting purposes.
 
 ## A052 — Phase-11C Table-6 constant water-factor reconstruction
 
-**Status:** controlled interpretation frozen before Table-6 production.
+**Status:** controlled interpretation frozen before Table-6 production.  
+- Constant water-factor Table 6 scenarios were completed and NFR=λAFR validated.  
 
 The publication defines Table 6 as a Partial-Reroute experiment over water
 factors:
