@@ -21,7 +21,6 @@ class ConfigurationError(ValueError):
 
 
 def _as_mapping(value: object, context: str) -> dict[str, object]:
-    """Validate and return a string-keyed mapping."""
     if not isinstance(value, dict):
         raise ConfigurationError(f"{context} must be a mapping.")
 
@@ -37,7 +36,6 @@ def _as_mapping(value: object, context: str) -> dict[str, object]:
 
 
 def _as_sequence(value: object, context: str) -> tuple[object, ...]:
-    """Validate and return a sequence that is not text."""
     if not isinstance(value, (list, tuple)):
         raise ConfigurationError(f"{context} must be a sequence.")
 
@@ -49,7 +47,6 @@ def _required(
     key: str,
     context: str,
 ) -> object:
-    """Return one required configuration value."""
     if key not in mapping:
         raise ConfigurationError(f"Missing required key '{key}' in {context}.")
 
@@ -57,7 +54,6 @@ def _required(
 
 
 def _as_string(value: object, context: str) -> str:
-    """Validate and return a string."""
     if not isinstance(value, str):
         raise ConfigurationError(f"{context} must be a string.")
 
@@ -65,7 +61,6 @@ def _as_string(value: object, context: str) -> str:
 
 
 def _as_integer(value: object, context: str) -> int:
-    """Validate and return an integer."""
     if isinstance(value, bool) or not isinstance(value, int):
         raise ConfigurationError(f"{context} must be an integer.")
 
@@ -73,7 +68,6 @@ def _as_integer(value: object, context: str) -> int:
 
 
 def _as_number(value: object, context: str) -> float:
-    """Validate and return a real number."""
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise ConfigurationError(f"{context} must be a real number.")
 
@@ -81,7 +75,6 @@ def _as_number(value: object, context: str) -> float:
 
 
 def _as_boolean(value: object, context: str) -> bool:
-    """Validate and return a boolean."""
     if not isinstance(value, bool):
         raise ConfigurationError(f"{context} must be a boolean.")
 
@@ -91,7 +84,6 @@ def _as_boolean(value: object, context: str) -> bool:
 def _parse_transport_legs(
     value: object,
 ) -> tuple[ScheduledTransportLeg, ...]:
-    """Parse scheduled transport legs from YAML values."""
     raw_legs = _as_sequence(value, "network.transport_legs")
     legs: list[ScheduledTransportLeg] = []
 

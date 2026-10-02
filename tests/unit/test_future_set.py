@@ -1,5 +1,3 @@
-"""Tests for construction of K(current)."""
-
 from pathlib import Path
 
 import pytest
@@ -83,7 +81,6 @@ def forecast(
 
 
 def test_explicit_set_keeps_supplied_feasible_forecasts() -> None:
-    """Explicit mode must not infer shared-arc membership."""
     instance, event = build_current_example()
 
     shared = forecast(
@@ -116,7 +113,6 @@ def test_explicit_set_keeps_supplied_feasible_forecasts() -> None:
 
 
 def test_explicit_candidate_contains_solver_ready_network() -> None:
-    """Projected forecasts must have flow and sink indexes."""
     instance, event = build_current_example()
 
     future_set = select_explicit_future_set(
@@ -144,7 +140,6 @@ def test_explicit_candidate_contains_solver_ready_network() -> None:
 
 
 def test_shared_arc_interaction_is_indexed() -> None:
-    """The shared forecast must compete on S_BOTTLENECK."""
     instance, event = build_current_example()
 
     future_set = select_explicit_future_set(
@@ -167,7 +162,6 @@ def test_shared_arc_interaction_is_indexed() -> None:
 
 
 def test_a004_selector_keeps_only_interacting_forecast() -> None:
-    """Automatic mode must retain only later shared-capacity demand."""
     instance, event = build_current_example()
 
     future_set = select_a004_interacting_future_set(
@@ -199,7 +193,6 @@ def test_a004_selector_keeps_only_interacting_forecast() -> None:
 
 
 def test_same_time_forecast_is_not_inferred_as_future() -> None:
-    """Availability must be later under the A004 proxy rule."""
     instance, event = build_current_example()
 
     future_set = select_a004_interacting_future_set(
@@ -223,7 +216,6 @@ def test_same_time_forecast_is_not_inferred_as_future() -> None:
 
 
 def test_infeasible_forecast_is_excluded() -> None:
-    """A forecast with no route by its deadline cannot enter K."""
     instance, event = build_current_example()
 
     future_set = select_a004_interacting_future_set(
@@ -247,7 +239,6 @@ def test_infeasible_forecast_is_excluded() -> None:
 
 
 def test_zero_volume_forecast_is_excluded() -> None:
-    """A degenerate zero forecast has no selector level."""
     instance, event = build_current_example()
 
     future_set = select_a004_interacting_future_set(
@@ -272,7 +263,6 @@ def test_zero_volume_forecast_is_excluded() -> None:
 
 
 def test_lookahead_horizon_excludes_later_forecasts() -> None:
-    """The optional horizon must constrain inferred candidates."""
     instance, event = build_current_example()
 
     future_set = select_a004_interacting_future_set(
@@ -297,7 +287,6 @@ def test_lookahead_horizon_excludes_later_forecasts() -> None:
 
 
 def test_invalid_lookahead_is_rejected() -> None:
-    """A look-ahead horizon cannot precede the event."""
     instance, event = build_current_example()
 
     with pytest.raises(
@@ -313,7 +302,6 @@ def test_invalid_lookahead_is_rejected() -> None:
 
 
 def test_duplicate_forecast_ids_are_rejected() -> None:
-    """Forecast identifiers must be unique within one decision."""
     instance, event = build_current_example()
     duplicate = forecast(
         "DUPLICATE",
@@ -335,7 +323,6 @@ def test_duplicate_forecast_ids_are_rejected() -> None:
 
 
 def test_future_set_is_deterministic() -> None:
-    """Input ordering must not change selected candidates."""
     instance, event = build_current_example()
 
     shared = forecast(

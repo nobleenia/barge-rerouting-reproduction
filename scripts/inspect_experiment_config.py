@@ -10,7 +10,6 @@ from barge_rerouting.network.time_space import build_time_space_network
 
 
 def parse_arguments() -> argparse.Namespace:
-    """Parse command-line arguments."""
     parser = argparse.ArgumentParser(
         description="Inspect a barge-rerouting experiment configuration."
     )
@@ -23,7 +22,6 @@ def parse_arguments() -> argparse.Namespace:
 
 
 def main() -> None:
-    """Load, validate, and summarise the experiment."""
     arguments = parse_arguments()
     config = load_experiment_config(arguments.config_path)
 

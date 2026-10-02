@@ -30,7 +30,6 @@ def _validate_positive_integer(
     name: str,
     value: object,
 ) -> int:
-    """Validate and return a strictly positive integer."""
     if isinstance(value, bool) or not isinstance(value, int):
         raise TypeError(f"{name} must be an integer.")
 
@@ -44,7 +43,6 @@ def _validate_nonnegative_integer(
     name: str,
     value: object,
 ) -> int:
-    """Validate and return a non-negative integer."""
     if isinstance(value, bool) or not isinstance(value, int):
         raise TypeError(f"{name} must be an integer.")
 
@@ -57,7 +55,6 @@ def _validate_nonnegative_integer(
 def _event_physical_time(
     event: OperationalSourceEvent,
 ) -> int:
-    """Return the physical time represented by one source event."""
     if isinstance(event, ServiceStatusUpdateEvent):
         return int(event.update_time)
 
@@ -70,7 +67,6 @@ def _event_physical_time(
 def _event_kind(
     event: OperationalSourceEvent,
 ) -> OperationalEventKind:
-    """Return the kind of one source event."""
     if isinstance(event, ServiceStatusUpdateEvent):
         return OperationalEventKind.STATUS_UPDATE
 
@@ -83,7 +79,6 @@ def _event_kind(
 def _event_local_sequence(
     event: OperationalSourceEvent,
 ) -> int:
-    """Return the event's own booking/status sequence."""
     return int(event.sequence_number)
 
 
@@ -115,7 +110,6 @@ class OperationalTimelineEntry:
     source_event: OperationalSourceEvent
 
     def __post_init__(self) -> None:
-        """Validate entry identity and source-event time."""
         sequence_number = _validate_positive_integer(
             "operational_sequence_number",
             self.operational_sequence_number,
@@ -151,29 +145,24 @@ class OperationalTimelineEntry:
 
     @property
     def event_id(self) -> str:
-        """Return the source event's deterministic identifier."""
         return str(self.source_event.event_id)
 
     @property
     def kind(self) -> OperationalEventKind:
-        """Return whether this is a status or booking event."""
         return _event_kind(self.source_event)
 
     @property
     def is_status_update(self) -> bool:
-        """Return whether this entry changes service status."""
         return self.kind is OperationalEventKind.STATUS_UPDATE
 
     @property
     def is_booking(self) -> bool:
-        """Return whether this entry is a booking decision."""
         return self.kind is OperationalEventKind.BOOKING
 
     @property
     def booking_event(
         self,
     ) -> BookingDecisionEvent | None:
-        """Return the booking event when applicable."""
         if isinstance(
             self.source_event,
             BookingDecisionEvent,
@@ -186,7 +175,6 @@ class OperationalTimelineEntry:
     def status_update(
         self,
     ) -> ServiceStatusUpdateEvent | None:
-        """Return the status update when applicable."""
         if isinstance(
             self.source_event,
             ServiceStatusUpdateEvent,
@@ -203,7 +191,6 @@ class OperationalTimeline:
     entries: tuple[OperationalTimelineEntry, ...]
 
     def __post_init__(self) -> None:
-        """Validate global and source-specific ordering."""
         if not isinstance(self.entries, tuple):
             raise TypeError("entries must be a tuple.")
 
@@ -248,9 +235,7 @@ class OperationalTimeline:
             )
         )
 
-        # Reuse the existing BookingTimeline validator. This
-        # guarantees that integrating status events has not altered
-        # the original booking sequence.
+        # Confirm that status events do not change booking order.
         BookingTimeline(events=booking_events)
 
         status_updates = tuple(
@@ -279,29 +264,24 @@ class OperationalTimeline:
 
     @property
     def event_count(self) -> int:
-        """Return all operational events."""
         return len(self.entries)
 
     @property
     def booking_event_count(self) -> int:
-        """Return the number of booking decisions."""
         return sum(1 for entry in self.entries if entry.is_booking)
 
     @property
     def status_update_count(self) -> int:
-        """Return the number of status updates."""
         return sum(1 for entry in self.entries if entry.is_status_update)
 
     @property
     def physical_times(self) -> tuple[int, ...]:
-        """Return distinct operational times."""
         return tuple(sorted({entry.physical_time for entry in self.entries}))
 
     @property
     def booking_events(
         self,
     ) -> tuple[BookingDecisionEvent, ...]:
-        """Return booking events in their original sequence."""
         return tuple(
             entry.source_event
             for entry in self.entries
@@ -315,7 +295,6 @@ class OperationalTimeline:
     def status_updates(
         self,
     ) -> tuple[ServiceStatusUpdateEvent, ...]:
-        """Return status updates in chronological sequence."""
         return tuple(
             entry.source_event
             for entry in self.entries
@@ -327,7 +306,6 @@ class OperationalTimeline:
 
     @property
     def booking_timeline(self) -> BookingTimeline:
-        """Reconstruct the original booking-only timeline."""
         return BookingTimeline(events=self.booking_events)
 
     def entries_at_time(
@@ -360,7 +338,6 @@ class OperationalTimeline:
 def _validate_status_updates(
     value: Sequence[ServiceStatusUpdateEvent],
 ) -> tuple[ServiceStatusUpdateEvent, ...]:
-    """Validate status-update input."""
     if isinstance(value, (str, bytes)):
         raise TypeError("status_updates must be a sequence of ServiceStatusUpdateEvent objects.")
 

@@ -1,5 +1,3 @@
-"""Tests for the Phase 11 non-oracle forecast catalogue."""
-
 from barge_rerouting.experiments import (
     TABLE4_FORECAST_LOOKAHEAD_PERIODS,
     TABLE4_FORECAST_SELECTION_MODE,
@@ -15,13 +13,11 @@ from barge_rerouting.revenue_management.future_set import (
 
 
 def test_forecast_random_stream_is_independent() -> None:
-    """Forecast RNG does not reuse structural or economic seeds."""
     assert table4_forecast_seed(11001) == 2011001
     assert table4_forecast_seed(11005) == 2011005
 
 
 def test_catalogue_contains_ten_forecasts_per_half_day() -> None:
-    """One-week baseline creates 14 x 10 ex-ante opportunities."""
     catalogue = build_table4_forecast_catalogue(seed=11001)
 
     assert catalogue.entry_count == 140
@@ -36,7 +32,6 @@ def test_catalogue_contains_ten_forecasts_per_half_day() -> None:
 
 
 def test_catalogue_is_deterministic_and_seed_sensitive() -> None:
-    """A registered seed fixes the complete ex-ante catalogue."""
     first = build_table4_forecast_catalogue(seed=11002)
     second = build_table4_forecast_catalogue(seed=11002)
     third = build_table4_forecast_catalogue(seed=11003)
@@ -49,7 +44,6 @@ def test_catalogue_is_deterministic_and_seed_sensitive() -> None:
 
 
 def test_forecast_volume_distribution_matches_a032() -> None:
-    """Every future class has the pre-registered uncertainty."""
     catalogue = build_table4_forecast_catalogue(seed=11003)
 
     for entry in catalogue.entries:
@@ -64,7 +58,6 @@ def test_forecast_volume_distribution_matches_a032() -> None:
 
 
 def test_provider_boundary_excludes_current_half_day() -> None:
-    """Only strictly later reservation periods are forecast."""
     catalogue = build_table4_forecast_catalogue(seed=11004)
 
     at_zero = forecasts_after_decision_time(
@@ -91,7 +84,6 @@ def test_provider_boundary_excludes_current_half_day() -> None:
 
 
 def test_forecast_catalogue_does_not_equal_realised_future_stream() -> None:
-    """Independent forecast attributes are not copied from reality."""
     demand_set = build_table4_controlled_demand_set(seed=11005)
     catalogue = build_table4_forecast_catalogue(seed=11005)
 
@@ -123,7 +115,6 @@ def test_forecast_catalogue_does_not_equal_realised_future_stream() -> None:
 
 
 def test_table4_forecast_policy_settings_are_locked() -> None:
-    """Baseline uses printed value and A004 shared-arc selection."""
     assert TABLE4_FORECAST_SELECTION_MODE is FutureDemandSelectionMode.A004_SHARED_ARC
 
     assert TABLE4_FORECAST_VALUE_INTERPRETATION.value == "printed"
@@ -132,7 +123,6 @@ def test_table4_forecast_policy_settings_are_locked() -> None:
 
 
 def test_forecast_identifiers_cannot_collide_with_realised_demands() -> None:
-    """Forecast IDs use a separate namespace."""
     demand_set = build_table4_controlled_demand_set(seed=11001)
     catalogue = build_table4_forecast_catalogue(seed=11001)
 

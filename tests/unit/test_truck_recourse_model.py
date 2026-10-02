@@ -1,5 +1,3 @@
-"""Tests for explicit truck recourse after capacity reduction."""
-
 import pytest
 
 from barge_rerouting.config import (
@@ -190,7 +188,6 @@ def build_recovery_example(
 
 
 def test_forced_reduction_requires_three_teu_by_truck() -> None:
-    """Ten committed TEU with capacity seven leaves three for truck."""
     example = build_recovery_example(0.7)
 
     try:
@@ -210,7 +207,6 @@ def test_forced_reduction_requires_three_teu_by_truck() -> None:
 
 
 def test_remaining_seven_teu_stay_on_barge() -> None:
-    """Every affected transport leg carries seven TEU."""
     example = build_recovery_example(0.7)
 
     try:
@@ -237,7 +233,6 @@ def test_remaining_seven_teu_stay_on_barge() -> None:
 
 
 def test_barge_plus_truck_reproduces_fragment_volume() -> None:
-    """The recourse identity holds at delivery."""
     example = build_recovery_example(0.7)
 
     try:
@@ -262,7 +257,6 @@ def test_barge_plus_truck_reproduces_fragment_volume() -> None:
 
 
 def test_actual_capacity_is_respected() -> None:
-    """Barge recovery uses actual rather than nominal capacity."""
     example = build_recovery_example(0.7)
 
     try:
@@ -290,7 +284,6 @@ def test_actual_capacity_is_respected() -> None:
 
 
 def test_nominal_capacity_uses_no_truck() -> None:
-    """No capacity reduction means the penalty-minimizer stays on barge."""
     example = build_recovery_example(1.0)
 
     try:
@@ -306,7 +299,6 @@ def test_nominal_capacity_uses_no_truck() -> None:
 
 
 def test_independent_validator_accepts_solution() -> None:
-    """Independent residual checks reproduce all model identities."""
     example = build_recovery_example(0.7)
 
     try:
@@ -326,7 +318,6 @@ def test_independent_validator_accepts_solution() -> None:
 
 
 def test_missing_truck_penalty_is_rejected() -> None:
-    """The ambiguous paper penalty must be supplied explicitly."""
     example = build_recovery_example(0.7)
 
     try:
@@ -346,7 +337,6 @@ def test_missing_truck_penalty_is_rejected() -> None:
 
 
 def test_repeated_solution_is_deterministic() -> None:
-    """The controlled recovery solve is deterministic."""
     example = build_recovery_example(0.7)
 
     try:
@@ -358,7 +348,6 @@ def test_repeated_solution_is_deterministic() -> None:
 
 
 def test_recovery_transition_preserves_booking_history() -> None:
-    """A status event changes operations, not the booking decision."""
     example = build_recovery_example(0.7)
 
     try:
@@ -382,7 +371,6 @@ def test_recovery_transition_preserves_booking_history() -> None:
 
 
 def test_recovery_transition_persists_seven_plus_three_split() -> None:
-    """The 10-TEU fragment persists as seven barge and three truck."""
     example = build_recovery_example(0.7)
 
     try:
@@ -415,7 +403,6 @@ def test_recovery_transition_persists_seven_plus_three_split() -> None:
 
 
 def test_nominal_recovery_persists_no_truck_transfer() -> None:
-    """Unreduced capacity preserves the full barge plan."""
     example = build_recovery_example(1.0)
 
     try:
@@ -441,7 +428,6 @@ def test_nominal_recovery_persists_no_truck_transfer() -> None:
 
 
 def test_recovery_event_cannot_be_persisted_twice() -> None:
-    """Operational recovery events are idempotence-protected."""
     example = build_recovery_example(0.7)
 
     try:
@@ -467,7 +453,6 @@ def test_recovery_event_cannot_be_persisted_twice() -> None:
 
 
 def test_highs_matches_cplex_truck_recourse_solution() -> None:
-    """HiGHS must reproduce the validated CPLEX truck-recourse optimum."""
     from barge_rerouting.disruption.truck_recourse import (
         solve_truck_recourse_model,
         validate_truck_recourse_solution,

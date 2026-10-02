@@ -25,7 +25,6 @@ def _nonnegative_finite(
     name: str,
     value: object,
 ) -> float:
-    """Validate and return a finite non-negative value."""
     if isinstance(value, bool) or not isinstance(
         value,
         (int, float),
@@ -47,7 +46,6 @@ def _positive_finite(
     name: str,
     value: object,
 ) -> float:
-    """Validate and return a finite positive value."""
     numeric = _nonnegative_finite(name, value)
 
     if numeric <= 0.0:
@@ -60,7 +58,6 @@ def _normalise_identifier(
     name: str,
     value: object,
 ) -> str:
-    """Validate a non-empty identifier."""
     if not isinstance(value, str):
         raise TypeError(f"{name} must be a string.")
 
@@ -80,7 +77,6 @@ class RecoveryArcFlow:
     volume: float
 
     def __post_init__(self) -> None:
-        """Validate one persisted barge flow."""
         object.__setattr__(
             self,
             "arc_id",
@@ -111,7 +107,6 @@ class TruckTransferPlan:
     penalty_per_teu: float
 
     def __post_init__(self) -> None:
-        """Validate one truck-transfer record."""
         object.__setattr__(
             self,
             "event_id",
@@ -163,12 +158,10 @@ class TruckTransferPlan:
 
     @property
     def transfer_time(self) -> int:
-        """Return the terminal-time at which truck transfer occurs."""
         return int(self.transfer_node[1])
 
     @property
     def penalty_value(self) -> float:
-        """Return the incurred truck penalty."""
         return float(self.volume * self.penalty_per_teu)
 
 
@@ -188,7 +181,6 @@ class RecoveredFragmentPlan:
     truck_transfer: TruckTransferPlan | None
 
     def __post_init__(self) -> None:
-        """Validate recovered fragment accounting."""
         event_id = _normalise_identifier(
             "event_id",
             self.event_id,
@@ -325,7 +317,6 @@ class RecoveredFragmentPlan:
 
     @property
     def truck_volume(self) -> float:
-        """Return volume assigned to truck."""
         if self.truck_transfer is None:
             return 0.0
 
@@ -333,7 +324,6 @@ class RecoveredFragmentPlan:
 
     @property
     def barge_volume(self) -> float:
-        """Return volume remaining on the barge network."""
         return float(self.barge_delivered_volume)
 
     def barge_flow_on(
@@ -369,7 +359,6 @@ class RecoveryOperationalState:
     recovery_event_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
-        """Validate operational recovery history."""
         if not isinstance(
             self.booking_state,
             RollingBookingState,
@@ -470,22 +459,18 @@ class RecoveryOperationalState:
 
     @property
     def instance_fingerprint(self) -> str:
-        """Return the underlying experiment fingerprint."""
         return str(self.booking_state.instance_fingerprint)
 
     @property
     def recovery_event_count(self) -> int:
-        """Return number of persisted status recoveries."""
         return len(self.recovery_event_ids)
 
     @property
     def total_truck_volume(self) -> float:
-        """Return cumulative truck allocation."""
         return float(sum(transfer.volume for transfer in self.truck_transfer_history))
 
     @property
     def total_truck_penalty(self) -> float:
-        """Return cumulative truck penalty."""
         return float(sum(transfer.penalty_value for transfer in self.truck_transfer_history))
 
     def plan_for(
@@ -601,7 +586,6 @@ class TruckRecourseTransitionResult:
     validation_report: TruckRecourseValidationReport
 
     def __post_init__(self) -> None:
-        """Validate transition bookkeeping."""
         if not isinstance(
             self.state_before,
             RecoveryOperationalState,

@@ -26,7 +26,6 @@ from barge_rerouting.rolling_horizon.commitment import (
 
 
 def _validate_tolerance(value: object) -> float:
-    """Validate one positive finite tolerance."""
     if isinstance(value, bool) or not isinstance(
         value,
         (int, float),
@@ -50,7 +49,6 @@ def _normalise_acceptance(
     *,
     tolerance: float,
 ) -> float:
-    """Validate and normalize current acceptance."""
     if solution.acceptance_fraction is None:
         raise ValueError("Solved dynamic FR requires an acceptance fraction.")
 
@@ -71,16 +69,12 @@ def _current_commitment(
     acceptance: float,
     tolerance: float,
 ) -> DemandCommitment | None:
-    """Persist the arriving request as a barge commitment."""
     if solution.current_truck_volume is None:
         raise ValueError("Solved dynamic FR requires current truck volume.")
 
     current_truck = float(solution.current_truck_volume)
 
-    # The Phase-6--9 contractual state deliberately stores
-    # full barge commitments. Immediate current-demand trucking
-    # therefore cannot be represented there without changing that
-    # invariant or inventing a truck network arc.
+    # Contractual state stores full barge commitments and has no truck arc.
     if current_truck > tolerance:
         raise ValueError(
             "Operational dynamic FR cannot persist a "
@@ -133,7 +127,6 @@ def _recovered_fragment_plans(
     tuple[RecoveredFragmentPlan, ...],
     tuple[TruckTransferPlan, ...],
 ]:
-    """Persist rerouted prior fragments and incremental trucks."""
     event_id = artifacts.event.event_id
 
     plans: list[RecoveredFragmentPlan] = []
@@ -210,7 +203,6 @@ class DynamicFullRerouteTransitionResult:
     validation_report: DynamicFullRerouteValidationReport
 
     def __post_init__(self) -> None:
-        """Validate state advancement."""
         if not isinstance(
             self.state_before,
             RecoveryOperationalState,
@@ -245,12 +237,10 @@ class DynamicFullRerouteTransitionResult:
 
     @property
     def additional_truck_volume(self) -> float:
-        """Return only truck volume newly assigned this booking."""
         return float(sum(transfer.volume for transfer in self.new_truck_transfers))
 
     @property
     def additional_truck_penalty(self) -> float:
-        """Return only new truck penalty at this booking."""
         return float(sum(transfer.penalty_value for transfer in self.new_truck_transfers))
 
 

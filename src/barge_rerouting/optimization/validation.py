@@ -28,7 +28,6 @@ class DcaValidationReport:
 
 
 def _validate_tolerance(tolerance: object) -> float:
-    """Validate and return a strictly positive finite tolerance."""
     if isinstance(tolerance, bool) or not isinstance(tolerance, (int, float)):
         raise TypeError("tolerance must be a real number.")
 

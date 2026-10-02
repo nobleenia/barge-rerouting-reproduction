@@ -42,7 +42,6 @@ def _validate_nonnegative_integer(
     name: str,
     value: object,
 ) -> int:
-    """Validate a non-negative integer."""
     if isinstance(value, bool) or not isinstance(value, int):
         raise TypeError(f"{name} must be an integer.")
 
@@ -102,7 +101,6 @@ def _decompose_recovered_plan(
     instance: ExperimentInstance,
     plan: RecoveredFragmentPlan,
 ) -> tuple[PlannedDemandPath, ...]:
-    """Decompose one persisted recovered barge flow into paths."""
     if plan.original_remaining_volume <= RECOVERY_NUMERICAL_DUST_TOLERANCE:
         return ()
 
@@ -265,7 +263,6 @@ def _delivery_time_for(
     instance: ExperimentInstance,
     path: PlannedDemandPath,
 ) -> int:
-    """Return the destination time encoded by a recovery sink arc."""
     demand = instance.demand_by_id(path.demand_id)
 
     destination_nodes = tuple(
@@ -277,9 +274,7 @@ def _delivery_time_for(
         and node[1] <= demand.due_time
     )
 
-    # Recovery delivery IDs are deterministic and unique over the
-    # candidate destination nodes. Rebuild them rather than parsing
-    # the string representation.
+    # Rebuild deterministic delivery IDs instead of parsing them.
     sink_arcs = build_auxiliary_sink_arcs(
         demand_id=(
             path.path_id.rsplit(
@@ -300,7 +295,6 @@ def _delivery_time_for(
 def _numerical_barge_closure_volume(
     plans: tuple[RecoveredFragmentPlan, ...],
 ) -> float:
-    """Return barge volume closed from numerical-dust recovery plans."""
     return float(
         sum(
             plan.barge_delivered_volume
@@ -320,7 +314,6 @@ def _state_from_recovered_plans(
     AcceptedDemandState,
     tuple[PlannedDemandPath, ...],
 ]:
-    """Reconstruct one demand from its latest recovery plans."""
     recovery_time = plans[0].recovery_time
     recovery_event_id = plans[0].event_id
 
@@ -349,20 +342,13 @@ def _state_from_recovered_plans(
 
     baseline_state = baseline.demand_state_for(demand_id)
 
-    # Contractual acceptance remains authoritative, but
-    # the original booking route is no longer authoritative
-    # for physical delivery after recovery.
+    # Recovery changes the route, not the accepted volume.
     accepted_volume = float(baseline_state.accepted_volume)
 
-    # Volume that physically entered the latest recovery
-    # generation. RecoveredFragmentPlan validates that each
-    # such volume is subsequently partitioned between barge
-    # and truck.
+    # Volume entering the latest recovery, later split between barge and truck.
     recovery_remaining_volume = float(sum(plan.original_remaining_volume for plan in plans))
 
-    # Truck allocations from earlier recovery generations are
-    # persistent commitments and therefore no longer belong to
-    # the volume entering the latest recovery generation.
+    # Earlier truck allocations remain committed.
     prior_truck_volume = float(
         sum(
             transfer.volume
@@ -374,8 +360,7 @@ def _state_from_recovered_plans(
         )
     )
 
-    # A later truck allocation for this demand would contradict
-    # the claim that `plans` are its latest recovery generation.
+    # Later truck history would make `plans` stale.
     later_truck_volume = float(
         sum(
             transfer.volume
@@ -395,13 +380,7 @@ def _state_from_recovered_plans(
             f"later_truck={later_truck_volume}."
         )
 
-    # Conservation at the instant immediately before the
-    # latest recovery:
-    #
-    # accepted
-    #   = previously barge-delivered
-    #   + previously truck-allocated
-    #   + volume entering latest recovery.
+    # Before recovery: accepted = barge delivered + prior truck + remaining.
     delivered_barge_before_recovery = float(
         accepted_volume - prior_truck_volume - recovery_remaining_volume
     )
@@ -421,8 +400,7 @@ def _state_from_recovered_plans(
     if abs(delivered_barge_before_recovery) <= EXECUTION_TOLERANCE:
         delivered_barge_before_recovery = 0.0
 
-    # Cross-check persistence of the truck allocation belonging
-    # specifically to the latest recovery generation.
+    # Match the latest truck plan to persisted history.
     current_generation_truck_history = float(
         sum(
             transfer.volume

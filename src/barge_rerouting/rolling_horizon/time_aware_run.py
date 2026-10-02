@@ -41,7 +41,6 @@ class TimeAwareEpochResult:
     capacity_after: TransportCapacitySnapshot
 
     def __post_init__(self) -> None:
-        """Validate epoch timing consistency."""
         if isinstance(self.physical_time, bool) or not isinstance(
             self.physical_time,
             int,
@@ -91,7 +90,6 @@ class TimeAwareEpochResult:
 
     @property
     def has_failure(self) -> bool:
-        """Return whether this epoch ended with an unsolved event."""
         return any(not event_result.is_solved for event_result in self.event_results)
 
 
@@ -104,7 +102,6 @@ class TimeAwareSequentialDcaRun:
     final_state: RollingBookingState
 
     def __post_init__(self) -> None:
-        """Validate epoch ordering and state consistency."""
         if not isinstance(self.timeline, BookingTimeline):
             raise TypeError("timeline must be a BookingTimeline.")
 
@@ -130,29 +127,24 @@ class TimeAwareSequentialDcaRun:
 
     @property
     def results(self) -> tuple[SequentialEventResult, ...]:
-        """Return all event results in chronological sequence."""
         return tuple(result for epoch in self.epochs for result in epoch.event_results)
 
     @property
     def completed(self) -> bool:
-        """Return whether all booking events were processed."""
         return len(self.results) == self.timeline.event_count and all(
             result.is_solved for result in self.results
         )
 
     @property
     def total_revenue(self) -> float:
-        """Return accumulated event revenue."""
         return float(sum(result.objective_value or 0.0 for result in self.results))
 
     @property
     def accepted_volume(self) -> float:
-        """Return total accepted demand volume."""
         return float(sum(result.accepted_volume for result in self.results))
 
     @property
     def failure_result(self) -> SequentialEventResult | None:
-        """Return the first unsolved event."""
         for result in self.results:
             if not result.is_solved:
                 return result
@@ -165,7 +157,6 @@ def _build_snapshots(
     state: RollingBookingState,
     physical_time: int,
 ) -> tuple[ExecutionSnapshot, TransportCapacitySnapshot]:
-    """Build mutually consistent execution and capacity snapshots."""
     execution_snapshot = build_execution_snapshot(
         instance,
         state,

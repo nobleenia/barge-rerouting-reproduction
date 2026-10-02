@@ -1,5 +1,3 @@
-"""Tests for demand-specific time-space-network pruning."""
-
 import pytest
 
 from barge_rerouting.network.feasibility import (
@@ -54,7 +52,6 @@ def build_toy_graph():
 
 
 def test_pruning_retains_only_paths_reaching_destination_by_deadline() -> None:
-    """Only A0-B1-C2 is useful when the C deadline is time 2."""
     full_graph = build_toy_graph()
 
     result = extract_demand_feasible_network(
@@ -81,7 +78,6 @@ def test_pruning_retains_only_paths_reaching_destination_by_deadline() -> None:
 
 
 def test_later_deadline_preserves_multiple_feasible_paths() -> None:
-    """A deadline of 3 permits both immediate and delayed options."""
     full_graph = build_toy_graph()
 
     result = extract_demand_feasible_network(
@@ -99,7 +95,6 @@ def test_later_deadline_preserves_multiple_feasible_paths() -> None:
 
 
 def test_infeasible_demand_returns_source_only_subgraph() -> None:
-    """A demand unavailable at A1 cannot reach C by time 2."""
     full_graph = build_toy_graph()
 
     result = extract_demand_feasible_network(
@@ -117,7 +112,6 @@ def test_infeasible_demand_returns_source_only_subgraph() -> None:
 
 
 def test_reject_due_time_before_availability() -> None:
-    """A deadline cannot occur before cargo becomes available."""
     full_graph = build_toy_graph()
 
     with pytest.raises(ValueError, match="earlier"):
@@ -131,7 +125,6 @@ def test_reject_due_time_before_availability() -> None:
 
 
 def test_reject_unknown_origin() -> None:
-    """The demand origin must exist in the physical network."""
     full_graph = build_toy_graph()
 
     with pytest.raises(ValueError, match="Unknown demand origin"):

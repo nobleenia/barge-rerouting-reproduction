@@ -1,5 +1,3 @@
-"""Tests for dynamic Partial-Reroute orchestration."""
-
 import pytest
 from test_dynamic_booking_capacity import build_instance
 
@@ -35,7 +33,6 @@ def build_pr_run():
 
 
 def test_pr_uses_status_before_same_time_booking() -> None:
-    """The t=1 forecast must be processed before booking K2."""
     _, status, run = build_pr_run()
 
     assert run.timeline.event_count == 3
@@ -51,7 +48,6 @@ def test_pr_uses_status_before_same_time_booking() -> None:
 
 
 def test_pr_status_update_trucks_three_teu() -> None:
-    """The 10-to-7 reduction sends only unavoidable shortfall to truck."""
     _, _, run = build_pr_run()
 
     status_result = run.event_results[1]
@@ -66,7 +62,6 @@ def test_pr_status_update_trucks_three_teu() -> None:
 
 
 def test_pr_booking_does_not_reroute_prior_cargo() -> None:
-    """K2 booking performs ordinary DCA, not another reroute."""
     _, _, run = build_pr_run()
 
     status_result = run.event_results[1]
@@ -82,7 +77,6 @@ def test_pr_booking_does_not_reroute_prior_cargo() -> None:
 
 
 def test_pr_rejects_k2_under_reduced_actual_capacity() -> None:
-    """K2 cannot use the nominal three-TEU residual."""
     _, _, run = build_pr_run()
 
     booking_result = run.event_results[2]
@@ -95,7 +89,6 @@ def test_pr_rejects_k2_under_reduced_actual_capacity() -> None:
 
 
 def test_pr_final_operational_accounting_preserves_7_plus_3() -> None:
-    """K1 remains seven TEU on barge and three terminal truck TEU."""
     instance, _, run = build_pr_run()
 
     snapshot = build_operational_execution_snapshot(

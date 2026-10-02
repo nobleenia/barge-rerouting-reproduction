@@ -10,7 +10,6 @@ from barge_rerouting.rolling_horizon import build_booking_timeline
 
 
 def main() -> None:
-    """Assemble and print the canonical booking timeline."""
     config = load_experiment_config("configs/toy_experiment.yaml")
     instance = assemble_experiment_instance(config)
     timeline = build_booking_timeline(instance)

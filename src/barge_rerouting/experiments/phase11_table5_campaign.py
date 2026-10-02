@@ -1,11 +1,4 @@
-"""Deterministic Phase-11 Table-5 campaign construction.
-
-This module constructs the frozen 8 structural cells and 24 policy runs
-required by the controlled Table-5 reproduction.
-
-Execution/checkpointing is intentionally added separately after the campaign
-input contract and rich reporting persistence have been validated.
-"""
+"""Build the eight Table 5 cells and their 24 policy runs."""
 
 from __future__ import annotations
 
@@ -63,7 +56,6 @@ class Table5CampaignCell:
 
     @property
     def cell_key(self) -> str:
-        """Return stable cell identifier."""
         return f"{self.service_family}__capacity_{self.capacity_teu}"
 
 
@@ -78,12 +70,10 @@ class Table5CampaignRunSpec:
 
     @property
     def cell_key(self) -> str:
-        """Return stable structural cell identifier."""
         return f"{self.service_family}__capacity_{self.capacity_teu}"
 
     @property
     def run_key(self) -> str:
-        """Return stable policy-run identifier."""
         return f"{self.cell_key}__{self.policy_key}"
 
 
@@ -113,12 +103,10 @@ class Table5CampaignCellInputs:
 
     @property
     def requested_booking_count(self) -> int:
-        """Return frozen request count."""
         return len(self.instance.demands)
 
     @property
     def requested_volume(self) -> float:
-        """Return total frozen requested cargo volume."""
         return float(fsum(float(demand.volume) for demand in self.instance.demands))
 
 
@@ -178,7 +166,6 @@ def _validate_cell(
     cell: Table5CampaignCell,
     spec: Table5ExperimentSpec,
 ) -> None:
-    """Reject cells outside the frozen Table-5 contract."""
     if cell.service_family not in spec.service_families:
         raise ValueError(f"Unknown Table-5 service family: {cell.service_family}.")
 

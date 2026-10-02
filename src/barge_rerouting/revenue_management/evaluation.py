@@ -39,7 +39,6 @@ EVALUATION_TOLERANCE = 1e-6
 def _validate_occurrence_probability(
     value: object,
 ) -> float:
-    """Validate a future-demand occurrence probability."""
     if isinstance(value, bool) or not isinstance(
         value,
         (int, float),
@@ -60,7 +59,6 @@ def _validate_occurrence_probability(
 def _validate_maximum_volume(
     value: object,
 ) -> int:
-    """Validate a positive integer forecast-volume maximum."""
     if isinstance(value, bool) or not isinstance(value, int):
         raise TypeError("maximum_volume must be an integer.")
 
@@ -125,7 +123,6 @@ class ForecastSensitivityRegime:
     value_interpretation: FutureValueInterpretation
 
     def __post_init__(self) -> None:
-        """Validate and normalise one regime."""
         if not isinstance(self.key, str):
             raise TypeError("key must be a string.")
 
@@ -230,7 +227,6 @@ class Phase8CanonicalEvaluation:
     events: tuple[Phase8EventRecord, ...]
 
     def __post_init__(self) -> None:
-        """Validate evaluation shape and unique policy keys."""
         if len(self.instance_fingerprint) != 64:
             raise ValueError("instance_fingerprint must be a SHA-256 value.")
 
@@ -305,7 +301,7 @@ def build_attribute_conditioned_forecast_provider(
     maximum_volume: int,
     occurrence_probability: float,
 ) -> ForecastProvider:
-    """Build a diagnostic provider from unrevealed demand attributes.
+    """Build forecasts from attributes of later requests.
 
     For every later timeline event, the forecast reuses:
 
@@ -316,12 +312,8 @@ def build_attribute_conditioned_forecast_provider(
     - category;
     - fare.
 
-    It deliberately does not use the future event's realised volume.
-    Volume uncertainty is replaced by the configured zero-inflated
+    Realised future volume is replaced by the configured zero-inflated
     uniform distribution.
-
-    This is an attribute-conditioned diagnostic regime, not a claim
-    that the paper's operational forecasting process is known.
     """
     if not isinstance(timeline, BookingTimeline):
         raise TypeError("timeline must be a BookingTimeline.")
@@ -379,7 +371,6 @@ def _baseline_event_records(
     timeline: BookingTimeline,
     run: TimeAwareSequentialDcaRun,
 ) -> tuple[Phase8EventRecord, ...]:
-    """Build complete baseline DCA event records."""
     result_by_event_id = {result.event.event_id: result for result in run.results}
 
     records: list[Phase8EventRecord] = []
@@ -474,7 +465,6 @@ def _rm_event_records(
     regime: ForecastSensitivityRegime,
     run: TimeAwareDcaRmRun,
 ) -> tuple[Phase8EventRecord, ...]:
-    """Build complete event records for one DCA-RM regime."""
     result_by_event_id = {result.event.event_id: result for result in run.results}
 
     records: list[Phase8EventRecord] = []
@@ -577,7 +567,6 @@ def _rm_event_records(
 def _acceptance_value(
     result: DcaRmEventResult,
 ) -> float:
-    """Return a solved DCA-RM acceptance value."""
     if not result.is_solved or result.acceptance_fraction is None:
         return 0.0
 
@@ -592,7 +581,6 @@ def _rm_summary(
     maximum_volume: int,
     lookahead_periods: int | None,
 ) -> Phase8PolicySummary:
-    """Build one DCA-RM summary against the DCA baseline."""
     baseline_processed = baseline.final_state.processed_event_count
     rm_processed = run.final_state.processed_event_count
     common_prefix_length = min(
@@ -679,7 +667,6 @@ def _rm_summary(
 def _baseline_summary(
     run: TimeAwareSequentialDcaRun,
 ) -> Phase8PolicySummary:
-    """Build the baseline DCA summary."""
     failure = run.failure_result
 
     return Phase8PolicySummary(
@@ -720,12 +707,9 @@ def evaluate_phase8_canonical(
     maximum_volume: int | None = None,
     lookahead_periods: int | None = None,
 ) -> Phase8CanonicalEvaluation:
-    """Evaluate DCA and synthetic DCA-RM regimes.
+    """Evaluate DCA and DCA-RM with attribute-conditioned forecasts.
 
-    The forecast regime is attribute-conditioned and deliberately
-    excludes realised future request volume. The evaluation is a
-    mechanism and sensitivity study, not an exact numerical
-    reproduction of the paper's experimental tables.
+    Realised future request volume is excluded.
     """
     if not isinstance(instance, ExperimentInstance):
         raise TypeError("instance must be an ExperimentInstance.")
@@ -831,7 +815,6 @@ class Phase8EvaluationPaths:
 def _csv_optional_float(
     value: float | None,
 ) -> str:
-    """Format an optional floating-point CSV value."""
     if value is None:
         return ""
 
@@ -841,7 +824,6 @@ def _csv_optional_float(
 def _csv_optional_int(
     value: int | None,
 ) -> str:
-    """Format an optional integer CSV value."""
     if value is None:
         return ""
 
@@ -851,7 +833,6 @@ def _csv_optional_int(
 def _markdown_optional_float(
     value: float | None,
 ) -> str:
-    """Format an optional floating-point Markdown value."""
     if value is None:
         return "—"
 
@@ -861,7 +842,6 @@ def _markdown_optional_float(
 def _markdown_optional_int(
     value: int | None,
 ) -> str:
-    """Format an optional integer Markdown value."""
     if value is None:
         return "—"
 
@@ -871,7 +851,6 @@ def _markdown_optional_int(
 def _phase8_markdown_report(
     evaluation: Phase8CanonicalEvaluation,
 ) -> str:
-    """Render the canonical synthetic DCA-RM report."""
     lines = [
         "# Phase 8 Canonical Synthetic DCA-RM Evaluation",
         "",
@@ -886,7 +865,7 @@ def _phase8_markdown_report(
         (
             "The forecast provider uses the origin, destination, "
             "availability time, deadline, customer category, and fare "
-            "of later timeline requests, but deliberately replaces "
+            "of later timeline requests and replaces "
             "their realised volumes with a configured probability "
             "distribution."
         ),

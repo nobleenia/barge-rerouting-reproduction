@@ -43,7 +43,6 @@ _METADATA_VOLUME_TOLERANCE: Final = 1.0e-9
 def _validate_max_new_runs(
     max_new_runs: int | None,
 ) -> None:
-    """Validate the optional campaign execution limit."""
     if max_new_runs is None:
         return
 
@@ -67,7 +66,6 @@ def _ordered_records(
     Table5CampaignPolicyRecord,
     ...,
 ]:
-    """Return records in canonical frozen run-plan order."""
     run_plan = build_default_table5_run_plan()
 
     order = {run.run_key: index for index, run in enumerate(run_plan)}
@@ -83,7 +81,6 @@ def _ordered_records(
 def _expected_cell_metadata(
     inputs: Table5CampaignCellInputs,
 ) -> dict[str, object]:
-    """Return frozen resumability metadata for one structural cell."""
     return {
         "service_family": (inputs.cell.service_family),
         "capacity_teu": (inputs.cell.capacity_teu),
@@ -102,7 +99,6 @@ def _validate_cell_metadata(
     persisted: dict[str, object],
     expected: dict[str, object],
 ) -> None:
-    """Reject resumed cell metadata that no longer matches inputs."""
     for key, expected_value in expected.items():
         if key not in persisted:
             raise RuntimeError(
@@ -147,7 +143,6 @@ def _validate_existing_cell_records(
     records: list[Table5CampaignPolicyRecord],
     inputs: Table5CampaignCellInputs,
 ) -> None:
-    """Verify existing successful records against rebuilt frozen inputs."""
     cell_records = [record for record in records if (record.cell_key == inputs.cell.cell_key)]
 
     for record in cell_records:
@@ -202,7 +197,6 @@ def _build_validated_cell_inputs(
         dict[str, object],
     ],
 ]:
-    """Build each structural cell once and validate resume evidence."""
     inputs_by_cell: dict[
         str,
         Table5CampaignCellInputs,
@@ -396,9 +390,7 @@ def run_table5_campaign(
 
         ordered = _ordered_records(records)
 
-        # Critical durability boundary:
-        # persist this successful policy before
-        # any subsequent policy may begin.
+        # Save each completed policy before starting the next.
         write_table5_campaign_checkpoint(
             list(ordered),
             cell_metadata,

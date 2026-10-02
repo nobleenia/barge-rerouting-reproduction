@@ -14,7 +14,6 @@ from barge_rerouting.network.time_space import (
 
 
 def main() -> None:
-    """Generate and plot a toy time-space network."""
     terminals = ("A", "B", "C")
     time_periods = (0, 1, 2, 3)
 

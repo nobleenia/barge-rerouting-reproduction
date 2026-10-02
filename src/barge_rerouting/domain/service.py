@@ -21,7 +21,6 @@ class ScheduledTransportLeg:
     direction: str = "unspecified"
 
     def __post_init__(self) -> None:
-        """Validate and normalise the scheduled leg."""
         if not isinstance(self.service_id, str):
             raise TypeError("service_id must be a string.")
         if not isinstance(self.origin, str):
@@ -85,15 +84,12 @@ class ScheduledTransportLeg:
 
     @property
     def tail(self) -> TimeSpaceNode:
-        """Return the departure terminal-time node."""
         return self.origin, self.departure_time
 
     @property
     def head(self) -> TimeSpaceNode:
-        """Return the arrival terminal-time node."""
         return self.destination, self.arrival_time
 
     @property
     def duration(self) -> int:
-        """Return the travel duration in discrete time periods."""
         return self.arrival_time - self.departure_time

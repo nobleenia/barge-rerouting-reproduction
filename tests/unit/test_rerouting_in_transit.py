@@ -1,5 +1,3 @@
-"""Tests for irreversible in-transit fragment movements."""
-
 from pathlib import Path
 
 import pytest
@@ -119,7 +117,6 @@ def build_in_transit_example():
 
 
 def test_detects_locked_in_transit_service() -> None:
-    """S_LONG has departed and must remain irreversible."""
     (
         instance,
         _,
@@ -144,7 +141,6 @@ def test_detects_locked_in_transit_service() -> None:
 
 
 def test_rerouting_begins_after_in_transit_arrival() -> None:
-    """Onboard cargo may reroute only from B at time two."""
     (
         _,
         execution,
@@ -164,7 +160,6 @@ def test_rerouting_begins_after_in_transit_arrival() -> None:
 
 
 def test_only_future_service_is_releasable() -> None:
-    """S_LONG remains fixed while S_FUTURE may be replanned."""
     (
         instance,
         _,
@@ -185,7 +180,6 @@ def test_only_future_service_is_releasable() -> None:
 
 
 def test_in_transit_state_is_deterministic() -> None:
-    """Repeated reconstruction must produce identical decision state."""
     (
         instance,
         _,

@@ -35,7 +35,6 @@ from barge_rerouting.network.time_space import build_time_space_network
 def _build_node_flow_indexes(
     graph: nx.MultiDiGraph,
 ) -> tuple[NodeFlowIndex, ...]:
-    """Build incoming and outgoing arc-ID indexes for a feasible graph."""
     arcs = extract_time_space_arcs(graph)
 
     raw_nodes = tuple(graph.nodes)

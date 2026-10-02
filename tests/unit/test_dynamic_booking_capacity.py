@@ -1,5 +1,3 @@
-"""Tests for bookings after water-adjusted disruption recovery."""
-
 import pytest
 
 from barge_rerouting.config import (
@@ -241,7 +239,6 @@ def build_status_then_booking_example():
 
 
 def test_actual_residual_is_zero_not_nominal_three() -> None:
-    """Seven recovered TEU exactly fill reduced seven-TEU capacity."""
     example = build_status_then_booking_example()
 
     try:
@@ -261,7 +258,6 @@ def test_actual_residual_is_zero_not_nominal_three() -> None:
 
 
 def test_booking_uses_actual_not_nominal_residual() -> None:
-    """K2 must be rejected because reduced capacity is already full."""
     example = build_status_then_booking_example()
 
     try:
@@ -297,7 +293,6 @@ def test_booking_uses_actual_not_nominal_residual() -> None:
 
 
 def test_booking_advancement_preserves_recovery_overlay() -> None:
-    """Processing K2 must not erase K1's recovery history."""
     example = build_status_then_booking_example()
 
     try:

@@ -13,7 +13,6 @@ from barge_rerouting.instance import ExperimentInstance
 
 
 def _solver_name(*parts: object) -> str:
-    """Create a readable CPLEX-compatible identifier."""
     raw_name = "__".join(str(part) for part in parts)
     return re.sub(r"[^A-Za-z0-9_]", "_", raw_name)
 
@@ -32,12 +31,10 @@ class DcaModelArtifacts:
 
     @property
     def acceptance_variable_count(self) -> int:
-        """Return the number of demand-acceptance variables."""
         return len(self.acceptance_variables)
 
     @property
     def flow_variable_count(self) -> int:
-        """Return the number of demand-arc flow variables."""
         return len(self.flow_variables)
 
 
@@ -91,7 +88,6 @@ def _create_acceptance_variable(
     demand_id: str,
     category: CustomerCategory,
 ) -> Any:
-    """Create an acceptance variable with the correct mathematical domain."""
     variable_name = _solver_name("xi", demand_id)
 
     if category is CustomerCategory.REGULAR:

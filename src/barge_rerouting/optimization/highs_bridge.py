@@ -66,7 +66,6 @@ class HighsPrimalResult:
 
 
 def _create_highs() -> highspy.Highs:
-    """Create HiGHS across its incomplete third-party typing boundary."""
     return highspy.Highs()  # type: ignore[no-untyped-call]
 
 
@@ -139,7 +138,6 @@ def _read_highs_values(
     highs: highspy.Highs,
     alias_to_original: dict[str, str],
 ) -> dict[str, float]:
-    """Return HiGHS primal values keyed by original DOcplex name."""
     solution = highs.getSolution()
 
     if len(solution.col_value) != len(alias_to_original):
@@ -188,7 +186,6 @@ def _value_of(
     values: dict[str, float],
     variable: Any,
 ) -> float:
-    """Return one DOcplex variable's HiGHS primal value."""
     name = str(variable.name)
 
     if name not in values:
@@ -249,9 +246,7 @@ def solve_docplex_mip_with_highs(
 
         solve_status = f"HiGHS {highs.version()} {model_status}"
 
-        # Production integration accepts only proven
-        # optimal solutions. Time-limit incumbents retain
-        # the established unsolved reporting contract.
+        # Only proven optima enter the reporting pipeline.
         if model_status.lower() != "optimal":
             return HighsPrimalResult(
                 is_solved=False,

@@ -38,7 +38,6 @@ class DcaRrmTransitionResult:
     discarded_expected_future_revenue: float
 
     def __post_init__(self) -> None:
-        """Validate transition and discarded-forecast metadata."""
         if not isinstance(
             self.state_before,
             RollingBookingState,
@@ -112,12 +111,10 @@ class DcaRrmTransitionResult:
 
     @property
     def current_was_accepted(self) -> bool:
-        """Return whether the current demand was accepted."""
         return self.current_commitment is not None
 
     @property
     def rerouted_demand_ids(self) -> tuple[str, ...]:
-        """Return prior demands rebuilt in persistent state."""
         return tuple(commitment.demand_id for commitment in self.rerouted_commitments)
 
 
@@ -125,7 +122,6 @@ def _persistence_solution(
     artifacts: DcaRrmModelArtifacts,
     solution: DcaRrmSolution,
 ) -> DcaRerouteSolution:
-    """Remove forecast-only components from a DCA-RRM result."""
     if solution.current_revenue is None:
         raise ValueError("A solved DCA-RRM result requires current revenue.")
 
@@ -147,18 +143,16 @@ def apply_dca_rrm_solution(
     *,
     tolerance: float = COMMITMENT_TOLERANCE,
 ) -> DcaRrmTransitionResult:
-    """Persist only realised and rerouted commodities.
+    """Store realised and rerouted commodities.
 
-    The following forecast-planning quantities are deliberately
-    discarded after the booking decision:
+    Forecast-planning data are discarded after the booking decision:
 
     - future selectors;
     - selected protected volumes;
     - tentative future flows;
     - expected future revenue contributions.
 
-    They affect the optimisation decision but do not become
-    contractual reservations in the rolling booking state.
+    These values do not become contractual reservations.
     """
     if not isinstance(
         artifacts,

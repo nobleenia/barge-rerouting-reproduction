@@ -17,7 +17,6 @@ from barge_rerouting.rolling_horizon import (
 
 
 def main() -> None:
-    """Solve a controlled plan and persist its booking decisions."""
     config = load_experiment_config("configs/toy_experiment.yaml")
 
     instance = assemble_experiment_instance(

@@ -1,5 +1,3 @@
-"""Tests for explicit Table-5 volume-indicator candidates."""
-
 import pytest
 
 from barge_rerouting.reporting.table5_ledger import (

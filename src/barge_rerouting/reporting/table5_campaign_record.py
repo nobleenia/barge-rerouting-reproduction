@@ -67,7 +67,6 @@ class Table5CampaignPolicyRecord:
     service_capacity_snapshot: Table5ServiceCapacitySnapshot
 
     def __post_init__(self) -> None:
-        """Validate persisted campaign evidence."""
         if self.reporting_schema_version != TABLE5_CAMPAIGN_RECORD_SCHEMA:
             raise ValueError("Unsupported Table-5 reporting schema.")
 
@@ -170,7 +169,6 @@ class Table5CampaignPolicyRecord:
     def indicator_snapshot(
         self,
     ) -> Table5IndicatorSnapshot:
-        """Reconstruct publication-facing indicators from raw evidence."""
         return build_table5_indicator_snapshot(
             volume_ledger=self.volume_ledger,
             service_capacity_snapshot=(self.service_capacity_snapshot),

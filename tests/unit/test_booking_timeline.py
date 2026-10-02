@@ -1,5 +1,3 @@
-"""Tests for deterministic rolling-horizon booking timelines."""
-
 from pathlib import Path
 
 import pytest
@@ -21,7 +19,6 @@ def load_toy_instance():
 
 
 def test_canonical_timeline_contains_every_demand_once() -> None:
-    """Every canonical demand must produce exactly one booking event."""
     instance = load_toy_instance()
     timeline = build_booking_timeline(instance)
 
@@ -34,7 +31,6 @@ def test_canonical_timeline_contains_every_demand_once() -> None:
 
 
 def test_timeline_is_sorted_by_reservation_time_then_identifier() -> None:
-    """Equal-time booking requests use deterministic demand-ID order."""
     timeline = build_booking_timeline(load_toy_instance())
 
     ordering_keys = tuple(
@@ -49,7 +45,6 @@ def test_timeline_is_sorted_by_reservation_time_then_identifier() -> None:
 
 
 def test_sequence_numbers_are_contiguous_and_one_based() -> None:
-    """Booking sequence must be suitable for rolling iteration."""
     timeline = build_booking_timeline(load_toy_instance())
 
     assert tuple(event.sequence_number for event in timeline.events) == tuple(
@@ -58,7 +53,6 @@ def test_sequence_numbers_are_contiguous_and_one_based() -> None:
 
 
 def test_event_time_matches_demand_reservation_time() -> None:
-    """A request becomes visible at its configured reservation time."""
     timeline = build_booking_timeline(load_toy_instance())
 
     for event in timeline.events:
@@ -66,7 +60,6 @@ def test_event_time_matches_demand_reservation_time() -> None:
 
 
 def test_visibility_partition_at_one_event() -> None:
-    """Prior, current, and future demand sets must form a partition."""
     timeline = build_booking_timeline(load_toy_instance())
     sequence_number = 5
 
@@ -82,7 +75,6 @@ def test_visibility_partition_at_one_event() -> None:
 
 
 def test_same_time_demands_are_processed_sequentially_by_id() -> None:
-    """The deterministic tie-breaking assumption must be explicit."""
     config = load_experiment_config(Path("configs/toy_experiment.yaml"))
 
     demands = (
@@ -131,7 +123,6 @@ def test_same_time_demands_are_processed_sequentially_by_id() -> None:
 
 
 def test_events_at_time_returns_only_matching_requests() -> None:
-    """Time filtering must not reveal later requests."""
     timeline = build_booking_timeline(load_toy_instance())
 
     for decision_time in timeline.decision_times:
@@ -142,7 +133,6 @@ def test_events_at_time_returns_only_matching_requests() -> None:
 
 
 def test_event_rejects_time_different_from_reservation() -> None:
-    """A booking event cannot reveal a request at the wrong time."""
     demand = Demand(
         demand_id="KTEST",
         volume=1.0,
@@ -164,7 +154,6 @@ def test_event_rejects_time_different_from_reservation() -> None:
 
 
 def test_timeline_rejects_noncontiguous_sequences() -> None:
-    """Timeline sequence numbers cannot contain gaps."""
     demand = Demand(
         demand_id="KTEST",
         volume=1.0,

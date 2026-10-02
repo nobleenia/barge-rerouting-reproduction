@@ -1,13 +1,4 @@
-"""Complete candidate indicator snapshot for Phase-11 Table 5.
-
-The publication does not disclose complete mathematical formulas for
-all reported indicators. This module therefore bundles explicitly named
-candidate reconstructions together with directly observed economic and
-timing quantities.
-
-It does not silently promote any candidate to the publication's exact
-undisclosed definition.
-"""
+"""Table 5 indicator candidates and observed reporting values."""
 
 from __future__ import annotations
 
@@ -52,7 +43,6 @@ class Table5IndicatorSnapshot:
     standard_water: bool
 
     def __post_init__(self) -> None:
-        """Validate one complete reporting snapshot."""
         if self.indicator_schema_version != TABLE5_INDICATOR_SCHEMA_VERSION:
             raise ValueError("Unsupported Table-5 indicator schema.")
 

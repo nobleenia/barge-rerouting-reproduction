@@ -1,5 +1,3 @@
-"""Tests for one complete Full-Reroute booking event."""
-
 from pathlib import Path
 
 import pytest
@@ -126,7 +124,6 @@ def commitment_for(state, demand_id: str):
 
 
 def test_event_pipeline_improves_current_acceptance() -> None:
-    """Full-Reroute must accept what ordinary DCA rejects."""
     example = build_switch_event()
 
     result = run_full_reroute_event(
@@ -142,7 +139,6 @@ def test_event_pipeline_improves_current_acceptance() -> None:
 
 
 def test_event_pipeline_preserves_all_intermediate_state() -> None:
-    """The result must retain execution and capacity diagnostics."""
     example = build_switch_event()
 
     result = run_full_reroute_event(
@@ -162,7 +158,6 @@ def test_event_pipeline_preserves_all_intermediate_state() -> None:
 
 
 def test_event_pipeline_persists_old_and_new_routes() -> None:
-    """The final state must contain both reconstructed routes."""
     example = build_switch_event()
 
     result = run_full_reroute_event(
@@ -198,7 +193,6 @@ def test_event_pipeline_persists_old_and_new_routes() -> None:
 
 
 def test_event_without_prior_commitments_matches_ordinary_dca() -> None:
-    """The first Full-Reroute event reduces to ordinary booking."""
     config = load_experiment_config(Path("tests/fixtures/rerouting_switch_experiment.yaml"))
     demand = Demand(
         demand_id="KONE",
@@ -231,7 +225,6 @@ def test_event_without_prior_commitments_matches_ordinary_dca() -> None:
 
 
 def test_event_orchestration_is_deterministic() -> None:
-    """Identical input state must produce identical event results."""
     example = build_switch_event()
 
     first = run_full_reroute_event(

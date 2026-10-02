@@ -12,7 +12,6 @@ from barge_rerouting.optimization import (
 
 
 def main() -> None:
-    """Build and solve the controlled DCA example."""
     config = load_experiment_config("configs/toy_experiment.yaml")
 
     demands = (

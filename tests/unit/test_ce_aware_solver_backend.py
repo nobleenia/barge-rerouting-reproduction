@@ -1,5 +1,3 @@
-"""Tests for deterministic CPLEX Community Edition solver selection."""
-
 import pytest
 
 from barge_rerouting.optimization.solver_backend import (
@@ -98,7 +96,6 @@ def test_ce_aware_selection_rejects_invalid_types(
 
 
 def test_disruption_ce_aware_imports_in_clean_process() -> None:
-    """Dynamic disruption runners must not depend on import order."""
     import subprocess
     import sys
 

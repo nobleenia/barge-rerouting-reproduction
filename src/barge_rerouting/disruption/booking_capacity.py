@@ -20,7 +20,6 @@ def _nonnegative_finite(
     name: str,
     value: object,
 ) -> float:
-    """Validate a finite non-negative value."""
     if isinstance(value, bool) or not isinstance(
         value,
         (int, float),
@@ -51,7 +50,6 @@ class ActualBookableArcCapacity:
     is_bookable: bool
 
     def __post_init__(self) -> None:
-        """Validate one actual booking-capacity state."""
         if not isinstance(self.arc_id, str):
             raise TypeError("arc_id must be a string.")
 
@@ -147,7 +145,6 @@ class ActualBookableCapacitySnapshot:
     arc_states: tuple[ActualBookableArcCapacity, ...]
 
     def __post_init__(self) -> None:
-        """Validate actual booking-capacity snapshot."""
         if isinstance(self.physical_time, bool) or not isinstance(
             self.physical_time,
             int,

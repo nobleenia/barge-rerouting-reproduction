@@ -1,5 +1,3 @@
-"""Tests for complete event-by-event Full-Reroute runs."""
-
 from pathlib import Path
 
 import pytest
@@ -59,7 +57,6 @@ def build_shared_service_instance():
 
 
 def test_full_reroute_processes_every_booking_event() -> None:
-    """Every incoming request must invoke Full-Reroute."""
     run = run_full_reroute(build_shared_service_instance())
 
     assert run.completed
@@ -75,7 +72,6 @@ def test_full_reroute_processes_every_booking_event() -> None:
 
 
 def test_run_carries_state_between_events() -> None:
-    """Each event must begin with the preceding output state."""
     run = run_full_reroute(build_shared_service_instance())
 
     assert run.results[0].state_before.processed_event_count == 0
@@ -91,7 +87,6 @@ def test_run_carries_state_between_events() -> None:
 
 
 def test_single_route_run_matches_sequential_dca() -> None:
-    """Without route alternatives, both mechanisms must agree."""
     instance = build_shared_service_instance()
 
     full_reroute = run_full_reroute(instance)
@@ -108,7 +103,6 @@ def test_single_route_run_matches_sequential_dca() -> None:
 
 
 def test_run_stops_at_first_infeasible_regular_request() -> None:
-    """Mandatory old and current cargo may make the joint model infeasible."""
     instance = assemble_experiment_instance(
         load_config(),
         demands=(
@@ -156,7 +150,6 @@ def test_run_stops_at_first_infeasible_regular_request() -> None:
 
 
 def test_complete_run_is_deterministic() -> None:
-    """Repeated Full-Reroute runs must produce identical results."""
     instance = build_shared_service_instance()
 
     first = run_full_reroute(instance)

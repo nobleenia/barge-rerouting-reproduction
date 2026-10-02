@@ -1,5 +1,3 @@
-"""Tests for deterministic Full-Reroute eligibility detection."""
-
 from dataclasses import replace
 from pathlib import Path
 
@@ -111,7 +109,6 @@ def service_ids_for(instance, arc_ids: tuple[str, ...]) -> tuple[str, ...]:
 
 
 def test_detects_only_accepted_unfinished_demand() -> None:
-    """A delivered demand is excluded while unfinished cargo is selected."""
     (
         instance,
         _,
@@ -137,7 +134,6 @@ def test_detects_only_accepted_unfinished_demand() -> None:
 
 
 def test_fragment_starts_from_actual_time_one_position() -> None:
-    """The unfinished fragment must not restart from its original source."""
     (
         instance,
         _,
@@ -171,7 +167,6 @@ def test_fragment_starts_from_actual_time_one_position() -> None:
 
 
 def test_equal_time_event_does_not_execute_old_route() -> None:
-    """A prior same-time commitment is reroutable from its origin."""
     instance = assemble_experiment_instance(
         quiet_config(),
         demands=(
@@ -242,7 +237,6 @@ def test_equal_time_event_does_not_execute_old_route() -> None:
 
 
 def test_current_event_must_be_next_unprocessed_event() -> None:
-    """Eligibility cannot be constructed for an already processed event."""
     (
         instance,
         timeline,
@@ -264,7 +258,6 @@ def test_current_event_must_be_next_unprocessed_event() -> None:
 
 
 def test_detection_is_deterministic() -> None:
-    """Repeated construction must produce identical eligibility state."""
     (
         instance,
         _,

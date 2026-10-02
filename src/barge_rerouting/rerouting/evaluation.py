@@ -83,7 +83,6 @@ class Phase7CanonicalEvaluation:
     events: tuple[CanonicalEventComparison, ...]
 
     def __post_init__(self) -> None:
-        """Validate timeline ordering and fingerprint presence."""
         if not isinstance(
             self.summary,
             CanonicalComparisonSummary,
@@ -121,7 +120,6 @@ class Phase7EvaluationPaths:
 def _optional_float(
     value: float | None,
 ) -> float | None:
-    """Return an explicitly typed optional float."""
     if value is None:
         return None
 
@@ -132,7 +130,6 @@ def _released_services(
     instance: ExperimentInstance,
     released_arc_ids: tuple[str, ...],
 ) -> tuple[str, ...]:
-    """Translate released transport arcs to service IDs."""
     service_ids: set[str] = set()
 
     for arc_id in released_arc_ids:
@@ -150,7 +147,6 @@ def _event_rows(
     ordinary_run: TimeAwareSequentialDcaRun,
     full_run: FullRerouteRun,
 ) -> tuple[CanonicalEventComparison, ...]:
-    """Build complete event-level comparison rows."""
     ordinary_by_event_id = {result.event.event_id: result for result in ordinary_run.results}
     full_by_event_id = {result.event.event_id: result for result in full_run.results}
 
@@ -341,7 +337,6 @@ def evaluate_full_reroute_against_sequential(
 def _csv_value(
     value: float | None,
 ) -> str:
-    """Format an optional numerical CSV value."""
     if value is None:
         return ""
 
@@ -351,7 +346,6 @@ def _csv_value(
 def _markdown_value(
     value: float | None,
 ) -> str:
-    """Format an optional numerical Markdown value."""
     if value is None:
         return "—"
 
@@ -361,7 +355,6 @@ def _markdown_value(
 def _markdown_report(
     evaluation: Phase7CanonicalEvaluation,
 ) -> str:
-    """Render a reproducible Markdown results report."""
     summary = evaluation.summary
 
     lines = [

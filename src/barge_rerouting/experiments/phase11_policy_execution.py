@@ -84,7 +84,6 @@ class Phase11PolicyEventResult:
     state_after: RollingBookingState
 
     def __post_init__(self) -> None:
-        """Validate one Phase 11 event record."""
         policy_key = self.policy_key.strip()
         solver_status = self.solver_status.strip()
 
@@ -171,7 +170,6 @@ class Phase11PolicyEventResult:
 
     @property
     def accepted_volume(self) -> float:
-        """Return realised accepted current volume."""
         if self.acceptance_fraction is None:
             return 0.0
 
@@ -179,7 +177,6 @@ class Phase11PolicyEventResult:
 
     @property
     def is_ordinary_rejection(self) -> bool:
-        """Return whether optimisation solved with zero acceptance."""
         return bool(
             self.disposition is Phase11EventDisposition.OPTIMISATION_SOLVED
             and self.acceptance_fraction is not None
@@ -198,7 +195,6 @@ class Phase11PolicyRun:
     final_state: RollingBookingState
 
     def __post_init__(self) -> None:
-        """Validate event ordering and state chaining."""
         if not isinstance(
             self.solver_backend,
             SolverBackend,
@@ -243,14 +239,12 @@ class Phase11PolicyRun:
 
     @property
     def completed(self) -> bool:
-        """Return whether every booking received a valid disposition."""
         return bool(
             len(self.event_results) == self.timeline.event_count and self.solver_failure_count == 0
         )
 
     @property
     def processed_event_count(self) -> int:
-        """Return events that advanced booking state."""
         return sum(
             result.disposition is not Phase11EventDisposition.SOLVER_FAILURE
             for result in self.event_results
@@ -258,22 +252,18 @@ class Phase11PolicyRun:
 
     @property
     def total_revenue(self) -> float:
-        """Return realised current-booking revenue."""
         return float(sum(result.realised_revenue for result in self.event_results))
 
     @property
     def accepted_volume(self) -> float:
-        """Return total realised accepted volume."""
         return float(sum(result.accepted_volume for result in self.event_results))
 
     @property
     def ordinary_rejection_count(self) -> int:
-        """Return solved zero-acceptance decisions."""
         return sum(result.is_ordinary_rejection for result in self.event_results)
 
     @property
     def feasibility_rejection_count(self) -> int:
-        """Return A036 rejection count."""
         return sum(
             result.disposition is Phase11EventDisposition.FEASIBILITY_REJECTED
             for result in self.event_results
@@ -283,7 +273,6 @@ class Phase11PolicyRun:
     def feasibility_rejected_demand_ids(
         self,
     ) -> tuple[str, ...]:
-        """Return A036-rejected demand identifiers."""
         return tuple(
             result.event.demand_id
             for result in self.event_results
@@ -292,7 +281,6 @@ class Phase11PolicyRun:
 
     @property
     def solver_failure_count(self) -> int:
-        """Return computational/model failure count."""
         return sum(
             result.disposition is Phase11EventDisposition.SOLVER_FAILURE
             for result in self.event_results
@@ -302,7 +290,6 @@ class Phase11PolicyRun:
     def failure_event(
         self,
     ) -> Phase11PolicyEventResult | None:
-        """Return the terminating solver failure."""
         for result in self.event_results:
             if result.disposition is Phase11EventDisposition.SOLVER_FAILURE:
                 return result
@@ -354,7 +341,6 @@ def _unsolved_event(
     RollingBookingState,
     bool,
 ]:
-    """Apply A036 when permitted, otherwise return solver failure."""
     if event.demand.category.value == "R" and is_proven_infeasible_status(solve_status):
         state_after = advance_regular_feasibility_rejection(
             instance,

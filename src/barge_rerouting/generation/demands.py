@@ -28,7 +28,6 @@ class FeasibleDemandTemplate:
 
 
 def _validate_random_seed(random_seed: object) -> int:
-    """Validate and return a nonnegative random seed."""
     if isinstance(random_seed, bool) or not isinstance(random_seed, int):
         raise TypeError("random_seed must be an integer.")
 
@@ -47,7 +46,6 @@ def _can_reach_destination_by_due(
     due_time: int,
     time_periods: tuple[int, ...],
 ) -> bool:
-    """Return whether the destination can be reached by the deadline."""
     if source not in graph:
         return False
 
@@ -152,7 +150,6 @@ def _sample_customer_category(
     random_generator: Random,
     config: ExperimentConfig,
 ) -> CustomerCategory:
-    """Sample one category using the configured category probabilities."""
     mix = config.demand_generation.customer_mix
     random_value = random_generator.random()
 

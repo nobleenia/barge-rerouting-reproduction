@@ -43,13 +43,11 @@ DCA_RRM_TOLERANCE = 1e-6
 
 
 def _solver_name(*parts: object) -> str:
-    """Create a readable CPLEX-compatible identifier."""
     raw_name = "__".join(str(part) for part in parts)
     return re.sub(r"[^A-Za-z0-9_]", "_", raw_name)
 
 
 def _validate_tolerance(value: object) -> float:
-    """Validate and return a positive finite tolerance."""
     if isinstance(value, bool) or not isinstance(
         value,
         (int, float),
@@ -71,7 +69,6 @@ def _future_transport_arc_ids(
     instance: ExperimentInstance,
     candidate: FutureDemandCandidate,
 ) -> tuple[str, ...]:
-    """Return transport arcs used by one future commodity."""
     return tuple(
         arc_id
         for arc_id in candidate.network_index.feasible_arc_ids
@@ -88,7 +85,6 @@ def _validate_future_inputs(
     future_set: FutureDemandSet,
     value_interpretation: FutureValueInterpretation,
 ) -> None:
-    """Validate the DCA-RRM-specific inputs."""
     if not isinstance(instance, ExperimentInstance):
         raise TypeError("instance must be an ExperimentInstance.")
 
@@ -170,46 +166,38 @@ class DcaRrmModelArtifacts:
 
     @property
     def instance(self) -> ExperimentInstance:
-        """Return the experiment instance."""
         return self.base_artifacts.instance
 
     @property
     def state(self) -> RollingBookingState:
-        """Return the persistent state before solving."""
         return self.base_artifacts.state
 
     @property
     def event(self) -> BookingDecisionEvent:
-        """Return the current booking event."""
         return self.base_artifacts.event
 
     @property
     def model(self) -> Any:
-        """Return the combined DOcplex model."""
         return self.base_artifacts.model
 
     @property
     def capacity_snapshot(
         self,
     ) -> ReroutingCapacitySnapshot:
-        """Return released rerouting capacity."""
         return self.base_artifacts.capacity_snapshot
 
     @property
     def fragment_networks(
         self,
     ) -> FragmentNetworkSnapshot:
-        """Return accepted-fragment networks."""
         return self.base_artifacts.fragment_networks
 
     @property
     def acceptance_variable(self) -> Any:
-        """Return the current acceptance variable."""
         return self.base_artifacts.acceptance_variable
 
     @property
     def current_flow_variables(self) -> dict[str, Any]:
-        """Return current-demand flow variables."""
         return cast(
             dict[str, Any],
             self.base_artifacts.current_flow_variables,
@@ -219,7 +207,6 @@ class DcaRrmModelArtifacts:
     def fragment_flow_variables(
         self,
     ) -> dict[tuple[str, str], Any]:
-        """Return accepted-fragment flow variables."""
         return cast(
             dict[tuple[str, str], Any],
             self.base_artifacts.fragment_flow_variables,
@@ -227,7 +214,6 @@ class DcaRrmModelArtifacts:
 
     @property
     def fragment_count(self) -> int:
-        """Return the number of mandatory fragments."""
         return cast(
             int,
             self.base_artifacts.fragment_count,
@@ -235,27 +221,22 @@ class DcaRrmModelArtifacts:
 
     @property
     def forecast_count(self) -> int:
-        """Return the number of future commodities."""
         return len(self.future_set.candidates)
 
     @property
     def current_flow_variable_count(self) -> int:
-        """Return current-demand flow-variable count."""
         return len(self.current_flow_variables)
 
     @property
     def fragment_flow_variable_count(self) -> int:
-        """Return accepted-fragment flow-variable count."""
         return len(self.fragment_flow_variables)
 
     @property
     def future_flow_variable_count(self) -> int:
-        """Return tentative future-flow count."""
         return len(self.future_flow_variables)
 
     @property
     def selector_variable_count(self) -> int:
-        """Return future binary-selector count."""
         return len(self.selector_variables)
 
 
@@ -804,7 +785,6 @@ def _validate_solution_indexes(
     artifacts: DcaRrmModelArtifacts,
     solution: DcaRrmSolution,
 ) -> None:
-    """Validate exact correspondence with model variables."""
     current_arc_ids = tuple(result.arc_id for result in solution.current_flows)
 
     if len(set(current_arc_ids)) != len(current_arc_ids):

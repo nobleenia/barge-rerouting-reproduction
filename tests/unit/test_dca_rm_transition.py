@@ -1,5 +1,3 @@
-"""Tests for persistence of realised DCA-RM decisions."""
-
 from pathlib import Path
 
 import pytest
@@ -89,7 +87,6 @@ def build_decision(probability_four: float):
 
 
 def test_rejected_current_demand_creates_no_commitment() -> None:
-    """High future value must not become a fake commitment."""
     artifacts, solution = build_decision(0.50)
 
     try:
@@ -109,7 +106,6 @@ def test_rejected_current_demand_creates_no_commitment() -> None:
 
 
 def test_future_tentative_flow_is_not_persisted() -> None:
-    """Only the current rejection is written to state."""
     artifacts, solution = build_decision(0.50)
 
     try:
@@ -127,7 +123,6 @@ def test_future_tentative_flow_is_not_persisted() -> None:
 
 
 def test_low_future_value_persists_only_current_demand() -> None:
-    """A realised current acceptance becomes one commitment."""
     artifacts, solution = build_decision(0.05)
 
     try:
@@ -145,7 +140,6 @@ def test_low_future_value_persists_only_current_demand() -> None:
 
 
 def test_objective_is_split_before_persistence() -> None:
-    """Expected future value must not masquerade as revenue."""
     artifacts, solution = build_decision(0.50)
 
     try:

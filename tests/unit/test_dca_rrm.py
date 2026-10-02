@@ -1,5 +1,3 @@
-"""Reduction and composition tests for DCA-RRM."""
-
 from dataclasses import replace
 from pathlib import Path
 
@@ -204,7 +202,6 @@ def state_with_prior_commitment():
 
 
 def test_empty_past_and_future_reduce_to_dca() -> None:
-    """DCA-RRM must equal sequential DCA when both sets are empty."""
     instance = current_only_instance()
     timeline = build_booking_timeline(instance)
     event = timeline.event_at_sequence(1)
@@ -260,7 +257,6 @@ def test_empty_past_and_future_reduce_to_dca() -> None:
 
 
 def test_no_past_fragments_reduce_to_dca_rm() -> None:
-    """DCA-RRM must equal DCA-RM without unfinished past demand."""
     instance = current_only_instance()
     timeline = build_booking_timeline(instance)
     event = timeline.event_at_sequence(1)
@@ -323,7 +319,6 @@ def test_no_past_fragments_reduce_to_dca_rm() -> None:
 
 
 def test_empty_future_set_reduces_to_dca_reroute() -> None:
-    """DCA-RRM must equal DCA-R when K(current) is empty."""
     (
         instance,
         state,
@@ -385,7 +380,6 @@ def test_empty_future_set_reduces_to_dca_reroute() -> None:
 
 
 def test_combined_model_contains_all_three_commodity_groups() -> None:
-    """Past, current, and future flows must coexist."""
     (
         instance,
         state,
@@ -479,7 +473,6 @@ def build_solved_combined_model():
 
 
 def test_combined_solution_passes_independent_validation() -> None:
-    """A genuine solver result must satisfy every equation."""
     from barge_rerouting.optimization.dca_rrm import (
         validate_dca_rrm_solution,
     )
@@ -503,7 +496,6 @@ def test_combined_solution_passes_independent_validation() -> None:
 
 
 def test_validator_detects_altered_objective() -> None:
-    """The validator must independently recompute value."""
     from dataclasses import replace
 
     from barge_rerouting.optimization.dca_rrm import (
@@ -533,7 +525,6 @@ def test_validator_detects_altered_objective() -> None:
 
 
 def test_validator_detects_nonbinary_selector() -> None:
-    """The validator must reject fractional y(k,j)."""
     from dataclasses import replace
 
     from barge_rerouting.optimization.dca_rrm import (
@@ -570,7 +561,6 @@ def test_validator_detects_nonbinary_selector() -> None:
 
 
 def test_rrm_transition_persists_only_realised_commodities() -> None:
-    """Future protection must not become a stored commitment."""
     from barge_rerouting.revenue_management.rrm_transition import (
         apply_dca_rrm_solution,
     )
@@ -613,7 +603,6 @@ def test_rrm_transition_persists_only_realised_commodities() -> None:
 
 
 def test_empty_future_transition_reduces_to_dca_reroute() -> None:
-    """Without forecasts, DCA-RRM persistence must equal DCA-R."""
     from barge_rerouting.rerouting.transition import (
         apply_dca_reroute_solution,
     )
@@ -684,7 +673,6 @@ def test_empty_future_transition_reduces_to_dca_reroute() -> None:
 
 
 def test_rrm_transition_rejects_invalid_solution() -> None:
-    """No invalid combined solution may update persistent state."""
     from barge_rerouting.revenue_management.rrm_transition import (
         apply_dca_rrm_solution,
     )
@@ -712,7 +700,6 @@ def test_rrm_transition_rejects_invalid_solution() -> None:
 
 
 def test_highs_combined_solution_matches_cplex_and_validates() -> None:
-    """HiGHS must solve genuine past-current-future DCA-RRM."""
     from barge_rerouting.optimization.dca_rrm import (
         validate_dca_rrm_solution,
     )

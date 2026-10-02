@@ -1,5 +1,3 @@
-"""Tests for the canonical four-mechanism evaluation."""
-
 from dataclasses import replace
 from pathlib import Path
 
@@ -91,7 +89,6 @@ def evaluate_controlled():
 
 
 def test_evaluation_contains_four_mechanisms() -> None:
-    """One regime must produce exactly four policy rows."""
     evaluation = evaluate_controlled()
 
     assert len(evaluation.summaries) == 4
@@ -106,7 +103,6 @@ def test_evaluation_contains_four_mechanisms() -> None:
 
 
 def test_rm_and_rrm_match_without_reroutable_fragments() -> None:
-    """Without useful fragments, DCA-RRM reduces to DCA-RM."""
     evaluation = evaluate_controlled()
 
     rm = evaluation.summary_for("rm_printed_p80")
@@ -122,7 +118,6 @@ def test_rm_and_rrm_match_without_reroutable_fragments() -> None:
 
 
 def test_dca_r_summary_matches_standalone_run() -> None:
-    """The comparison must not alter Full-Reroute results."""
     instance = build_instance()
     standalone = run_full_reroute(instance)
 
@@ -140,7 +135,6 @@ def test_dca_r_summary_matches_standalone_run() -> None:
 
 
 def test_future_value_is_not_reported_as_revenue() -> None:
-    """RM and RRM objective sums must remain diagnostic."""
     evaluation = evaluate_controlled()
 
     for policy_key in (
@@ -154,7 +148,6 @@ def test_future_value_is_not_reported_as_revenue() -> None:
 
 
 def test_event_rows_cover_solved_and_not_run_events() -> None:
-    """Every policy must retain the complete timeline."""
     evaluation = evaluate_controlled()
 
     for summary in evaluation.summaries:
@@ -170,7 +163,6 @@ def test_event_rows_cover_solved_and_not_run_events() -> None:
 
 
 def test_phase9_evaluation_is_deterministic() -> None:
-    """Repeated four-mechanism evaluation must agree."""
     instance = build_instance()
 
     first = evaluate_phase9_canonical(
@@ -202,7 +194,6 @@ def canonical_instance():
 
 
 def test_canonical_headline_results_are_locked() -> None:
-    """Freeze the principal Phase 9 canonical findings."""
     evaluation = evaluate_phase9_canonical(canonical_instance())
 
     dca = evaluation.summary_for("dca")
@@ -228,7 +219,6 @@ def test_canonical_headline_results_are_locked() -> None:
 
 
 def test_canonical_rm_rrm_pairs_match_eventwise_realisation() -> None:
-    """Observed RM/RRM equality must hold event by event."""
     evaluation = evaluate_phase9_canonical(canonical_instance())
 
     for regime in evaluation.regimes:
@@ -262,7 +252,6 @@ def test_canonical_rm_rrm_pairs_match_eventwise_realisation() -> None:
 
 
 def test_phase9_export_is_complete(tmp_path) -> None:
-    """CSV, JSON, and Markdown outputs must be complete."""
     import csv
     import json
 
@@ -306,7 +295,6 @@ def test_phase9_export_is_complete(tmp_path) -> None:
 
 
 def test_phase9_report_discloses_boundaries(tmp_path) -> None:
-    """The generated report must not overclaim reproduction."""
     from barge_rerouting.revenue_management.rrm_evaluation import (
         write_phase9_evaluation,
     )
@@ -334,7 +322,6 @@ def test_phase9_report_discloses_boundaries(tmp_path) -> None:
 def test_phase9_report_declares_truck_disabled_scope(
     tmp_path,
 ) -> None:
-    """The generated report must delimit the Phase 9 model."""
     from barge_rerouting.revenue_management.rrm_evaluation import (
         write_phase9_evaluation,
     )

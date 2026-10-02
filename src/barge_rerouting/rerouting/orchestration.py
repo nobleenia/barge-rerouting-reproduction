@@ -76,7 +76,6 @@ class FullRerouteEventResult:
     capacity_after: TransportCapacitySnapshot
 
     def __post_init__(self) -> None:
-        """Validate event, state, and snapshot consistency."""
         if not isinstance(
             self.event,
             BookingDecisionEvent,
@@ -227,7 +226,6 @@ class FullRerouteEventResult:
     def ordinary_acceptance_fraction(
         self,
     ) -> float | None:
-        """Return the ordinary sequential-DCA acceptance."""
         if self.ordinary_solution.acceptance_fraction is None:
             return None
 
@@ -237,7 +235,6 @@ class FullRerouteEventResult:
     def reroute_acceptance_fraction(
         self,
     ) -> float | None:
-        """Return the Full-Reroute acceptance."""
         if self.reroute_solution.acceptance_fraction is None:
             return None
 
@@ -245,17 +242,14 @@ class FullRerouteEventResult:
 
     @property
     def event_was_processed(self) -> bool:
-        """Return whether the rerouting model produced a solution."""
         return self.transition is not None
 
     @property
     def current_was_accepted(self) -> bool:
-        """Return whether the current request was accepted."""
         return self.transition is not None and self.transition.current_was_accepted
 
     @property
     def rerouted_demand_ids(self) -> tuple[str, ...]:
-        """Return prior demands whose routes were rebuilt."""
         if self.transition is None:
             return ()
 
@@ -263,7 +257,6 @@ class FullRerouteEventResult:
 
     @property
     def released_arc_ids(self) -> tuple[str, ...]:
-        """Return transport arcs with released prior reservations."""
         return tuple(
             arc_id
             for arc_id in (self.rerouting_capacity.available_arc_ids)

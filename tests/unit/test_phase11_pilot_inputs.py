@@ -1,5 +1,3 @@
-"""Pre-solve tests for the first Phase 11 Table 4 pilot."""
-
 from barge_rerouting.experiments import (
     TABLE4_PILOT_EXPECTED_DEMAND_FINGERPRINT,
     TABLE4_PILOT_EXPECTED_FORECAST_FINGERPRINT,
@@ -9,7 +7,6 @@ from barge_rerouting.experiments import (
 
 
 def test_pilot_configuration_has_published_cell_identity() -> None:
-    """The first pilot is Family 1 at 10 TEU."""
     config = build_table4_pilot_config()
 
     transport_legs = config.network.transport_legs
@@ -22,7 +19,6 @@ def test_pilot_configuration_has_published_cell_identity() -> None:
 
 
 def test_pilot_configuration_records_140_opportunities() -> None:
-    """Configuration distinguishes opportunities from positive bookings."""
     config = build_table4_pilot_config()
 
     generation = config.demand_generation
@@ -35,7 +31,6 @@ def test_pilot_configuration_records_140_opportunities() -> None:
 
 
 def test_pilot_assembles_the_frozen_positive_demand_set() -> None:
-    """Instance assembly cannot silently alter the frozen realization."""
     inputs = build_table4_pilot_inputs()
 
     assert inputs.demand_fingerprint == TABLE4_PILOT_EXPECTED_DEMAND_FINGERPRINT
@@ -48,7 +43,6 @@ def test_pilot_assembles_the_frozen_positive_demand_set() -> None:
 
 
 def test_pilot_uses_the_frozen_non_oracle_forecast_catalogue() -> None:
-    """The pilot catalogue is fixed independently of realised demands."""
     inputs = build_table4_pilot_inputs()
 
     assert inputs.forecast_fingerprint == TABLE4_PILOT_EXPECTED_FORECAST_FINGERPRINT
@@ -57,7 +51,6 @@ def test_pilot_uses_the_frozen_non_oracle_forecast_catalogue() -> None:
 
 
 def test_pilot_configuration_fingerprint_is_deterministic() -> None:
-    """Repeated assembly produces the exact same cell configuration."""
     first = build_table4_pilot_inputs()
     second = build_table4_pilot_inputs()
 

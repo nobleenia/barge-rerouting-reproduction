@@ -1,5 +1,3 @@
-"""Tests for the resumable Phase 11 Table 4 campaign."""
-
 from __future__ import annotations
 
 from pathlib import Path
@@ -107,7 +105,6 @@ def test_missing_checkpoint_loads_empty_state(
 
 
 def test_campaign_imports_in_clean_python_process() -> None:
-    """Campaign imports must not depend on prior module import order."""
     import subprocess
     import sys
 

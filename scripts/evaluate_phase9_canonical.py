@@ -16,7 +16,6 @@ from barge_rerouting.revenue_management.rrm_evaluation import (
 
 
 def main() -> None:
-    """Evaluate all default forecast regimes twice and export."""
     config = load_experiment_config(Path("configs/toy_experiment.yaml"))
     config = replace(
         config,

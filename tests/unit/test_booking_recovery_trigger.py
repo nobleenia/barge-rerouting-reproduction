@@ -1,5 +1,3 @@
-"""Tests for booking-triggered recovery fragments."""
-
 import pytest
 from test_dynamic_booking_capacity import (
     build_status_then_booking_example,
@@ -13,7 +11,6 @@ from barge_rerouting.disruption import (
 
 
 def test_booking_event_can_trigger_recovery_snapshot() -> None:
-    """FR may reconstruct unfinished cargo at a booking event."""
     example = build_status_then_booking_example()
 
     try:
@@ -58,7 +55,6 @@ def test_booking_event_can_trigger_recovery_snapshot() -> None:
 
 
 def test_booking_recovery_releases_only_remaining_barge_volume() -> None:
-    """Previously trucked cargo must not re-enter FR recovery."""
     example = build_status_then_booking_example()
 
     try:
@@ -88,9 +84,7 @@ def test_booking_recovery_releases_only_remaining_barge_volume() -> None:
             event,
         )
 
-        # Original acceptance = 10.
-        # Status recovery already transferred 3 to truck.
-        # Therefore booking-triggered FR sees exactly 7.
+        # Original 10 TEU minus 3 TEU already transferred to truck.
         assert recovery.total_remaining_volume == pytest.approx(7.0)
 
         assert recovery.total_remaining_volume + state.total_truck_volume == pytest.approx(10.0)

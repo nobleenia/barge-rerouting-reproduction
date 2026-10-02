@@ -1,10 +1,4 @@
-"""Candidate Table-5 AFR/NFR reconstructions.
-
-The publication provides verbal AFR/NFR definitions but does not give
-the complete aggregation formula. This module therefore computes
-explicitly named candidate definitions from the same raw transport
-evidence. No candidate is silently treated as the publication formula.
-"""
+"""Candidate AFR/NFR calculations from Table 5 transport data."""
 
 from __future__ import annotations
 
@@ -26,7 +20,6 @@ def _percentage(
     numerator: float,
     denominator: float,
 ) -> float:
-    """Return a percentage with explicit zero-denominator handling."""
     if denominator <= SERVICE_CAPACITY_TOLERANCE:
         return 0.0
 
@@ -36,7 +29,6 @@ def _percentage(
 def _mean_percentage(
     ratios: list[float],
 ) -> float:
-    """Return mean ratio as a percentage."""
     if not ratios:
         return 0.0
 
@@ -61,28 +53,24 @@ class Table5FillRateCandidates:
 
     @property
     def mean_arc_standard_water_residual(self) -> float:
-        """Return AFR-NFR residual for mean-arc candidate."""
         return float(self.mean_arc_actual_pct - self.mean_arc_nominal_pct)
 
     @property
     def capacity_weighted_standard_water_residual(
         self,
     ) -> float:
-        """Return AFR-NFR residual for capacity-weighted candidate."""
         return float(self.capacity_weighted_actual_pct - self.capacity_weighted_nominal_pct)
 
     @property
     def sailing_peak_standard_water_residual(
         self,
     ) -> float:
-        """Return AFR-NFR residual for sailing-peak candidate."""
         return float(self.mean_sailing_peak_actual_pct - self.mean_sailing_peak_nominal_pct)
 
 
 def _sailing_peak_actual_ratio(
     occurrence: Table5SailingOccurrence,
 ) -> float:
-    """Return maximum final utilisation ratio across sailing legs."""
     ratios = [
         arc.final_load / arc.actual_capacity
         for arc in occurrence.arcs
@@ -98,7 +86,6 @@ def _sailing_peak_actual_ratio(
 def _sailing_peak_nominal_ratio(
     occurrence: Table5SailingOccurrence,
 ) -> float:
-    """Return maximum nominal-capacity utilisation over the sailing."""
     ratios = [
         arc.final_load / arc.nominal_capacity
         for arc in occurrence.arcs

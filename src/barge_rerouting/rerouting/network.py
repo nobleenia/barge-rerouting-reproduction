@@ -35,7 +35,6 @@ def _normalise_arc_ids(
     *,
     field_name: str,
 ) -> tuple[str, ...]:
-    """Validate and deterministically sort unique arc identifiers."""
     if not isinstance(value, tuple):
         raise TypeError(f"{field_name} must be a tuple.")
 
@@ -61,7 +60,6 @@ def _normalise_arc_ids(
 def _build_node_flow_indexes(
     graph: nx.MultiDiGraph,
 ) -> tuple[NodeFlowIndex, ...]:
-    """Build physical incoming and outgoing indexes for a fragment graph."""
     arcs = extract_time_space_arcs(graph)
 
     nodes = tuple(
@@ -104,7 +102,6 @@ class FragmentNetworkIndex:
     original_arc_count: int
 
     def __post_init__(self) -> None:
-        """Validate fragment-network consistency."""
         if not isinstance(
             self.fragment_state,
             ReroutingFragmentDecisionState,
@@ -304,37 +301,30 @@ class FragmentNetworkIndex:
 
     @property
     def fragment_id(self) -> str:
-        """Return the fragment identifier."""
         return str(self.fragment_state.fragment_id)
 
     @property
     def demand_id(self) -> str:
-        """Return the original demand identifier."""
         return str(self.demand.demand_id)
 
     @property
     def volume(self) -> float:
-        """Return fixed unfinished fragment volume."""
         return float(self.fragment_state.volume)
 
     @property
     def feasible_node_count(self) -> int:
-        """Return the retained time-space node count."""
         return len(self.node_flow_indexes)
 
     @property
     def feasible_arc_count(self) -> int:
-        """Return the retained physical arc count."""
         return len(self.feasible_arc_ids)
 
     @property
     def sink_arc_ids(self) -> tuple[str, ...]:
-        """Return fragment-specific delivery arc IDs."""
         return tuple(str(sink_arc.arc_id) for sink_arc in self.sink_arcs)
 
     @property
     def all_flow_arc_ids(self) -> tuple[str, ...]:
-        """Return physical and logical delivery arc IDs."""
         return tuple(
             sorted(
                 (
@@ -401,7 +391,6 @@ class FragmentNetworkSnapshot:
     indexes: tuple[FragmentNetworkIndex, ...]
 
     def __post_init__(self) -> None:
-        """Validate fragment-network snapshot consistency."""
         if not isinstance(self.current_event_id, str):
             raise TypeError("current_event_id must be a string.")
 
@@ -470,7 +459,6 @@ class FragmentNetworkSnapshot:
 
     @property
     def fragment_ids(self) -> tuple[str, ...]:
-        """Return indexed fragment identifiers."""
         return tuple(index.fragment_id for index in self.indexes)
 
     def index_for(
@@ -497,7 +485,6 @@ def _candidate_future_graph(
     due_time: int,
     available_transport_arc_ids: set[str],
 ) -> nx.MultiDiGraph:
-    """Retain future holding arcs and available transport services."""
     candidate = nx.MultiDiGraph(name="fragment_rerouting_candidate")
 
     for raw_node, raw_attributes in instance.graph.nodes(data=True):
@@ -541,7 +528,6 @@ def _prune_fragment_graph(
     destination: str,
     due_time: int,
 ) -> tuple[nx.MultiDiGraph, tuple[TimeSpaceNode, ...]]:
-    """Retain nodes on a source-to-destination path by the deadline."""
     if source not in graph:
         raise ValueError(f"Fragment source node does not exist: {source}.")
 

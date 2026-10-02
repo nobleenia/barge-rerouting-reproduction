@@ -1,5 +1,3 @@
-"""Tests for independent DCA-solution validation."""
-
 from pathlib import Path
 
 import pytest
@@ -64,7 +62,6 @@ def build_and_solve_controlled_model():
 
 
 def test_valid_controlled_solution_passes_independent_validation() -> None:
-    """The known optimal example must satisfy every validation check."""
     instance, solution = build_and_solve_controlled_model()
 
     report = validate_dca_solution(
@@ -85,7 +82,6 @@ def test_valid_controlled_solution_passes_independent_validation() -> None:
 
 
 def test_unsolved_solution_cannot_be_validated() -> None:
-    """Validation requires actual decision-variable values."""
     instance, _ = build_and_solve_controlled_model()
 
     unsolved = DcaSolution(

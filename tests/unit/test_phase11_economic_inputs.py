@@ -1,5 +1,3 @@
-"""Tests for Phase 11 economic/stochastic input structure."""
-
 from dataclasses import replace
 
 import pytest
@@ -61,7 +59,6 @@ def _spec() -> Table4EconomicInputSpec:
 
 
 def test_volume_distribution_preserves_zero_to_vmax_support() -> None:
-    """The published support is exactly 0 through VMAX."""
     distribution = _distribution()
 
     assert distribution.support == (0, 1, 2)
@@ -71,7 +68,6 @@ def test_volume_distribution_preserves_zero_to_vmax_support() -> None:
 
 
 def test_volume_distribution_rejects_missing_support_value() -> None:
-    """Protection levels require contiguous 0..VMAX support."""
     with pytest.raises(
         ValueError,
         match="contiguous",
@@ -85,7 +81,6 @@ def test_volume_distribution_rejects_missing_support_value() -> None:
 
 
 def test_fare_rates_enforce_published_reference_classes() -> None:
-    """Early reservation and standard delivery must equal one."""
     with pytest.raises(
         ValueError,
         match="early-reservation",
@@ -110,7 +105,6 @@ def test_fare_rates_enforce_published_reference_classes() -> None:
 
 
 def test_premium_fare_rates_must_exceed_one() -> None:
-    """Late and express classes are high-contribution classes."""
     with pytest.raises(
         ValueError,
         match="late-reservation",
@@ -135,7 +129,6 @@ def test_premium_fare_rates_must_exceed_one() -> None:
 
 
 def test_complete_spec_requires_all_four_corridor_distances() -> None:
-    """Economic inputs cannot silently omit an OD distance."""
     with pytest.raises(
         ValueError,
         match="distances 1, 2, 3 and 4",
@@ -148,7 +141,6 @@ def test_complete_spec_requires_all_four_corridor_distances() -> None:
 
 
 def test_fare_equation_matches_multiplicative_paper_structure() -> None:
-    """f = p * anticipation-rate * delivery-rate."""
     spec = _spec()
 
     assert spec.fare_per_teu_for_classes(
@@ -177,7 +169,6 @@ def test_fare_equation_matches_multiplicative_paper_structure() -> None:
 
 
 def test_economic_input_fingerprint_is_deterministic_and_sensitive() -> None:
-    """Every numerical economic assumption enters traceability."""
     spec = _spec()
 
     first = table4_economic_input_fingerprint(spec)

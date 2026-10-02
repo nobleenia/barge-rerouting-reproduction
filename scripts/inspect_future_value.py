@@ -9,7 +9,6 @@ from barge_rerouting.domain import (
 
 
 def main() -> None:
-    """Display one controlled discrete value table."""
     forecast = FutureDemandForecast(
         forecast_id="FUTURE_HIGH",
         origin="A",

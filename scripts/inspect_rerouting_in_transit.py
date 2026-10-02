@@ -22,7 +22,6 @@ from barge_rerouting.rolling_horizon import (
 
 
 def main() -> None:
-    """Show a fragment onboard a long-duration service."""
     config = load_experiment_config(Path("tests/fixtures/long_leg_experiment.yaml"))
     instance = assemble_experiment_instance(
         config,

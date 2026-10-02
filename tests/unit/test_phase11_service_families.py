@@ -1,5 +1,3 @@
-"""Tests for publication-facing Phase 11 service families."""
-
 from collections import defaultdict
 
 import pytest
@@ -29,7 +27,6 @@ def _legs(
 
 
 def test_default_family_specs_preserve_two_to_one_frequency() -> None:
-    """Family 2 has exactly twice Family 1's slot frequency."""
     specs = default_table4_service_family_specs()
 
     assert len(specs) == 2
@@ -47,7 +44,6 @@ def test_default_family_specs_preserve_two_to_one_frequency() -> None:
 
 
 def test_controlled_offsets_are_explicit_and_weekly() -> None:
-    """Unpublished schedule choices remain inspectable constants."""
     assert TABLE4_REPEAT_PERIOD == 14
 
     assert TABLE4_FAMILY_1_DEPARTURE_OFFSETS == (
@@ -64,7 +60,6 @@ def test_controlled_offsets_are_explicit_and_weekly() -> None:
 
 
 def test_family_one_has_two_service_ids_per_direction() -> None:
-    """Recurring cycles reuse two directional service slots."""
     legs = _legs("service_family_1")
 
     eastbound = {leg.service_id for leg in legs if leg.direction == "eastbound"}
@@ -75,7 +70,6 @@ def test_family_one_has_two_service_ids_per_direction() -> None:
 
 
 def test_family_two_has_four_service_ids_per_direction() -> None:
-    """Family 2 doubles the directional service frequency."""
     legs = _legs("service_family_2")
 
     eastbound = {leg.service_id for leg in legs if leg.direction == "eastbound"}
@@ -86,7 +80,6 @@ def test_family_two_has_four_service_ids_per_direction() -> None:
 
 
 def test_every_occurrence_moves_only_between_adjacent_terminals() -> None:
-    """Generated service legs follow the A-B-C-D-E corridor."""
     terminal_index = {terminal: index for index, terminal in enumerate(TABLE4_TERMINALS)}
 
     for family in (
@@ -101,7 +94,6 @@ def test_every_occurrence_moves_only_between_adjacent_terminals() -> None:
 
 
 def test_recurring_service_slots_repeat_every_fourteen_periods() -> None:
-    """The same service slot reappears after one weekly cycle."""
     legs = _legs("service_family_1")
 
     first_leg_departures: dict[str, list[int]] = defaultdict(list)
@@ -118,7 +110,6 @@ def test_recurring_service_slots_repeat_every_fourteen_periods() -> None:
 
 
 def test_capacity_is_applied_to_every_scheduled_leg() -> None:
-    """Nominal Table 4 capacity is uniform over one network cell."""
     legs = _legs(
         "service_family_2",
         capacity=15,
@@ -130,7 +121,6 @@ def test_capacity_is_applied_to_every_scheduled_leg() -> None:
 
 
 def test_table4_network_config_preserves_published_corridor() -> None:
-    """Generated network config carries the fixed A--E corridor."""
     config = build_table4_network_config(
         time_periods=tuple(range(0, 29)),
         service_family="service_family_1",
@@ -144,7 +134,6 @@ def test_table4_network_config_preserves_published_corridor() -> None:
 
 
 def test_noncontiguous_time_grid_is_rejected() -> None:
-    """Publication-facing half-day periods require a regular grid."""
     with pytest.raises(
         ValueError,
         match="contiguous half-day",

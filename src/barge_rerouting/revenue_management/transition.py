@@ -21,7 +21,6 @@ from barge_rerouting.rolling_horizon.state import (
 
 
 def _validate_tolerance(value: object) -> float:
-    """Validate and return a positive finite tolerance."""
     if isinstance(value, bool) or not isinstance(
         value,
         (int, float),
@@ -45,12 +44,7 @@ def commitment_from_dca_rm_solution(
     *,
     tolerance: float = COMMITMENT_TOLERANCE,
 ) -> DemandCommitment | None:
-    """Convert only the realised current decision into a commitment.
-
-    Future selectors, protected volumes, and tentative future flows
-    are optimisation information. They are deliberately excluded
-    from persistent booking state.
-    """
+    """Store the current decision without tentative future flows."""
     if not isinstance(
         artifacts,
         DcaRmModelArtifacts,

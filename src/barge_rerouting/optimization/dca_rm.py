@@ -35,13 +35,11 @@ DCA_RM_TOLERANCE = 1e-6
 
 
 def _solver_name(*parts: object) -> str:
-    """Create a readable CPLEX-compatible identifier."""
     raw_name = "__".join(str(part) for part in parts)
     return re.sub(r"[^A-Za-z0-9_]", "_", raw_name)
 
 
 def _validate_tolerance(value: object) -> float:
-    """Validate and return a positive finite tolerance."""
     if isinstance(value, bool) or not isinstance(
         value,
         (int, float),
@@ -65,7 +63,6 @@ def _create_acceptance_variable(
     demand_id: str,
     category: CustomerCategory,
 ) -> Any:
-    """Create the current request's acceptance variable."""
     variable_name = _solver_name("xi", demand_id)
 
     if category is CustomerCategory.REGULAR:
@@ -123,17 +120,14 @@ class DcaRmModelArtifacts:
 
     @property
     def selector_variable_count(self) -> int:
-        """Return the number of binary y(k,j) variables."""
         return len(self.selector_variables)
 
     @property
     def future_flow_variable_count(self) -> int:
-        """Return the tentative future-flow count."""
         return len(self.future_flow_variables)
 
     @property
     def forecast_count(self) -> int:
-        """Return the number of forecasts in K(current)."""
         return len(self.future_set.candidates)
 
 
@@ -264,7 +258,6 @@ def _validate_inputs(
     value_interpretation: FutureValueInterpretation,
     capacity_snapshot: TransportCapacitySnapshot | None,
 ) -> None:
-    """Validate the common DCA-RM inputs."""
     if not isinstance(instance, ExperimentInstance):
         raise TypeError("instance must be an ExperimentInstance.")
 
@@ -315,7 +308,6 @@ def _available_capacity(
     arc_id: str,
     capacity_snapshot: TransportCapacitySnapshot | None,
 ) -> float:
-    """Return capacity available to current and future flow."""
     if capacity_snapshot is not None:
         return float(capacity_snapshot.bookable_capacity_for(arc_id))
 
@@ -331,7 +323,6 @@ def _future_transport_arc_ids(
     instance: ExperimentInstance,
     candidate: FutureDemandCandidate,
 ) -> tuple[str, ...]:
-    """Return transport arcs in one future network."""
     return tuple(
         arc_id
         for arc_id in candidate.network_index.feasible_arc_ids

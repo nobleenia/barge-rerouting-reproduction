@@ -20,7 +20,6 @@ def _validate_nonnegative_finite_number(
     name: str,
     value: object,
 ) -> float:
-    """Validate and return a nonnegative finite number."""
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise TypeError(f"{name} must be a real number.")
 
@@ -39,7 +38,6 @@ def _validate_positive_finite_number(
     name: str,
     value: object,
 ) -> float:
-    """Validate and return a strictly positive finite number."""
     numeric_value = _validate_nonnegative_finite_number(name, value)
 
     if numeric_value <= 0:
@@ -75,7 +73,6 @@ class DemandFragment:
     executed_arc_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
-        """Validate and normalise fragment attributes."""
         if not isinstance(self.fragment_id, str):
             raise TypeError("fragment_id must be a string.")
 
@@ -128,12 +125,10 @@ class DemandFragment:
 
     @property
     def current_terminal(self) -> str:
-        """Return the physical terminal containing the fragment."""
         return str(self.current_node[0])
 
     @property
     def current_time(self) -> int:
-        """Return the fragment's current time period."""
         return int(self.current_node[1])
 
     def move_along(self, arc: TimeSpaceArc) -> DemandFragment:
@@ -189,7 +184,6 @@ class AcceptedDemandState:
     pending_truck_volume: float = 0.0
 
     def __post_init__(self) -> None:
-        """Validate the commitment and its volume accounting."""
         if not isinstance(self.demand, Demand):
             raise TypeError("demand must be a Demand object.")
 
@@ -308,7 +302,6 @@ class AcceptedDemandState:
 
     @property
     def accepted_volume(self) -> float:
-        """Return the committed accepted volume."""
         demand_volume: float = float(self.demand.volume)
         acceptance_fraction: float = float(self.acceptance_fraction)
 
@@ -316,7 +309,6 @@ class AcceptedDemandState:
 
     @property
     def remaining_volume(self) -> float:
-        """Return total accepted volume not yet delivered."""
         total_volume: float = 0.0
 
         for fragment in self.fragments:
@@ -326,10 +318,8 @@ class AcceptedDemandState:
 
     @property
     def delivered_volume(self) -> float:
-        """Return total delivered volume across all permitted modes."""
         return self.delivered_barge_volume + self.delivered_truck_volume
 
     @property
     def is_complete(self) -> bool:
-        """Return whether no unfinished fragments remain."""
         return self.remaining_volume <= VOLUME_TOLERANCE

@@ -14,7 +14,6 @@ from barge_rerouting.revenue_management.evaluation import (
 
 
 def main() -> None:
-    """Run the canonical sensitivity evaluation twice."""
     config = load_experiment_config(Path("configs/toy_experiment.yaml"))
     config = replace(
         config,

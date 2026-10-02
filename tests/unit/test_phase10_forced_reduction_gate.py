@@ -1,22 +1,3 @@
-"""Final forced-reduction validation gate for Phase 10.
-
-This is a controlled mechanism-validation instance, not a numerical
-reproduction of the paper's experimental tables.
-
-The original 10-TEU booking is forced onto a primary barge route.
-A later water-level update reduces that route to 7 TEU. An unused
-one-TEU alternative barge route remains available. Recovery must
-therefore produce:
-
-    7 TEU primary barge
-  + 1 TEU alternative barge
-  + 2 TEU truck
-  = 10 TEU accepted demand.
-
-The test demonstrates that raw arc overload is not itself truck
-volume: network rerouting is attempted before truck recourse.
-"""
-
 import pytest
 
 from barge_rerouting.config import (
@@ -179,9 +160,7 @@ def build_forced_reduction_example():
 
     state = RollingBookingState.empty(instance)
 
-    # The alternate route exists physically but is deliberately
-    # unavailable for the original booking. This makes the original
-    # commitment deterministic: all 10 TEU are booked on S1.
+    # The original booking uses S1 because the alternate route is unavailable.
     initial_capacity_overrides = {
         arc_id: (
             0.0
@@ -225,8 +204,7 @@ def build_forced_reduction_example():
         execution,
     )
 
-    # Only primary service S1 is affected by the water reduction.
-    # S2 remains at its nominal one-TEU capacity.
+    # Water reduction affects S1; S2 retains one TEU.
     status = ServiceStatusUpdateEvent(
         sequence_number=1,
         update_time=1,
@@ -292,7 +270,6 @@ def build_forced_reduction_example():
 
 
 def test_forced_reduction_old_plan_has_three_teu_overload() -> None:
-    """Nominal ten-TEU plan exceeds reduced primary capacity by three."""
     example = build_forced_reduction_example()
 
     try:
@@ -324,7 +301,6 @@ def test_forced_reduction_old_plan_has_three_teu_overload() -> None:
 
 
 def test_rerouting_reduces_truck_shortfall_from_three_to_two() -> None:
-    """One TEU reroutes by barge before unavoidable truck recourse."""
     example = build_forced_reduction_example()
 
     try:
@@ -371,19 +347,13 @@ def test_rerouting_reduces_truck_shortfall_from_three_to_two() -> None:
 
         assert barge_delivered + solution.total_truck_volume == pytest.approx(10.0)
 
-        # Critical Phase-10 gate:
-        #
-        # raw primary overload = 3 TEU
-        # actual unavoidable truck shortfall = 2 TEU
-        #
-        # because one TEU was recovered through S2.
+        # Three-TEU S1 overload minus one TEU recovered through S2.
         assert solution.total_truck_volume < 3.0
     finally:
         example["artifacts"].model.end()
 
 
 def test_forced_reduction_persistence_reconciles_eight_plus_two() -> None:
-    """Operational execution preserves the recovered 8+2 split."""
     example = build_forced_reduction_example()
 
     try:

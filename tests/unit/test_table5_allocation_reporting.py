@@ -1,5 +1,3 @@
-"""Tests for rich per-demand Table-5 reporting records."""
-
 import pytest
 
 from barge_rerouting.reporting.table5_allocations import (
@@ -39,7 +37,6 @@ def _demand(
 
 
 def test_arc_flow_sum_is_not_used_as_cargo_volume() -> None:
-    """Multiple transport legs must not multiply accepted cargo."""
     demand = _demand(
         accepted=2.0,
         truck=0.0,

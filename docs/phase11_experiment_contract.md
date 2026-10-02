@@ -254,7 +254,7 @@ indicator
 table/figure.
 \]
 
-No presentation table or figure is admissible unless:
+A reported table or figure is retained only when:
 
 - it is regenerated automatically from raw results;
 - every denominator is defined;

@@ -41,17 +41,7 @@ TABLE5_REQUEST_PERIODS: Final[tuple[int, ...]] = tuple(range(80))
 
 TABLE5_DEMAND_COUNT: Final = 800
 
-# The Table-4 timing pools permit a maximum:
-#
-# reservation_time
-# + anticipation lag 6
-# + delivery slack 13
-#
-# for the longest OD distance.
-#
-# Final request period = 79, hence:
-#
-# 79 + 6 + 13 = 98.
+# Maximum horizon: final request 79 + anticipation 6 + delivery slack 13.
 TABLE5_CONTROLLED_HORIZON_END: Final = 98
 
 TABLE5_PR_TRIGGER_INTERVAL_PERIODS: Final = 4
@@ -116,13 +106,7 @@ def build_table5_pr_forecast_updates(
     *,
     horizon_end: int = TABLE5_CONTROLLED_HORIZON_END,
 ) -> tuple[ServiceStatusUpdateEvent, ...]:
-    """Encode standard-water PR forecast epochs as neutral updates.
-
-    Phase 10 currently represents operational forecast/status updates with
-    ServiceStatusUpdateEvent.  For Table 5 these events are deliberately
-    neutral: water_level_factor == 1.0.  Their purpose is to trigger PR at
-    four-period forecast-update epochs without reducing service capacity.
-    """
+    """Create four-period PR triggers with unchanged water capacity."""
     if isinstance(horizon_end, bool) or not isinstance(
         horizon_end,
         int,

@@ -10,7 +10,6 @@ def _validate_positive_integer(
     name: str,
     value: object,
 ) -> int:
-    """Validate and return a strictly positive integer."""
     if isinstance(value, bool) or not isinstance(value, int):
         raise TypeError(f"{name} must be an integer.")
 
@@ -24,7 +23,6 @@ def _validate_nonnegative_integer(
     name: str,
     value: object,
 ) -> int:
-    """Validate and return a non-negative integer."""
     if isinstance(value, bool) or not isinstance(value, int):
         raise TypeError(f"{name} must be an integer.")
 
@@ -37,7 +35,6 @@ def _validate_nonnegative_integer(
 def _validate_water_level_factor(
     value: object,
 ) -> float:
-    """Validate a proportional water-level capacity factor."""
     if isinstance(value, bool) or not isinstance(
         value,
         (int, float),
@@ -58,7 +55,6 @@ def _validate_water_level_factor(
 def _normalise_service_ids(
     value: tuple[str, ...],
 ) -> tuple[str, ...]:
-    """Validate service identifiers affected by an update."""
     if not isinstance(value, tuple):
         raise TypeError("affected_service_ids must be a tuple.")
 
@@ -101,7 +97,6 @@ class ServiceStatusUpdateEvent:
     affected_service_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
-        """Validate and normalise the status event."""
         sequence_number = _validate_positive_integer(
             "sequence_number",
             self.sequence_number,
@@ -160,7 +155,6 @@ class ServiceStatusUpdateEvent:
 
     @property
     def event_id(self) -> str:
-        """Return a deterministic status-event identifier."""
         return f"status::{self.sequence_number:04d}::{self.update_time:04d}"
 
     def applies_to_service(

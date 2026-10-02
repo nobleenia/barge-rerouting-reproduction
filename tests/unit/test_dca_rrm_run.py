@@ -1,5 +1,3 @@
-"""Tests for complete time-aware sequential DCA-RRM."""
-
 from dataclasses import replace
 from pathlib import Path
 
@@ -224,7 +222,6 @@ def combined_event_inputs():
 
 
 def test_event_orchestration_contains_all_commodity_groups() -> None:
-    """Past, current, and future decisions must coexist."""
     (
         instance,
         state,
@@ -253,7 +250,6 @@ def test_event_orchestration_contains_all_commodity_groups() -> None:
 
 
 def test_no_forecasts_match_full_reroute_run() -> None:
-    """Empty K(current) must reduce to Full-Reroute."""
     instance = switch_instance()
 
     reroute_run = run_full_reroute(instance)
@@ -273,7 +269,6 @@ def test_no_forecasts_match_full_reroute_run() -> None:
 
 
 def test_high_probability_protects_and_accepts_future() -> None:
-    """DCA-RRM must reproduce DCA-RM without past fragments."""
     run = run_high_probability_rrm()
 
     assert run.completed
@@ -291,7 +286,6 @@ def test_high_probability_protects_and_accepts_future() -> None:
 
 
 def test_objective_and_realised_revenue_remain_separate() -> None:
-    """Forecast value must not be reported as earned revenue."""
     run = run_high_probability_rrm()
 
     assert run.summed_event_objectives == pytest.approx(600.0)
@@ -302,7 +296,6 @@ def test_objective_and_realised_revenue_remain_separate() -> None:
 
 
 def test_run_stops_at_first_infeasible_regular_request() -> None:
-    """Mandatory cargo infeasibility must terminate DCA-RRM."""
     instance = assemble_experiment_instance(
         quiet_config("configs/toy_experiment.yaml"),
         demands=(
@@ -352,7 +345,6 @@ def test_run_stops_at_first_infeasible_regular_request() -> None:
 
 
 def test_sequential_dca_rrm_is_deterministic() -> None:
-    """Identical inputs must reproduce the same run."""
     first = run_high_probability_rrm()
     second = run_high_probability_rrm()
 
@@ -360,7 +352,6 @@ def test_sequential_dca_rrm_is_deterministic() -> None:
 
 
 def test_rrm_capacity_transition_allows_net_release() -> None:
-    """Rerouting may legitimately increase bookable capacity."""
     from barge_rerouting.revenue_management.rrm_orchestration import (
         DcaRrmArcCapacityTransition,
     )

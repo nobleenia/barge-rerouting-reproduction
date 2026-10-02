@@ -1,5 +1,3 @@
-"""Tests for operational persistence of dynamic Full-Reroute."""
-
 import pytest
 from test_dynamic_booking_capacity import (
     build_status_then_booking_example,
@@ -83,7 +81,6 @@ def build_operational_fr_booking():
 
 
 def test_fr_booking_optimizes_only_remaining_seven_teu() -> None:
-    """Already-trucked volume never re-enters the booking solve."""
     (
         example,
         state_before,
@@ -112,7 +109,6 @@ def test_fr_booking_optimizes_only_remaining_seven_teu() -> None:
 
 
 def test_fr_transition_accumulates_four_not_seven_truck_teu() -> None:
-    """Truck history is incremental across recovery generations."""
     (
         example,
         state_before,
@@ -143,7 +139,6 @@ def test_fr_transition_accumulates_four_not_seven_truck_teu() -> None:
 
 
 def test_fr_transition_reconstructs_six_plus_four_and_new_k2() -> None:
-    """Operational execution reflects latest FR generation."""
     (
         example,
         state_before,
@@ -189,7 +184,6 @@ def test_fr_transition_reconstructs_six_plus_four_and_new_k2() -> None:
 
 
 def test_fr_transition_refuses_unrepresentable_current_truck() -> None:
-    """Never hide a current truck transfer inside a barge commitment."""
     (
         example,
         state_before,
@@ -266,7 +260,6 @@ def test_fr_transition_refuses_unrepresentable_current_truck() -> None:
 
 
 def test_fr_repeated_recovery_preserves_nested_delivery_identity() -> None:
-    """A second recovery must resolve the preceding fragment's sink."""
     (
         example,
         state_before,

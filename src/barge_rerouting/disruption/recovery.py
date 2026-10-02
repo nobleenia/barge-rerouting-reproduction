@@ -55,7 +55,6 @@ class RecoveryFragmentSnapshot:
     fragments: tuple[ReroutingFragmentDecisionState, ...]
 
     def __post_init__(self) -> None:
-        """Validate recovery-event and fragment consistency."""
         if not isinstance(
             self.event,
             (
@@ -124,27 +123,22 @@ class RecoveryFragmentSnapshot:
 
     @property
     def event_id(self) -> str:
-        """Return the recovery-trigger event identifier."""
         return str(self.event.event_id)
 
     @property
     def fragment_ids(self) -> tuple[str, ...]:
-        """Return all unfinished recovery fragments."""
         return tuple(fragment.fragment_id for fragment in self.fragments)
 
     @property
     def demand_ids(self) -> tuple[str, ...]:
-        """Return accepted demands requiring recovery."""
         return tuple(sorted({fragment.demand_id for fragment in self.fragments}))
 
     @property
     def total_remaining_volume(self) -> float:
-        """Return volume still requiring delivery."""
         return float(sum(fragment.volume for fragment in self.fragments))
 
     @property
     def locked_fragment_ids(self) -> tuple[str, ...]:
-        """Return fragments already onboard a barge."""
         return tuple(
             fragment.fragment_id
             for fragment in self.fragments
@@ -177,7 +171,6 @@ def _reroutable_fragment_state(
     fragment: DemandFragment,
     old_path: PlannedDemandPath,
 ) -> ReroutableFragmentState:
-    """Reconstruct the old unexecuted suffix of one fragment."""
     executed_arc_ids = fragment.executed_arc_ids
     executed_count = len(executed_arc_ids)
 
@@ -211,7 +204,6 @@ def _decision_state(
     ordinary_capacity: TransportCapacitySnapshot,
     fragment_state: ReroutableFragmentState,
 ) -> ReroutingFragmentDecisionState:
-    """Lock any departed movement and release future movements."""
     locked_arc_ids: list[str] = []
     releasable_arc_ids: list[str] = []
 

@@ -20,7 +20,6 @@ def _validate_nonnegative_integer(
     name: str,
     value: object,
 ) -> int:
-    """Validate and return a nonnegative integer."""
     if isinstance(value, bool) or not isinstance(value, int):
         raise TypeError(f"{name} must be an integer.")
 
@@ -34,7 +33,6 @@ def _validate_nonnegative_float(
     name: str,
     value: object,
 ) -> float:
-    """Validate and return a finite nonnegative float."""
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise TypeError(f"{name} must be a real number.")
 
@@ -54,7 +52,6 @@ def _normalise_identifiers(
     *,
     field_name: str,
 ) -> tuple[str, ...]:
-    """Validate, normalise, and sort unique identifiers."""
     if not isinstance(value, tuple):
         raise TypeError(f"{field_name} must be a tuple.")
 
@@ -92,7 +89,6 @@ class ReleasedTransportArcCapacity:
     released_fragment_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
-        """Validate the capacity-release accounting identity."""
         if not isinstance(self.arc_id, str):
             raise TypeError("arc_id must be a string.")
 
@@ -195,7 +191,6 @@ class ReleasedTransportArcCapacity:
 
     @property
     def has_released_reservation(self) -> bool:
-        """Return whether at least one old reservation was released."""
         return self.released_reroutable_volume > REROUTING_CAPACITY_TOLERANCE
 
 
@@ -210,7 +205,6 @@ class ReroutingCapacitySnapshot:
     arc_states: tuple[ReleasedTransportArcCapacity, ...]
 
     def __post_init__(self) -> None:
-        """Validate snapshot identity and arc-state consistency."""
         if not isinstance(self.current_event_id, str):
             raise TypeError("current_event_id must be a string.")
 
@@ -293,12 +287,10 @@ class ReroutingCapacitySnapshot:
 
     @property
     def available_arc_ids(self) -> tuple[str, ...]:
-        """Return future transport arcs available to rerouting."""
         return tuple(arc_state.arc_id for arc_state in self.arc_states)
 
     @property
     def total_released_volume(self) -> float:
-        """Return reservations released across transport arcs."""
         return float(sum(arc_state.released_reroutable_volume for arc_state in self.arc_states))
 
     def state_for(

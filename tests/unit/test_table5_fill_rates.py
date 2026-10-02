@@ -1,5 +1,3 @@
-"""Tests for explicit Table-5 fill-rate candidates."""
-
 import pytest
 
 from barge_rerouting.experiments.phase11_table5 import (

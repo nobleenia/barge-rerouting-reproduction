@@ -1,5 +1,3 @@
-"""End-to-end tests for dynamic Full-Reroute."""
-
 import pytest
 from test_dynamic_booking_capacity import build_instance
 
@@ -45,7 +43,6 @@ def build_runs():
 
 
 def test_dynamic_fr_uses_status_before_same_time_booking() -> None:
-    """The t=1 forecast precedes K2 in operational order."""
     _, status, _, run = build_runs()
 
     assert run.timeline.event_count == 3
@@ -57,7 +54,6 @@ def test_dynamic_fr_uses_status_before_same_time_booking() -> None:
 
 
 def test_dynamic_fr_accepts_k2_that_partial_reroute_rejects() -> None:
-    """FR booking-triggered rerouting creates the policy difference."""
     _, _, partial, full = build_runs()
 
     assert partial.completed
@@ -77,7 +73,6 @@ def test_dynamic_fr_accepts_k2_that_partial_reroute_rejects() -> None:
 
 
 def test_dynamic_fr_accumulates_incremental_truck_history() -> None:
-    """Status trucks three TEU and K2-triggered FR trucks one more."""
     _, _, _, run = build_runs()
 
     status_result = run.event_results[1]
@@ -91,7 +86,6 @@ def test_dynamic_fr_accumulates_incremental_truck_history() -> None:
 
 
 def test_dynamic_fr_final_execution_is_six_plus_four_and_one() -> None:
-    """Final operational state is K1 6+4 and K2 1 barge."""
     instance, _, _, run = build_runs()
 
     execution = build_operational_execution_snapshot(
@@ -121,7 +115,6 @@ def test_dynamic_fr_final_execution_is_six_plus_four_and_one() -> None:
 
 
 def test_dynamic_fr_run_reconciles_revenue_and_penalty() -> None:
-    """Revenue and truck penalties remain separate accounting."""
     _, _, _, run = build_runs()
 
     assert run.completed

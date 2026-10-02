@@ -1,21 +1,7 @@
-"""Publication-facing structural demand process for Phase 11.
+"""Generate structural Phase 11 demand templates.
 
-The source paper supports the following demand-generation structure:
-
-- five terminals A--E;
-- ordered origin-destination pairs sampled uniformly;
-- ten requests per half-day period;
-- customer category selected uniformly from R, P and F;
-- anticipation and delivery-time parameters selected from
-  distance-dependent pools.
-
-The publication does not disclose the exact distance-dependent timing
-pools, realised-demand volume distribution, VMAX, base fares, fare
-multipliers, or original random seeds.
-
-This module therefore generates only the structural request templates.
-Economic quantities are deliberately attached in a later, separately
-documented experiment layer.
+The timing pools are controlled inputs because the paper does not give their
+numerical values. Volumes and fares are added by the economics layer.
 """
 
 from __future__ import annotations
@@ -56,7 +42,6 @@ def _validate_nonnegative_integer(
     name: str,
     value: object,
 ) -> int:
-    """Validate a non-negative integer."""
     if isinstance(value, bool) or not isinstance(value, int):
         raise TypeError(f"{name} must be an integer.")
 
@@ -70,7 +55,6 @@ def _validate_positive_integer(
     name: str,
     value: object,
 ) -> int:
-    """Validate a strictly positive integer."""
     value = _validate_nonnegative_integer(
         name,
         value,
@@ -111,7 +95,6 @@ class DistanceTimingPool:
     delivery_slacks: tuple[int, ...]
 
     def __post_init__(self) -> None:
-        """Validate a distance-dependent timing pool."""
         distance = _validate_positive_integer(
             "distance",
             self.distance,
@@ -192,7 +175,6 @@ class Table4DemandProcessSpec:
     reproduction_class: str = CONTROLLED_SUBSTITUTE_INPUT
 
     def __post_init__(self) -> None:
-        """Validate the structural demand-process specification."""
         if not isinstance(
             self.request_periods,
             tuple,
@@ -257,9 +239,7 @@ class Table4DemandProcessSpec:
         if set(by_distance) != {1, 2, 3, 4}:
             raise ValueError("Timing pools must cover distances 1, 2, 3 and 4.")
 
-        # Avoid implicit truncation or redraw near the horizon.
-        # Every published-pool outcome must fit for every configured
-        # request period.
+        # Every timing outcome must fit within the horizon.
         latest_request = periods[-1]
 
         for pool in by_distance.values():
@@ -302,7 +282,6 @@ class Table4DemandProcessSpec:
 
     @property
     def request_count(self) -> int:
-        """Return total structural requests."""
         return len(self.request_periods) * self.requests_per_period
 
     def timing_pool_for(
@@ -334,7 +313,6 @@ class Table4RequestTemplate:
     category: CustomerCategory
 
     def __post_init__(self) -> None:
-        """Validate one request template."""
         if not isinstance(self.demand_id, str):
             raise TypeError("demand_id must be a string.")
 

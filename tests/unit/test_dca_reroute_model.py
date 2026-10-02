@@ -1,5 +1,3 @@
-"""Tests for joint current-demand and fragment rerouting."""
-
 from pathlib import Path
 
 import pytest
@@ -198,7 +196,6 @@ def build_switch_example():
 
 
 def test_ordinary_dca_rejects_blocked_current_request() -> None:
-    """The old reservation leaves no direct capacity."""
     example = build_switch_example()
 
     ordinary_solution = example["ordinary_solution"]
@@ -209,7 +206,6 @@ def test_ordinary_dca_rejects_blocked_current_request() -> None:
 
 
 def test_dca_reroute_accepts_current_request() -> None:
-    """Moving old cargo to the alternative route admits KNEW."""
     example = build_switch_example()
     solution = example["reroute_solution"]
 
@@ -219,7 +215,6 @@ def test_dca_reroute_accepts_current_request() -> None:
 
 
 def test_old_fragment_moves_to_alternative_route() -> None:
-    """KOLD must leave the bottleneck for S_ALT1 and S_ALT2."""
     example = build_switch_example()
 
     solution = example["reroute_solution"]
@@ -243,7 +238,6 @@ def test_old_fragment_moves_to_alternative_route() -> None:
 
 
 def test_current_request_uses_released_bottleneck() -> None:
-    """KNEW must receive all four TEU on S_BOTTLENECK."""
     example = build_switch_example()
     solution = example["reroute_solution"]
 
@@ -253,7 +247,6 @@ def test_current_request_uses_released_bottleneck() -> None:
 
 
 def test_every_old_fragment_remains_fully_delivered() -> None:
-    """Previously accepted volume cannot be dropped."""
     example = build_switch_example()
 
     solution = example["reroute_solution"]
@@ -267,7 +260,6 @@ def test_every_old_fragment_remains_fully_delivered() -> None:
 
 
 def test_executed_prefix_is_not_reoptimised() -> None:
-    """S_PREFIX remains immutable and absent from the model."""
     example = build_switch_example()
 
     decision = example["decision"]
@@ -281,7 +273,6 @@ def test_executed_prefix_is_not_reoptimised() -> None:
 
 
 def test_shared_capacity_is_respected() -> None:
-    """The joint flow cannot exceed any available service."""
     example = build_switch_example()
 
     solution = example["reroute_solution"]
@@ -298,7 +289,6 @@ def test_shared_capacity_is_respected() -> None:
 
 
 def test_joint_solution_is_deterministic() -> None:
-    """Repeated solution extraction gives the same routing."""
     example = build_switch_example()
 
     second = solve_dca_reroute_model(example["reroute_artifacts"])
@@ -307,7 +297,6 @@ def test_joint_solution_is_deterministic() -> None:
 
 
 def test_highs_backend_matches_cplex_joint_reroute_solution() -> None:
-    """HiGHS must reproduce the validated CPLEX DCA-Reroute optimum."""
     from barge_rerouting.optimization.solver_backend import (
         SolverBackend,
         solve_dca_reroute_with_backend,

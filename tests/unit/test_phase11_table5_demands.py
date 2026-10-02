@@ -1,5 +1,3 @@
-"""Tests for the Phase 11 Table 5 controlled demand set."""
-
 from collections import Counter
 
 import pytest

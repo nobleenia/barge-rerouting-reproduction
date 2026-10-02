@@ -11,7 +11,6 @@ from barge_rerouting.network.physical import build_bidirectional_corridor
 
 
 def main() -> None:
-    """Generate the physical-corridor figure."""
     terminals = ("A", "B", "C", "D", "E")
     graph = build_bidirectional_corridor(terminals)
 

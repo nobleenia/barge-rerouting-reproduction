@@ -10,7 +10,6 @@ from barge_rerouting.experiments import (
 
 
 def main() -> None:
-    """Generate and report the deterministic 120-run plan."""
     cells = build_default_table4_cells()
     runs = build_default_table4_run_plan()
 

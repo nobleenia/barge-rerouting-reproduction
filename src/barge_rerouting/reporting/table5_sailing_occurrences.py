@@ -1,12 +1,4 @@
-"""Reconstruct unique scheduled sailing occurrences for Table 5.
-
-A recurring ``service_id`` identifies a service pattern, not one unique
-physical sailing. Each physical A--E or E--A occurrence consists of four
-connected transport legs.
-
-This module reconstructs those occurrences from the raw transport-arc
-evidence without introducing a publication-facing fill-rate formula.
-"""
+"""Reconstruct Table 5 sailings from their four transport legs."""
 
 from __future__ import annotations
 
@@ -34,7 +26,6 @@ class Table5SailingOccurrence:
     ]
 
     def __post_init__(self) -> None:
-        """Validate one connected physical sailing."""
         if not self.occurrence_key:
             raise ValueError("occurrence_key cannot be empty.")
 
@@ -80,37 +71,30 @@ class Table5SailingOccurrence:
 
     @property
     def leg_count(self) -> int:
-        """Return number of physical transport legs."""
         return len(self.arcs)
 
     @property
     def nominal_capacity(self) -> float:
-        """Return scheduled nominal barge capacity."""
         return float(self.arcs[0].nominal_capacity)
 
     @property
     def minimum_actual_capacity(self) -> float:
-        """Return minimum realised capacity over the sailing."""
         return float(min(arc.actual_capacity for arc in self.arcs))
 
     @property
     def maximum_actual_capacity(self) -> float:
-        """Return maximum realised capacity over the sailing."""
         return float(max(arc.actual_capacity for arc in self.arcs))
 
     @property
     def original_peak_load(self) -> float:
-        """Return maximum original booking load on any leg."""
         return float(max(arc.original_load for arc in self.arcs))
 
     @property
     def final_peak_load(self) -> float:
-        """Return maximum final operational load on any leg."""
         return float(max(arc.final_load for arc in self.arcs))
 
     @property
     def standard_water(self) -> bool:
-        """Return whether actual equals nominal capacity on all legs."""
         return all(
             abs(arc.actual_capacity - arc.nominal_capacity) <= SERVICE_CAPACITY_TOLERANCE
             for arc in self.arcs
@@ -123,7 +107,6 @@ def _finish_occurrence(
     arcs: list[Table5TransportArcEvidence],
     expected_legs_per_occurrence: int,
 ) -> Table5SailingOccurrence:
-    """Validate and construct one connected occurrence."""
     if len(arcs) != expected_legs_per_occurrence:
         raise ValueError(
             "Unexpected number of transport legs "

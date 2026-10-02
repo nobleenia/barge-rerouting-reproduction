@@ -1,5 +1,3 @@
-"""Tests for Table-5 physical sailing reconstruction."""
-
 from barge_rerouting.experiments.phase11_table5 import (
     default_table5_experiment_spec,
 )

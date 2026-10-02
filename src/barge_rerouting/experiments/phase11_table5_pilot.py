@@ -73,7 +73,6 @@ class Table5PilotInputs:
     demand_fingerprint: str
 
     def __post_init__(self) -> None:
-        """Validate the publication-facing pilot contract."""
         if len(self.instance.demands) != TABLE5_DEMAND_COUNT:
             raise ValueError("Table 5 pilot must contain exactly 800 demands.")
 

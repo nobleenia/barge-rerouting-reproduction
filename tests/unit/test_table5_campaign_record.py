@@ -1,5 +1,3 @@
-"""Tests for rich persisted Table-5 campaign policy records."""
-
 import pytest
 
 from barge_rerouting.reporting.table5_allocations import (

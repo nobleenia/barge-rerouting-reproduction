@@ -44,7 +44,6 @@ class Table5OriginalArcAllocation:
     volume: float
 
     def __post_init__(self) -> None:
-        """Validate one original allocation."""
         if not self.arc_id:
             raise ValueError("arc_id cannot be empty.")
 
@@ -81,7 +80,6 @@ class Table5DemandAllocation:
     final_barge_volume: float
 
     def __post_init__(self) -> None:
-        """Validate per-demand terminal conservation."""
         if not self.demand_id:
             raise ValueError("demand_id cannot be empty.")
 
@@ -197,7 +195,6 @@ class Table5AllocationSnapshot:
     ]
 
     def __post_init__(self) -> None:
-        """Validate demand identity uniqueness."""
         if not isinstance(
             self.demands,
             tuple,
@@ -211,27 +208,22 @@ class Table5AllocationSnapshot:
 
     @property
     def accepted_request_count(self) -> int:
-        """Return positively accepted demand count."""
         return len(self.demands)
 
     @property
     def accepted_volume(self) -> float:
-        """Return accepted cargo volume."""
         return float(fsum(demand.accepted_volume for demand in self.demands))
 
     @property
     def truck_volume(self) -> float:
-        """Return cumulative terminal truck volume."""
         return float(fsum(demand.truck_volume for demand in self.demands))
 
     @property
     def truck_penalty(self) -> float:
-        """Return cumulative terminal truck penalty."""
         return float(fsum(demand.truck_penalty for demand in self.demands))
 
     @property
     def final_barge_volume(self) -> float:
-        """Return accepted cargo remaining on barge."""
         return float(fsum(demand.final_barge_volume for demand in self.demands))
 
 

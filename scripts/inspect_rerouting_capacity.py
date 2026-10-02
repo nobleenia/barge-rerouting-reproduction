@@ -23,7 +23,6 @@ from barge_rerouting.rolling_horizon import (
 
 
 def main() -> None:
-    """Show ordinary and released capacity for S2 at time one."""
     config = load_experiment_config("configs/toy_experiment.yaml")
     quiet_config = replace(
         config,

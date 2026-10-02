@@ -28,7 +28,6 @@ from barge_rerouting.rolling_horizon import (
 
 
 def solve_case(probability_four: float):
-    """Solve one zero-or-four future forecast case."""
     config = load_experiment_config(Path("tests/fixtures/rerouting_switch_experiment.yaml"))
     current = Demand(
         "CURRENT",
@@ -96,7 +95,6 @@ def solve_case(probability_four: float):
 
 
 def main() -> None:
-    """Display the probability-driven decision reversal."""
     high = solve_case(0.50)
     low = solve_case(0.05)
 

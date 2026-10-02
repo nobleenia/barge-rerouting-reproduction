@@ -29,7 +29,6 @@ class FullRerouteRun:
     final_state: RollingBookingState
 
     def __post_init__(self) -> None:
-        """Validate event order, state chaining, and termination."""
         if not isinstance(self.timeline, BookingTimeline):
             raise TypeError("timeline must be a BookingTimeline.")
 
@@ -103,24 +102,20 @@ class FullRerouteRun:
     def results(
         self,
     ) -> tuple[FullRerouteEventResult, ...]:
-        """Return event results in booking order."""
         return self.event_results
 
     @property
     def completed(self) -> bool:
-        """Return whether every booking event was processed."""
         return len(self.event_results) == self.timeline.event_count and all(
             result.event_was_processed for result in self.event_results
         )
 
     @property
     def processed_event_count(self) -> int:
-        """Return the number of successfully processed events."""
         return sum(1 for result in self.event_results if result.event_was_processed)
 
     @property
     def total_revenue(self) -> float:
-        """Return revenue from current requests accepted by Full-Reroute."""
         return float(
             sum(
                 result.reroute_solution.objective_value or 0.0
@@ -131,7 +126,6 @@ class FullRerouteRun:
 
     @property
     def ordinary_total_revenue(self) -> float:
-        """Return the corresponding ordinary-DCA event revenue."""
         return float(
             sum(
                 result.ordinary_solution.objective_value or 0.0
@@ -142,7 +136,6 @@ class FullRerouteRun:
 
     @property
     def accepted_volume(self) -> float:
-        """Return total newly accepted cargo volume."""
         return float(
             sum(
                 (result.transition.current_commitment.accepted_volume)
@@ -157,12 +150,10 @@ class FullRerouteRun:
 
     @property
     def events_with_prior_reoptimization(self) -> int:
-        """Return events that rebuilt prior accepted commitments."""
         return sum(1 for result in self.event_results if result.rerouted_demand_ids)
 
     @property
     def acceptance_improvement_count(self) -> int:
-        """Return events whose Full-Reroute acceptance exceeds ordinary DCA."""
         improvement_count = 0
 
         for result in self.event_results:
@@ -181,7 +172,6 @@ class FullRerouteRun:
     def failure_result(
         self,
     ) -> FullRerouteEventResult | None:
-        """Return the first event that could not be processed."""
         for result in self.event_results:
             if not result.event_was_processed:
                 return result

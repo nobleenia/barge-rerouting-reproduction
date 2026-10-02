@@ -1,5 +1,3 @@
-"""Numerical cleanup tests for persisted recovery-flow decomposition."""
-
 import pytest
 
 from barge_rerouting.disruption.operational_execution import (
@@ -74,7 +72,6 @@ def _disconnected_plan(
 
 
 def test_decomposition_discards_observed_solver_dust() -> None:
-    """The exact 1.056901e-6 FR residual is numerical zero."""
     instance, plan = _disconnected_plan(1.056901e-6)
 
     paths = _decompose_recovered_plan(
@@ -86,7 +83,6 @@ def test_decomposition_discards_observed_solver_dust() -> None:
 
 
 def test_decomposition_still_rejects_material_disconnected_flow() -> None:
-    """Cleanup must not hide a materially disconnected recovery plan."""
     instance, plan = _disconnected_plan(1.0e-4)
 
     with pytest.raises(
@@ -100,7 +96,6 @@ def test_decomposition_still_rejects_material_disconnected_flow() -> None:
 
 
 def test_numerical_dust_barge_volume_is_preserved() -> None:
-    """Discarding dust paths must not discard their barge mass."""
     _, plan = _disconnected_plan(1.056901e-6)
 
     closure = _numerical_barge_closure_volume((plan,))
@@ -109,7 +104,6 @@ def test_numerical_dust_barge_volume_is_preserved() -> None:
 
 
 def test_material_recovery_plan_is_not_numerically_closed() -> None:
-    """Material recovery volume must remain physical network flow."""
     _, plan = _disconnected_plan(1.0e-4)
 
     closure = _numerical_barge_closure_volume((plan,))

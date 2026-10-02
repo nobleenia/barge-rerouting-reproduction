@@ -1,5 +1,3 @@
-"""Tests for Phase-11C campaign construction."""
-
 import pytest
 
 from barge_rerouting.experiments.phase11_table6_campaign import (

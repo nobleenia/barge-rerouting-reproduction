@@ -1,5 +1,3 @@
-"""Tests for the deterministic current-demand allocation model."""
-
 from pathlib import Path
 
 import pytest
@@ -63,7 +61,6 @@ def build_controlled_instance() -> ExperimentInstance:
 
 
 def test_model_has_expected_variable_and_constraint_indexes() -> None:
-    """The controlled instance must produce predictable model dimensions."""
     artifacts = build_dca_model(build_controlled_instance())
 
     assert artifacts.acceptance_variable_count == 3
@@ -74,7 +71,6 @@ def test_model_has_expected_variable_and_constraint_indexes() -> None:
 
 
 def test_controlled_dca_solution_respects_customer_categories() -> None:
-    """Regular is mandatory, partial fills residual capacity, binary is rejected."""
     artifacts = build_dca_model(build_controlled_instance())
     solution = solve_dca_model(artifacts)
 
@@ -87,7 +83,6 @@ def test_controlled_dca_solution_respects_customer_categories() -> None:
 
 
 def test_shared_transport_capacity_is_not_exceeded() -> None:
-    """Total routed volume on S6 must equal its ten-TEU capacity."""
     instance = build_controlled_instance()
     artifacts = build_dca_model(instance)
     solution = solve_dca_model(artifacts)
@@ -107,7 +102,6 @@ def test_shared_transport_capacity_is_not_exceeded() -> None:
 
 
 def test_transport_and_delivery_flows_are_equal_per_demand() -> None:
-    """Destination conservation must transfer transport flow into the sink."""
     instance = build_controlled_instance()
     artifacts = build_dca_model(instance)
     solution = solve_dca_model(artifacts)

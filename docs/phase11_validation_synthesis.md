@@ -283,10 +283,5 @@ reproduction is complete.
 No further long-running optimisation campaign is required for the strict
 paper reproduction.
 
-Subsequent project work should focus on:
-
-- final interpretation;
-- presentation preparation;
-- technical-interview defence;
-- limitations and future-work positioning;
-- optional extensions only where they add clear scientific value.
+Remaining work concerns interpretation, limitations, and separately labelled
+extensions.

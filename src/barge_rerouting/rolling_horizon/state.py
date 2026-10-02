@@ -21,7 +21,6 @@ class BookingDecisionRecord:
     commitment: DemandCommitment | None
 
     def __post_init__(self) -> None:
-        """Validate event and commitment consistency."""
         if not isinstance(self.event, BookingDecisionEvent):
             raise TypeError("event must be a BookingDecisionEvent.")
 
@@ -42,12 +41,10 @@ class BookingDecisionRecord:
 
     @property
     def is_accepted(self) -> bool:
-        """Return whether this event created a positive commitment."""
         return self.commitment is not None
 
     @property
     def demand_id(self) -> str:
-        """Return the processed demand identifier."""
         return str(self.event.demand_id)
 
 
@@ -59,7 +56,6 @@ class RollingBookingState:
     records: tuple[BookingDecisionRecord, ...] = ()
 
     def __post_init__(self) -> None:
-        """Validate fingerprint and record sequence."""
         if not isinstance(self.instance_fingerprint, str):
             raise TypeError("instance_fingerprint must be a string.")
 
@@ -113,27 +109,22 @@ class RollingBookingState:
 
     @property
     def processed_event_count(self) -> int:
-        """Return the number of recorded booking decisions."""
         return len(self.records)
 
     @property
     def next_sequence_number(self) -> int:
-        """Return the sequence number expected next."""
         return self.processed_event_count + 1
 
     @property
     def commitments(self) -> tuple[DemandCommitment, ...]:
-        """Return all positive accepted commitments."""
         return tuple(record.commitment for record in self.records if record.commitment is not None)
 
     @property
     def accepted_demand_ids(self) -> tuple[str, ...]:
-        """Return positively accepted demand identifiers."""
         return tuple(commitment.demand_id for commitment in self.commitments)
 
     @property
     def rejected_demand_ids(self) -> tuple[str, ...]:
-        """Return rejected demand identifiers."""
         return tuple(record.demand_id for record in self.records if not record.is_accepted)
 
     def advance(

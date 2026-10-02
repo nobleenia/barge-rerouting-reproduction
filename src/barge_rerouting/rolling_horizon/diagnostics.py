@@ -15,7 +15,6 @@ DIAGNOSTIC_TOLERANCE = 1e-6
 
 
 def _validate_required_volume(value: object) -> float:
-    """Validate a strictly positive finite diagnostic volume."""
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise TypeError("required_volume must be a real number.")
 
@@ -40,7 +39,6 @@ class BottleneckArcDiagnostic:
     nominal_capacity: float
 
     def __post_init__(self) -> None:
-        """Validate and normalise bottleneck information."""
         if not isinstance(self.arc_id, str):
             raise TypeError("arc_id must be a string.")
 
@@ -93,12 +91,10 @@ class BookingFeasibilityDiagnostic:
 
     @property
     def is_feasible(self) -> bool:
-        """Return whether the complete required volume can be routed."""
         return self.volume_shortfall <= DIAGNOSTIC_TOLERANCE
 
     @property
     def bottleneck_arc_ids(self) -> tuple[str, ...]:
-        """Return minimum-cut transport arc identifiers."""
         return tuple(bottleneck.arc_id for bottleneck in self.bottleneck_arcs)
 
 
@@ -106,7 +102,6 @@ def _diagnostic_arc_node(
     demand_id: str,
     arc_id: str,
 ) -> tuple[str, str, str]:
-    """Return an artificial node that preserves one parallel arc."""
     return ("diagnostic-arc", demand_id, arc_id)
 
 

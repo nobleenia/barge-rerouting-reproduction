@@ -1,8 +1,4 @@
-"""Raw transport-arc capacity and load evidence for Table 5 reporting.
-
-This module deliberately persists physical arc-level evidence before
-choosing a publication-facing AFR/NFR aggregation formula.
-"""
+"""Transport-arc capacity and load data for Table 5 reporting."""
 
 from __future__ import annotations
 
@@ -75,7 +71,6 @@ class Table5TransportArcEvidence:
     source_update_event_id: str | None = None
 
     def __post_init__(self) -> None:
-        """Validate one transport-arc reporting record."""
         for name, value in (
             ("arc_id", self.arc_id),
             ("service_id", self.service_id),
@@ -185,12 +180,10 @@ class Table5TransportArcEvidence:
 
     @property
     def water_level_factor(self) -> float:
-        """Return actual-to-nominal capacity ratio."""
         return float(self.actual_capacity / self.nominal_capacity)
 
     @property
     def final_actual_capacity_violation(self) -> float:
-        """Return final load above actual capacity, if any."""
         return float(
             max(
                 0.0,
@@ -211,7 +204,6 @@ class Table5ServiceCapacitySnapshot:
     ]
 
     def __post_init__(self) -> None:
-        """Validate arc evidence identity."""
         if isinstance(self.reporting_time, bool) or not isinstance(
             self.reporting_time,
             int,
@@ -276,19 +268,16 @@ class Table5ServiceCapacitySnapshot:
 
     @property
     def transport_arc_count(self) -> int:
-        """Return scheduled transport-arc count."""
         return len(self.arcs)
 
     @property
     def recurring_service_ids(
         self,
     ) -> tuple[str, ...]:
-        """Return recurring service-pattern identifiers."""
         return tuple(sorted({arc.service_id for arc in self.arcs}))
 
     @property
     def standard_water(self) -> bool:
-        """Return whether actual equals nominal capacity everywhere."""
         return all(
             abs(arc.actual_capacity - arc.nominal_capacity) <= SERVICE_CAPACITY_TOLERANCE
             for arc in self.arcs
@@ -296,29 +285,24 @@ class Table5ServiceCapacitySnapshot:
 
     @property
     def total_original_arc_load(self) -> float:
-        """Return original transport work in TEU-arc units."""
         return float(fsum(arc.original_load for arc in self.arcs))
 
     @property
     def total_final_arc_load(self) -> float:
-        """Return final transport work in TEU-arc units."""
         return float(fsum(arc.final_load for arc in self.arcs))
 
     @property
     def total_nominal_arc_capacity(self) -> float:
-        """Return nominal capacity summed over transport arcs."""
         return float(fsum(arc.nominal_capacity for arc in self.arcs))
 
     @property
     def total_actual_arc_capacity(self) -> float:
-        """Return actual capacity summed over transport arcs."""
         return float(fsum(arc.actual_capacity for arc in self.arcs))
 
     @property
     def max_final_actual_capacity_violation(
         self,
     ) -> float:
-        """Return largest final arc overload."""
         return float(
             max(
                 (arc.final_actual_capacity_violation for arc in self.arcs),
@@ -371,7 +355,6 @@ def _load_on_arc(
     snapshot: ExecutionSnapshot,
     arc_id: str,
 ) -> float:
-    """Return cargo load represented on one physical arc."""
     return float(
         fsum(path.volume for path in snapshot.planned_paths if arc_id in path.physical_arc_ids)
     )

@@ -58,7 +58,6 @@ class FutureDemandCandidate:
     shared_transport_arc_ids: tuple[str, ...]
 
     def __post_init__(self) -> None:
-        """Validate forecast and projected-network consistency."""
         if not isinstance(
             self.forecast,
             FutureDemandForecast,
@@ -104,12 +103,10 @@ class FutureDemandCandidate:
 
     @property
     def forecast_id(self) -> str:
-        """Return the future-demand forecast identifier."""
         return str(self.forecast.forecast_id)
 
     @property
     def transport_arc_ids(self) -> tuple[str, ...]:
-        """Return feasible transport arcs for tentative flow."""
         return tuple(
             arc_id
             for arc_id in self.network_index.feasible_arc_ids
@@ -125,7 +122,6 @@ class FutureDemandExclusion:
     reason: FutureDemandExclusionReason
 
     def __post_init__(self) -> None:
-        """Validate the exclusion record."""
         if not isinstance(self.forecast_id, str):
             raise TypeError("forecast_id must be a string.")
 
@@ -157,7 +153,6 @@ class FutureDemandSet:
     exclusions: tuple[FutureDemandExclusion, ...]
 
     def __post_init__(self) -> None:
-        """Validate ordering and forecast uniqueness."""
         if not isinstance(
             self.current_event,
             BookingDecisionEvent,
@@ -228,12 +223,10 @@ class FutureDemandSet:
 
     @property
     def forecast_ids(self) -> tuple[str, ...]:
-        """Return the selected set K(current)."""
         return tuple(candidate.forecast_id for candidate in self.candidates)
 
     @property
     def excluded_forecast_ids(self) -> tuple[str, ...]:
-        """Return excluded forecast identifiers."""
         return tuple(exclusion.forecast_id for exclusion in self.exclusions)
 
     def candidate_for(
@@ -274,7 +267,6 @@ def _normalise_forecasts(
     *,
     current_event: BookingDecisionEvent,
 ) -> tuple[FutureDemandForecast, ...]:
-    """Validate and deterministically order forecast inputs."""
     if isinstance(forecasts, (str, bytes)):
         raise TypeError("forecasts must be a sequence of forecasts.")
 
@@ -308,7 +300,6 @@ def _normalise_forecasts(
 def _build_node_flow_indexes(
     graph: nx.MultiDiGraph,
 ) -> tuple[NodeFlowIndex, ...]:
-    """Build node-level incoming and outgoing arc indexes."""
     arcs = extract_time_space_arcs(graph)
 
     nodes = tuple(
@@ -346,7 +337,6 @@ def _project_forecast_network(
     current_event: BookingDecisionEvent,
     forecast: FutureDemandForecast,
 ) -> DemandNetworkIndex | None:
-    """Project a forecast onto the existing time-space network."""
     if forecast.maximum_volume <= 0:
         raise ValueError(f"Forecast {forecast.forecast_id} has no positive protection level.")
 
@@ -403,7 +393,6 @@ def _transport_arc_ids(
     instance: ExperimentInstance,
     network_index: DemandNetworkIndex,
 ) -> tuple[str, ...]:
-    """Return feasible capacity-constrained transport arcs."""
     return tuple(
         sorted(
             arc_id
@@ -420,7 +409,6 @@ def _candidate_from_network(
     *,
     current_transport_arc_ids: set[str],
 ) -> FutureDemandCandidate:
-    """Build one selected candidate and interaction index."""
     future_transport_arc_ids = set(
         _transport_arc_ids(
             instance,

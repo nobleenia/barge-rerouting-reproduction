@@ -1,5 +1,3 @@
-"""Tests for water-adjusted transport capacities."""
-
 from barge_rerouting.config import (
     CustomerMix,
     DemandGenerationConfig,
@@ -118,7 +116,6 @@ def transport_arc(
 
 
 def test_no_updates_preserve_nominal_capacity() -> None:
-    """An empty update set must reproduce stable capacity."""
     instance = build_instance()
 
     profile = build_actual_capacity_profile(
@@ -136,7 +133,6 @@ def test_no_updates_preserve_nominal_capacity() -> None:
 
 
 def test_update_applies_by_service_and_validity_window() -> None:
-    """Only matching departures in the half-open window change."""
     instance = build_instance()
     update = ServiceStatusUpdateEvent(
         sequence_number=1,
@@ -175,7 +171,6 @@ def test_update_applies_by_service_and_validity_window() -> None:
 
 
 def test_past_departure_is_not_retroactively_changed() -> None:
-    """A departed leg retains historical nominal accounting."""
     instance = build_instance()
     update = ServiceStatusUpdateEvent(
         sequence_number=1,
@@ -208,7 +203,6 @@ def test_past_departure_is_not_retroactively_changed() -> None:
 
 
 def test_latest_known_update_wins() -> None:
-    """A later applicable forecast supersedes an earlier one."""
     instance = build_instance()
 
     profile = build_actual_capacity_profile(
@@ -247,7 +241,6 @@ def test_latest_known_update_wins() -> None:
 
 
 def test_empty_service_set_updates_every_service() -> None:
-    """An unscoped status update applies globally."""
     instance = build_instance()
     update = ServiceStatusUpdateEvent(
         sequence_number=1,
@@ -275,7 +268,6 @@ def test_empty_service_set_updates_every_service() -> None:
 
 
 def test_invalid_water_level_factor_is_rejected() -> None:
-    """Paper-aligned capacity factors must be in (0, 1]."""
     import pytest
 
     with pytest.raises(
@@ -304,7 +296,6 @@ def test_invalid_water_level_factor_is_rejected() -> None:
 
 
 def test_invalid_status_validity_is_rejected() -> None:
-    """Forecast validity cannot precede its publication."""
     import pytest
 
     with pytest.raises(
@@ -333,7 +324,6 @@ def test_invalid_status_validity_is_rejected() -> None:
 
 
 def test_duplicate_update_sequences_are_rejected() -> None:
-    """Status-event identity must remain unique."""
     import pytest
 
     instance = build_instance()

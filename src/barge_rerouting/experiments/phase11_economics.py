@@ -1,15 +1,4 @@
-"""Economic and stochastic input contract for Phase 11.
-
-The 2024 paper specifies the structure of the demand-volume and fare
-generation process but does not disclose all numerical parameters.
-
-This module encodes that published structure without selecting substitute
-VMAX values, probability masses, base fares, timing thresholds, or premium
-fare multipliers.
-
-Numerical baseline values belong to a separately documented experiment
-configuration and must not be tuned to reproduce Table 4.
-"""
+"""Types and validation for Phase 11 demand-volume and fare inputs."""
 
 from __future__ import annotations
 
@@ -33,7 +22,6 @@ def _validate_nonnegative_integer(
     name: str,
     value: object,
 ) -> int:
-    """Validate one non-negative integer."""
     if isinstance(value, bool) or not isinstance(value, int):
         raise TypeError(f"{name} must be an integer.")
 
@@ -47,7 +35,6 @@ def _validate_positive_integer(
     name: str,
     value: object,
 ) -> int:
-    """Validate one strictly positive integer."""
     validated = _validate_nonnegative_integer(
         name,
         value,
@@ -63,7 +50,6 @@ def _validate_positive_float(
     name: str,
     value: object,
 ) -> float:
-    """Validate one finite strictly positive number."""
     if isinstance(value, bool) or not isinstance(
         value,
         (int, float),
@@ -88,7 +74,6 @@ class DiscreteVolumeDistribution:
     outcomes: tuple[VolumeProbability, ...]
 
     def __post_init__(self) -> None:
-        """Validate contiguous support and total probability."""
         if not isinstance(self.outcomes, tuple):
             raise TypeError("outcomes must be a tuple.")
 
@@ -144,22 +129,18 @@ class DiscreteVolumeDistribution:
 
     @property
     def support(self) -> tuple[int, ...]:
-        """Return 0, ..., VMAX."""
         return tuple(outcome.volume for outcome in self.outcomes)
 
     @property
     def maximum_volume(self) -> int:
-        """Return VMAX."""
         return int(self.outcomes[-1].volume)
 
     @property
     def zero_probability(self) -> float:
-        """Return P(X=0)."""
         return float(self.outcomes[0].probability)
 
     @property
     def expected_volume(self) -> float:
-        """Return E[X]."""
         return float(sum(outcome.volume * float(outcome.probability) for outcome in self.outcomes))
 
 
@@ -183,7 +164,6 @@ class FareClassRates:
     express_delivery_rate: float
 
     def __post_init__(self) -> None:
-        """Validate the published fare-rate relationships."""
         early = _validate_positive_float(
             "early_reservation_rate",
             self.early_reservation_rate,
@@ -255,7 +235,6 @@ class DistanceEconomicInput:
     delivery_threshold: int
 
     def __post_init__(self) -> None:
-        """Validate one corridor-distance economic record."""
         distance = _validate_positive_integer(
             "distance",
             self.distance,
@@ -311,7 +290,6 @@ class Table4EconomicInputSpec:
     reproduction_class: str = CONTROLLED_SUBSTITUTE_INPUT
 
     def __post_init__(self) -> None:
-        """Validate one complete Table 4 economic specification."""
         if not isinstance(
             self.volume_distribution,
             DiscreteVolumeDistribution,
@@ -388,11 +366,10 @@ class Table4EconomicInputSpec:
         early_reservation: bool,
         standard_delivery: bool,
     ) -> float:
-        """Apply the paper's multiplicative fare equation.
+        """Apply the multiplicative fare equation to classified timing inputs.
 
-        This method deliberately accepts already classified timing
-        classes. Mapping numerical timing values into those classes is
-        kept separate because the paper does not disclose the thresholds.
+        Timing classification is separate because the source thresholds are
+        unavailable.
         """
         if not isinstance(
             early_reservation,

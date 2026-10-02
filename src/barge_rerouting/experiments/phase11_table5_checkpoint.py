@@ -44,7 +44,6 @@ def _as_mapping(
     value: object,
     context: str,
 ) -> dict[str, Any]:
-    """Return one validated JSON mapping."""
     if not isinstance(value, dict):
         raise TypeError(f"{context} must be a mapping.")
 
@@ -63,7 +62,6 @@ def _as_list(
     value: object,
     context: str,
 ) -> list[Any]:
-    """Return one validated JSON list."""
     if not isinstance(value, list):
         raise TypeError(f"{context} must be a list.")
 

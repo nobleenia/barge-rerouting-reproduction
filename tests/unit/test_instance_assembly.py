@@ -1,5 +1,3 @@
-"""Tests for canonical optimisation-instance assembly."""
-
 from pathlib import Path
 
 import networkx as nx
@@ -23,7 +21,6 @@ def load_toy_config():
 
 
 def test_toy_instance_has_expected_global_counts() -> None:
-    """The canonical toy instance must retain its known dimensions."""
     instance = assemble_experiment_instance(load_toy_config())
 
     assert instance.node_count == 21
@@ -35,7 +32,6 @@ def test_toy_instance_has_expected_global_counts() -> None:
 
 
 def test_every_demand_has_one_matching_network_index() -> None:
-    """Each realised demand requires exactly one feasible network index."""
     instance = assemble_experiment_instance(load_toy_config())
 
     demand_ids = {demand.demand_id for demand in instance.demands}
@@ -47,7 +43,6 @@ def test_every_demand_has_one_matching_network_index() -> None:
 
 
 def test_demand_sources_and_destinations_match_original_requests() -> None:
-    """Demand-specific source and destination nodes must be consistent."""
     instance = assemble_experiment_instance(load_toy_config())
 
     for network_index in instance.demand_network_indexes:
@@ -66,7 +61,6 @@ def test_demand_sources_and_destinations_match_original_requests() -> None:
 
 
 def test_all_feasible_arcs_belong_to_global_arc_index() -> None:
-    """Pruned demand networks may not invent new transport arcs."""
     instance = assemble_experiment_instance(load_toy_config())
 
     global_arc_ids = {arc.arc_id for arc in instance.arcs}
@@ -76,7 +70,6 @@ def test_all_feasible_arcs_belong_to_global_arc_index() -> None:
 
 
 def test_node_flow_indexes_cover_every_feasible_arc_once() -> None:
-    """Each feasible arc must have exactly one tail and one head index."""
     instance = assemble_experiment_instance(load_toy_config())
 
     for network_index in instance.demand_network_indexes:
@@ -95,7 +88,6 @@ def test_node_flow_indexes_cover_every_feasible_arc_once() -> None:
 
 
 def test_instance_lookup_methods_return_expected_objects() -> None:
-    """Arc, demand, and network-index lookups must use stable IDs."""
     instance = assemble_experiment_instance(load_toy_config())
 
     first_demand = instance.demands[0]
@@ -114,7 +106,6 @@ def test_instance_lookup_methods_return_expected_objects() -> None:
 
 
 def test_repeated_assembly_is_deterministic() -> None:
-    """Repeated assembly from one configuration must be reproducible."""
     config = load_toy_config()
 
     first = assemble_experiment_instance(config)
@@ -127,7 +118,6 @@ def test_repeated_assembly_is_deterministic() -> None:
 
 
 def test_explicit_infeasible_demand_is_rejected() -> None:
-    """Assembly must reject a demand with no route by its deadline."""
     config = load_toy_config()
 
     infeasible_demand = Demand(
@@ -150,7 +140,6 @@ def test_explicit_infeasible_demand_is_rejected() -> None:
 
 
 def test_explicit_demands_cannot_be_combined_with_seed_override() -> None:
-    """Explicit demands already determine the instance content."""
     config = load_toy_config()
 
     demand = Demand(
@@ -174,7 +163,6 @@ def test_explicit_demands_cannot_be_combined_with_seed_override() -> None:
 
 
 def test_instance_graph_is_frozen_after_assembly() -> None:
-    """The canonical graph must not be modified after indexes are prepared."""
     instance = assemble_experiment_instance(load_toy_config())
 
     assert instance.graph.frozen
@@ -184,7 +172,6 @@ def test_instance_graph_is_frozen_after_assembly() -> None:
 
 
 def test_seed_override_changes_instance_fingerprint() -> None:
-    """Controlled replications may use a documented alternative seed."""
     config = load_toy_config()
 
     baseline = assemble_experiment_instance(config)

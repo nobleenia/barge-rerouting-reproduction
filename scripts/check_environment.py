@@ -16,7 +16,6 @@ import yaml
 
 
 def main() -> None:
-    """Print the principal environment and dependency versions."""
     print("Barge rerouting reproduction environment")
     print("=" * 42)
     print(f"Operating system:           {platform.platform()}")

@@ -57,15 +57,13 @@ TABLE4_FORECAST_VALUE_INTERPRETATION: Final = FutureValueInterpretation.PRINTED
 
 TABLE4_FORECAST_SELECTION_MODE: Final = FutureDemandSelectionMode.A004_SHARED_ARC
 
-# None means no additional look-ahead truncation is applied after the
-# ex-ante catalogue provider has removed non-future reservation periods.
+# The catalogue already excludes non-future reservation periods.
 TABLE4_FORECAST_LOOKAHEAD_PERIODS: Final[int | None] = None
 
 
 def _validate_seed(
     value: object,
 ) -> int:
-    """Validate one non-negative experiment seed."""
     if isinstance(value, bool) or not isinstance(
         value,
         int,
@@ -88,7 +86,6 @@ def table4_forecast_seed(
 def _fare_for_forecast_template(
     template: Table4RequestTemplate,
 ) -> float:
-    """Return A032 fare for one independent forecast template."""
     economic_spec = default_table4_controlled_economic_spec()
 
     distance_input = economic_spec.input_for_distance(template.distance)
@@ -115,7 +112,6 @@ class Table4ForecastCatalogueEntry:
     forecast: FutureDemandForecast
 
     def __post_init__(self) -> None:
-        """Validate catalogue timing and identity."""
         if isinstance(self.reservation_time, bool) or not isinstance(
             self.reservation_time,
             int,
@@ -142,14 +138,12 @@ class Table4ForecastCatalogueEntry:
 
     @property
     def forecast_id(self) -> str:
-        """Return forecast identifier."""
         return str(self.forecast.forecast_id)
 
     @property
     def ordering_key(
         self,
     ) -> tuple[int, int, str]:
-        """Return deterministic catalogue order."""
         return (
             self.reservation_time,
             self.slot_number,
@@ -167,7 +161,6 @@ class Table4ForecastCatalogue:
     entries: tuple[Table4ForecastCatalogueEntry, ...]
 
     def __post_init__(self) -> None:
-        """Validate catalogue identity and deterministic ordering."""
         selected_seed = _validate_seed(self.seed)
         selected_forecast_seed = _validate_seed(self.forecast_seed)
 
@@ -209,14 +202,12 @@ class Table4ForecastCatalogue:
 
     @property
     def entry_count(self) -> int:
-        """Return total ex-ante forecast opportunities."""
         return len(self.entries)
 
 
 def _forecast_entry_record(
     entry: Table4ForecastCatalogueEntry,
 ) -> dict[str, object]:
-    """Return one stable serialisable catalogue record."""
     forecast = entry.forecast
 
     return {

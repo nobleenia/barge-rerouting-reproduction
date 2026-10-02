@@ -1,5 +1,3 @@
-"""Tests for resumable Phase-11 Table-5 checkpoints."""
-
 import json
 from dataclasses import replace
 

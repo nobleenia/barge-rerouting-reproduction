@@ -1,5 +1,3 @@
-"""Tests for the frozen Phase 11 Table 5 experiment contract."""
-
 import pytest
 
 from barge_rerouting.experiments.phase11_table5 import (

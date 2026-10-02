@@ -1,5 +1,3 @@
-"""Tests for service-leg and solver-ready arc domain objects."""
-
 import networkx as nx
 import pytest
 
@@ -16,7 +14,6 @@ from barge_rerouting.network.time_space import build_time_space_network
 
 
 def test_scheduled_leg_exposes_tail_head_and_duration() -> None:
-    """A scheduled leg must identify its time-space endpoints."""
     leg = ScheduledTransportLeg(
         service_id="S1",
         origin="A",
@@ -34,7 +31,6 @@ def test_scheduled_leg_exposes_tail_head_and_duration() -> None:
 
 
 def test_holding_arc_requires_same_terminal_and_no_capacity() -> None:
-    """A valid holding arc waits at one physical terminal."""
     arc = TimeSpaceArc(
         arc_id="holding::A::0->1",
         tail=("A", 0),
@@ -58,7 +54,6 @@ def test_holding_arc_requires_same_terminal_and_no_capacity() -> None:
 
 
 def test_transport_arc_requires_distinct_terminals_capacity_and_service() -> None:
-    """A valid transport arc must represent a scheduled movement."""
     arc = TimeSpaceArc(
         arc_id="transport::0::S1",
         tail=("A", 0),
@@ -95,7 +90,6 @@ def test_transport_arc_requires_distinct_terminals_capacity_and_service() -> Non
 
 
 def test_arcs_must_move_forward_in_time() -> None:
-    """No time-space arc may return to the same or an earlier time."""
     with pytest.raises(ValueError, match="strictly forward"):
         TimeSpaceArc(
             arc_id="bad-time",
@@ -108,7 +102,6 @@ def test_arcs_must_move_forward_in_time() -> None:
 
 
 def test_graph_edges_are_extracted_as_solver_ready_arcs() -> None:
-    """The standard toy graph must yield thirteen typed arc objects."""
     graph = build_time_space_network(
         terminals=("A", "B", "C"),
         time_periods=(0, 1, 2, 3),
@@ -136,7 +129,6 @@ def test_graph_edges_are_extracted_as_solver_ready_arcs() -> None:
 
 
 def test_parallel_services_remain_distinct_solver_arcs() -> None:
-    """Parallel NetworkX edges must retain separate arc identifiers."""
     graph = build_time_space_network(
         terminals=("A", "B"),
         time_periods=(0, 1),
@@ -156,7 +148,6 @@ def test_parallel_services_remain_distinct_solver_arcs() -> None:
 
 
 def test_arc_index_rejects_duplicate_identifiers() -> None:
-    """CPLEX indexing requires globally unique arc identifiers."""
     arc = TimeSpaceArc(
         arc_id="transport::0::S1",
         tail=("A", 0),

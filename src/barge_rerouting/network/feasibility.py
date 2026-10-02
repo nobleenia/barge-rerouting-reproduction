@@ -21,17 +21,14 @@ class DemandFeasibleNetwork:
 
     @property
     def is_feasible(self) -> bool:
-        """Return whether at least one destination can be reached."""
         return bool(self.destination_nodes)
 
     @property
     def removed_node_count(self) -> int:
-        """Return the number of nodes removed by pruning."""
         return self.original_node_count - int(self.graph.number_of_nodes())
 
     @property
     def removed_arc_count(self) -> int:
-        """Return the number of arcs removed by pruning."""
         return self.original_arc_count - int(self.graph.number_of_edges())
 
 

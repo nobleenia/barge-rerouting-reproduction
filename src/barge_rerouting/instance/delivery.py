@@ -38,7 +38,6 @@ class AuxiliarySinkArc:
     sink_id: str
 
     def __post_init__(self) -> None:
-        """Validate and normalise the auxiliary delivery arc."""
         if not isinstance(self.arc_id, str):
             raise TypeError("arc_id must be a string.")
 
@@ -78,7 +77,6 @@ class AuxiliarySinkArc:
 
     @property
     def head(self) -> str:
-        """Return the logical auxiliary-sink identifier."""
         return str(self.sink_id)
 
 

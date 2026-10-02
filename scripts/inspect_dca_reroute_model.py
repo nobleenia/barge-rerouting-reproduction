@@ -31,12 +31,10 @@ from barge_rerouting.rolling_horizon import (
 
 
 def service_arc_id(instance, service_id: str) -> str:
-    """Return a scheduled transport arc identifier."""
     return str(next(arc.arc_id for arc in instance.arcs if arc.service_id == service_id))
 
 
 def main() -> None:
-    """Compare ordinary DCA with joint DCA-Reroute."""
     config = load_experiment_config(Path("tests/fixtures/rerouting_switch_experiment.yaml"))
 
     old = Demand(

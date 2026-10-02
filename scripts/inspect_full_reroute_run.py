@@ -19,7 +19,6 @@ from barge_rerouting.rerouting import (
 
 
 def main() -> None:
-    """Run the three-request shared-capacity example."""
     config = load_experiment_config(Path("configs/toy_experiment.yaml"))
     config = replace(
         config,

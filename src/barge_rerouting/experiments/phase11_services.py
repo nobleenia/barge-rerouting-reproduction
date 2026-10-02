@@ -40,19 +40,13 @@ TABLE4_TERMINALS: Final[tuple[str, ...]] = (
 
 TABLE4_REPEAT_PERIOD: Final = 14
 
-# Controlled schedule assumption:
-#
 # Family 1: two departures per direction per 14-period cycle.
 # Family 2: four departures per direction per 14-period cycle.
-#
-# Family 2 therefore has exactly twice the service frequency.
 TABLE4_FAMILY_1_DEPARTURE_OFFSETS: Final[tuple[int, ...]] = (0, 7)
 
 TABLE4_FAMILY_2_DEPARTURE_OFFSETS: Final[tuple[int, ...]] = (0, 3, 7, 10)
 
-# The paper states equal adjacent-terminal travel times but does not
-# disclose the numerical duration. The controlled baseline maps one
-# adjacent leg to one half-day model period.
+# Assumption: one adjacent leg takes one half-day period.
 TABLE4_ADJACENT_TRAVEL_PERIODS: Final = 1
 
 
@@ -60,7 +54,6 @@ def _normalise_nonempty_string(
     name: str,
     value: object,
 ) -> str:
-    """Validate and normalise one non-empty string."""
     if not isinstance(value, str):
         raise TypeError(f"{name} must be a string.")
 
@@ -76,7 +69,6 @@ def _validate_positive_integer(
     name: str,
     value: object,
 ) -> int:
-    """Validate one strictly positive integer."""
     if isinstance(value, bool) or not isinstance(value, int):
         raise TypeError(f"{name} must be an integer.")
 
@@ -98,7 +90,6 @@ class PeriodicServiceFamilySpec:
     reproduction_class: str = CONTROLLED_SUBSTITUTE_INPUT
 
     def __post_init__(self) -> None:
-        """Validate one periodic service-family specification."""
         family_key = _normalise_nonempty_string(
             "family_key",
             self.family_key,
@@ -202,12 +193,10 @@ class PeriodicServiceFamilySpec:
 
     @property
     def service_slots_per_direction(self) -> int:
-        """Return recurring service slots in each direction."""
         return len(self.departure_offsets)
 
     @property
     def total_directional_service_slots(self) -> int:
-        """Return eastbound plus westbound service slots."""
         return 2 * self.service_slots_per_direction
 
 
@@ -246,7 +235,6 @@ def table4_service_family_spec(
 def _validate_time_periods(
     time_periods: tuple[int, ...],
 ) -> tuple[int, ...]:
-    """Validate a contiguous half-day integer time grid."""
     if not isinstance(time_periods, tuple):
         raise TypeError("time_periods must be a tuple.")
 
@@ -287,7 +275,6 @@ def _validate_capacity_teu_for(
     allowed_capacities_teu: tuple[int, ...],
     capacity_context: str,
 ) -> int:
-    """Validate one experiment-specific nominal service capacity."""
     if isinstance(capacity_teu, bool) or not isinstance(
         capacity_teu,
         int,
@@ -309,7 +296,6 @@ def _validate_capacity_teu_for(
 def _validate_capacity_teu(
     capacity_teu: object,
 ) -> int:
-    """Validate one frozen Table 4 nominal service capacity."""
     return _validate_capacity_teu_for(
         capacity_teu,
         allowed_capacities_teu=TABLE4_CAPACITIES_TEU,
@@ -323,14 +309,12 @@ def _service_id(
     direction: str,
     slot_number: int,
 ) -> str:
-    """Return a recurring scheduled-service identifier."""
     return f"table4::{spec.family_key}::{direction}::slot{slot_number:02d}"
 
 
 def _direction_pairs(
     direction: str,
 ) -> tuple[tuple[str, str], ...]:
-    """Return adjacent corridor pairs for one direction."""
     if direction == "eastbound":
         return tuple(
             zip(

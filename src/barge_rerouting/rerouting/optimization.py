@@ -27,7 +27,6 @@ from barge_rerouting.rolling_horizon import (
 
 
 def _solver_name(*parts: object) -> str:
-    """Create a readable CPLEX-compatible identifier."""
     raw_name = "__".join(str(part) for part in parts)
     return re.sub(r"[^A-Za-z0-9_]", "_", raw_name)
 
@@ -38,7 +37,6 @@ def _create_acceptance_variable(
     demand_id: str,
     category: CustomerCategory,
 ) -> Any:
-    """Create the current request's acceptance variable."""
     variable_name = _solver_name(
         "xi",
         demand_id,
@@ -92,22 +90,18 @@ class DcaRerouteModelArtifacts:
 
     @property
     def current_flow_variable_count(self) -> int:
-        """Return the current request's flow-variable count."""
         return len(self.current_flow_variables)
 
     @property
     def fragment_flow_variable_count(self) -> int:
-        """Return all accepted-fragment flow-variable count."""
         return len(self.fragment_flow_variables)
 
     @property
     def total_flow_variable_count(self) -> int:
-        """Return all flow-variable count."""
         return self.current_flow_variable_count + self.fragment_flow_variable_count
 
     @property
     def fragment_count(self) -> int:
-        """Return the number of mandatory fragment commodities."""
         return len(self.fragment_networks.indexes)
 
 
@@ -208,7 +202,6 @@ def _validate_joint_inputs(
     capacity_snapshot: ReroutingCapacitySnapshot,
     fragment_networks: FragmentNetworkSnapshot,
 ) -> None:
-    """Validate event and snapshot consistency."""
     if not isinstance(instance, ExperimentInstance):
         raise TypeError("instance must be an ExperimentInstance.")
 

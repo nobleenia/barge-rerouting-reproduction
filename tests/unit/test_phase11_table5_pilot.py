@@ -1,5 +1,3 @@
-"""Tests for the Phase 11 Table 5 pilot inputs."""
-
 import pytest
 
 from barge_rerouting.experiments.phase11_table5 import (

@@ -1,5 +1,3 @@
-"""Tests for persisted Table-5 reporting summaries."""
-
 import pytest
 
 from barge_rerouting.reporting.table5_persisted import (

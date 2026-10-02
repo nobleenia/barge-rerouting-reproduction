@@ -16,7 +16,6 @@ from barge_rerouting.generation import (
 
 
 def parse_arguments() -> argparse.Namespace:
-    """Parse command-line arguments."""
     parser = argparse.ArgumentParser(description="Generate deterministic synthetic barge demands.")
     parser.add_argument(
         "config_path",
@@ -39,7 +38,6 @@ def parse_arguments() -> argparse.Namespace:
 
 
 def main() -> None:
-    """Generate, write, and summarise one demand instance."""
     arguments = parse_arguments()
     config = load_experiment_config(arguments.config_path)
 

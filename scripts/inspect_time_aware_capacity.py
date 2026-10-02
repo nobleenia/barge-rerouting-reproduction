@@ -19,7 +19,6 @@ from barge_rerouting.rolling_horizon import (
 
 
 def main() -> None:
-    """Book one route and inspect S1/S2 capacity over time."""
     config = load_experiment_config("configs/toy_experiment.yaml")
     quiet_config = replace(
         config,

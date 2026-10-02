@@ -1,12 +1,6 @@
-"""Dynamic Partial-Reroute orchestration.
+"""Partial rerouting after service-status updates.
 
-Partial-Reroute reacts to service-status / forecast updates by
-reoptimising unfinished accepted cargo. Ordinary booking events do
-not trigger rerouting of prior accepted demand.
-
-This module is specific to the dynamic service-status scenario.
-The stable-capacity Phase-7 Full-Reroute implementation remains
-unchanged.
+Booking events do not reroute earlier commitments.
 """
 
 from __future__ import annotations
@@ -85,7 +79,6 @@ class PartialRerouteEventResult:
     recovery_transition: TruckRecourseTransitionResult | None = None
 
     def __post_init__(self) -> None:
-        """Validate event/result consistency."""
         if not isinstance(
             self.entry,
             OperationalTimelineEntry,
@@ -178,12 +171,10 @@ class PartialRerouteEventResult:
 
     @property
     def event_id(self) -> str:
-        """Return the operational source-event identifier."""
         return str(self.entry.event_id)
 
     @property
     def accepted_volume(self) -> float:
-        """Return volume newly accepted at this event."""
         if (
             not self.entry.is_booking
             or self.booking_solution is None
@@ -200,7 +191,6 @@ class PartialRerouteEventResult:
 
     @property
     def realised_revenue(self) -> float:
-        """Return current-demand revenue from this event."""
         if (
             not self.entry.is_booking
             or self.booking_solution is None
@@ -212,7 +202,6 @@ class PartialRerouteEventResult:
 
     @property
     def truck_volume(self) -> float:
-        """Return truck volume assigned at this status event."""
         if self.recovery_solution is None:
             return 0.0
 
@@ -228,7 +217,6 @@ class PartialRerouteRun:
     final_state: RecoveryOperationalState
 
     def __post_init__(self) -> None:
-        """Validate event order and state chaining."""
         if not isinstance(
             self.timeline,
             OperationalTimeline,
@@ -286,14 +274,12 @@ class PartialRerouteRun:
 
     @property
     def completed(self) -> bool:
-        """Return whether every operational event was processed."""
         return len(self.event_results) == self.timeline.event_count and all(
             result.event_was_processed for result in self.event_results
         )
 
     @property
     def processed_booking_count(self) -> int:
-        """Return successfully processed booking events."""
         return sum(
             1
             for result in self.event_results
@@ -302,7 +288,6 @@ class PartialRerouteRun:
 
     @property
     def processed_status_count(self) -> int:
-        """Return successfully processed status updates."""
         return sum(
             1
             for result in self.event_results
@@ -311,22 +296,18 @@ class PartialRerouteRun:
 
     @property
     def accepted_volume(self) -> float:
-        """Return newly accepted volume across booking events."""
         return float(sum(result.accepted_volume for result in self.event_results))
 
     @property
     def total_revenue(self) -> float:
-        """Return realised current-demand revenue."""
         return float(sum(result.realised_revenue for result in self.event_results))
 
     @property
     def total_truck_volume(self) -> float:
-        """Return cumulative terminal truck allocation."""
         return float(self.final_state.total_truck_volume)
 
     @property
     def total_truck_penalty(self) -> float:
-        """Return cumulative truck penalty."""
         return float(self.final_state.total_truck_penalty)
 
 
@@ -341,7 +322,6 @@ def _status_result(
     truck_penalty_per_teu_by_demand: Mapping[str, float],
     solver_backend: SolverBackend,
 ) -> PartialRerouteEventResult:
-    """Process one forecast/status update under PR."""
     status_event = entry.status_update
 
     if status_event is None:
@@ -373,8 +353,7 @@ def _status_result(
         status_event,
     )
 
-    # Nothing unfinished: the forecast is processed, but there is
-    # no rerouting/truck optimisation to persist.
+    # A status update with no unfinished cargo requires no recovery solve.
     if not recovery_fragments.fragments:
         return PartialRerouteEventResult(
             entry=entry,
@@ -461,7 +440,6 @@ def _booking_result(
         ...,
     ],
 ) -> PartialRerouteEventResult:
-    """Process one ordinary booking under current actual capacity."""
     booking_event = entry.booking_event
 
     if booking_event is None:
@@ -586,7 +564,7 @@ def run_partial_reroute(
             if status_event is None:
                 raise ValueError("Operational status entry has no status-update event.")
 
-            # The newly published forecast is visible immediately.
+            # The update is available at its publication time.
             known_status_updates.append(status_event)
 
             result = _status_result(

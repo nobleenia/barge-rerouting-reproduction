@@ -30,7 +30,6 @@ def _validate_positive_finite_float(
     name: str,
     value: object,
 ) -> float:
-    """Validate and return a strictly positive finite float."""
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise TypeError(f"{name} must be a real number.")
 
@@ -60,7 +59,6 @@ class ReroutingExclusion:
     reason: ReroutingExclusionReason
 
     def __post_init__(self) -> None:
-        """Validate and normalise exclusion information."""
         if not isinstance(self.demand_id, str):
             raise TypeError("demand_id must be a string.")
 
@@ -85,7 +83,6 @@ class ReroutableFragmentState:
     old_unexecuted_transport_arc_ids: tuple[str, ...]
 
     def __post_init__(self) -> None:
-        """Validate fragment and old-plan consistency."""
         if not isinstance(self.fragment, DemandFragment):
             raise TypeError("fragment must be a DemandFragment.")
 
@@ -148,32 +145,26 @@ class ReroutableFragmentState:
 
     @property
     def fragment_id(self) -> str:
-        """Return the deterministic fragment identifier."""
         return str(self.fragment.fragment_id)
 
     @property
     def demand_id(self) -> str:
-        """Return the parent demand identifier."""
         return str(self.fragment.demand_id)
 
     @property
     def volume(self) -> float:
-        """Return fixed unfinished fragment volume."""
         return float(self.fragment.volume)
 
     @property
     def current_node(self) -> TimeSpaceNode:
-        """Return the fragment's actual terminal-time position."""
         return self.fragment.current_node
 
     @property
     def executed_arc_ids(self) -> tuple[str, ...]:
-        """Return immutable historical arcs."""
         return tuple(str(arc_id) for arc_id in self.fragment.executed_arc_ids)
 
     @property
     def old_delivery_arc_id(self) -> str:
-        """Return the delivery arc terminating the old path."""
         return str(self.old_path.delivery_arc_id)
 
 
@@ -186,7 +177,6 @@ class ReroutableDemandState:
     fragments: tuple[ReroutableFragmentState, ...]
 
     def __post_init__(self) -> None:
-        """Validate accepted-volume and fragment consistency."""
         if not isinstance(self.commitment, DemandCommitment):
             raise TypeError("commitment must be a DemandCommitment.")
 
@@ -247,22 +237,18 @@ class ReroutableDemandState:
 
     @property
     def demand_id(self) -> str:
-        """Return the accepted demand identifier."""
         return str(self.commitment.demand_id)
 
     @property
     def accepted_volume(self) -> float:
-        """Return the original fixed accepted quantity."""
         return float(self.commitment.accepted_volume)
 
     @property
     def remaining_volume(self) -> float:
-        """Return accepted volume still requiring delivery."""
         return float(self.execution_state.remaining_volume)
 
     @property
     def delivered_volume(self) -> float:
-        """Return volume delivered before this rerouting decision."""
         return float(self.execution_state.delivered_volume)
 
 
@@ -277,7 +263,6 @@ class ReroutingEligibilitySnapshot:
     exclusions: tuple[ReroutingExclusion, ...]
 
     def __post_init__(self) -> None:
-        """Validate event, time, and demand partition."""
         if not isinstance(
             self.current_event,
             BookingDecisionEvent,
@@ -367,17 +352,14 @@ class ReroutingEligibilitySnapshot:
 
     @property
     def reroutable_demand_ids(self) -> tuple[str, ...]:
-        """Return selected accepted-demand identifiers."""
         return tuple(demand_state.demand_id for demand_state in self.reroutable_demands)
 
     @property
     def excluded_demand_ids(self) -> tuple[str, ...]:
-        """Return accepted demands excluded from rerouting."""
         return tuple(exclusion.demand_id for exclusion in self.exclusions)
 
     @property
     def reroutable_fragment_count(self) -> int:
-        """Return the number of unfinished fragments selected."""
         return sum(len(demand_state.fragments) for demand_state in self.reroutable_demands)
 
     def demand_state_for(
@@ -402,7 +384,6 @@ def _normalise_arc_ids(
     *,
     field_name: str,
 ) -> tuple[str, ...]:
-    """Validate arc identifiers while preserving route order."""
     arc_ids: list[str] = []
 
     for arc_id in value:
@@ -427,7 +408,6 @@ def _fragment_state(
     fragment: DemandFragment,
     old_path: PlannedDemandPath,
 ) -> ReroutableFragmentState:
-    """Construct one reroutable fragment from execution and path state."""
     executed_arc_ids = fragment.executed_arc_ids
     executed_count = len(executed_arc_ids)
 

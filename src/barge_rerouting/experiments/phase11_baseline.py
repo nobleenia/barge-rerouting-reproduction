@@ -54,14 +54,11 @@ TABLE4_CONTROLLED_REQUEST_PERIODS: Final[tuple[int, ...]] = tuple(range(14))
 
 TABLE4_CONTROLLED_HORIZON_END: Final = 32
 
-# Economic random draws use an independent deterministic stream so changes
-# to structural request-generation internals do not silently change volume
-# realisations.
+# Keep economic draws independent of structural request generation.
 TABLE4_ECONOMIC_SEED_OFFSET: Final = 1_000_000
 
 
 def _validate_seed(value: object) -> int:
-    """Validate one non-negative experiment seed."""
     if isinstance(value, bool) or not isinstance(
         value,
         int,
@@ -148,7 +145,6 @@ def _draw_volume(
     random_generator: Random,
     distribution: DiscreteVolumeDistribution,
 ) -> int:
-    """Draw one volume from an explicit probability mass."""
     random_value = random_generator.random()
     cumulative_probability = 0.0
 
@@ -165,13 +161,12 @@ def _fare_for_template(
     template: Table4RequestTemplate,
     economic_spec: Table4EconomicInputSpec,
 ) -> float:
-    """Calculate the fare class for one structural request."""
     distance_input = economic_spec.input_for_distance(template.distance)
 
-    # More anticipation means earlier reservation.
+    # Longer anticipation identifies early reservation.
     early_reservation = template.anticipation_lag >= distance_input.anticipation_threshold
 
-    # More delivery slack means standard rather than express delivery.
+    # Longer delivery slack identifies standard delivery.
     standard_delivery = template.delivery_slack >= distance_input.delivery_threshold
 
     fare_per_teu = economic_spec.fare_per_teu_for_classes(
@@ -199,7 +194,6 @@ class Table4ControlledDemandSet:
     demands: tuple[Demand, ...]
 
     def __post_init__(self) -> None:
-        """Validate demand-set accounting and fingerprints."""
         selected_seed = _validate_seed(self.seed)
         selected_economic_seed = _validate_seed(self.economic_seed)
 

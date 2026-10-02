@@ -25,13 +25,11 @@ from barge_rerouting.rolling_horizon.timeline import BookingDecisionEvent
 
 
 def _solver_name(*parts: object) -> str:
-    """Create a readable CPLEX-compatible identifier."""
     raw_name = "__".join(str(part) for part in parts)
     return re.sub(r"[^A-Za-z0-9_]", "_", raw_name)
 
 
 def _validate_tolerance(value: object) -> float:
-    """Validate and return a strictly positive finite tolerance."""
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise TypeError("tolerance must be a real number.")
 
@@ -63,7 +61,6 @@ class SequentialBookingModelArtifacts:
 
     @property
     def flow_variable_count(self) -> int:
-        """Return the number of current-demand flow variables."""
         return len(self.flow_variables)
 
 
@@ -107,7 +104,6 @@ def _create_acceptance_variable(
     demand_id: str,
     category: CustomerCategory,
 ) -> Any:
-    """Create the current demand's acceptance variable."""
     variable_name = _solver_name("xi", demand_id)
 
     if category is CustomerCategory.REGULAR:

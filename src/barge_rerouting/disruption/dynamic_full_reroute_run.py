@@ -74,7 +74,6 @@ class DynamicFullRerouteEventResult:
     status_transition: TruckRecourseTransitionResult | None = None
 
     def __post_init__(self) -> None:
-        """Validate event/result consistency."""
         if not isinstance(
             self.entry,
             OperationalTimelineEntry,
@@ -153,12 +152,10 @@ class DynamicFullRerouteEventResult:
 
     @property
     def event_id(self) -> str:
-        """Return source-event identifier."""
         return str(self.entry.event_id)
 
     @property
     def accepted_volume(self) -> float:
-        """Return newly accepted current-demand volume."""
         if (
             not self.entry.is_booking
             or self.booking_solution is None
@@ -175,7 +172,6 @@ class DynamicFullRerouteEventResult:
 
     @property
     def realised_revenue(self) -> float:
-        """Return revenue earned from current acceptance."""
         if (
             not self.entry.is_booking
             or self.booking_solution is None
@@ -192,7 +188,6 @@ class DynamicFullRerouteEventResult:
 
     @property
     def additional_truck_volume(self) -> float:
-        """Return truck volume newly assigned at this event."""
         if self.entry.is_booking:
             if self.booking_transition is None:
                 return 0.0
@@ -206,7 +201,6 @@ class DynamicFullRerouteEventResult:
 
     @property
     def additional_truck_penalty(self) -> float:
-        """Return truck penalty newly incurred at this event."""
         if self.entry.is_booking:
             if self.booking_transition is None:
                 return 0.0
@@ -233,7 +227,6 @@ class DynamicFullRerouteRun:
     final_state: RecoveryOperationalState
 
     def __post_init__(self) -> None:
-        """Validate timeline ordering and state chaining."""
         if not isinstance(
             self.timeline,
             OperationalTimeline,
@@ -291,14 +284,12 @@ class DynamicFullRerouteRun:
 
     @property
     def completed(self) -> bool:
-        """Return whether every operational event was processed."""
         return len(self.event_results) == self.timeline.event_count and all(
             result.event_was_processed for result in self.event_results
         )
 
     @property
     def processed_booking_count(self) -> int:
-        """Return successfully processed booking events."""
         return sum(
             1
             for result in self.event_results
@@ -307,7 +298,6 @@ class DynamicFullRerouteRun:
 
     @property
     def processed_status_count(self) -> int:
-        """Return successfully processed status updates."""
         return sum(
             1
             for result in self.event_results
@@ -316,27 +306,22 @@ class DynamicFullRerouteRun:
 
     @property
     def accepted_volume(self) -> float:
-        """Return total newly accepted volume."""
         return float(sum(result.accepted_volume for result in self.event_results))
 
     @property
     def total_revenue(self) -> float:
-        """Return realised booking revenue."""
         return float(sum(result.realised_revenue for result in self.event_results))
 
     @property
     def total_truck_volume(self) -> float:
-        """Return cumulative terminal truck volume."""
         return float(self.final_state.total_truck_volume)
 
     @property
     def total_truck_penalty(self) -> float:
-        """Return cumulative truck penalty."""
         return float(self.final_state.total_truck_penalty)
 
     @property
     def net_realised_value(self) -> float:
-        """Return realised booking revenue less truck penalties."""
         return float(self.total_revenue - self.total_truck_penalty)
 
 
@@ -344,7 +329,6 @@ def _penalties_for(
     demand_ids: set[str],
     supplied: Mapping[str, float],
 ) -> dict[str, float]:
-    """Select explicit penalties for one optimisation."""
     missing = tuple(sorted(demand_id for demand_id in demand_ids if demand_id not in supplied))
 
     if missing:
@@ -364,7 +348,6 @@ def _status_result(
     truck_penalties: Mapping[str, float],
     solver_backend: SolverBackend,
 ) -> DynamicFullRerouteEventResult:
-    """Process one status update under dynamic Full-Reroute."""
     status_event = entry.status_update
 
     if status_event is None:
@@ -481,7 +464,6 @@ def _booking_result(
     truck_penalties: Mapping[str, float],
     solver_backend: SolverBackend,
 ) -> DynamicFullRerouteEventResult:
-    """Process one booking-triggered dynamic Full-Reroute."""
     booking_event = entry.booking_event
 
     if booking_event is None:
@@ -543,10 +525,7 @@ def _booking_result(
         recovery_capacity,
         networks,
         truck_penalty_per_teu_by_demand=penalties,
-        # Operational baseline:
-        # truck recourse applies to already accepted
-        # unfinished cargo, not directly to the newly
-        # arriving request.
+        # Truck recourse applies only to previously accepted cargo.
         allow_current_truck=False,
     )
 
@@ -649,8 +628,7 @@ def run_dynamic_full_reroute(
             if status_event is None:
                 raise ValueError("Status timeline entry has no status event.")
 
-            # Status first on a timestamp means every
-            # later booking at that same time sees it.
+            # Same-time bookings use the latest status update.
             known_updates.append(status_event)
 
             result = _status_result(

@@ -20,7 +20,6 @@ def _validate_nonnegative_integer(
     name: str,
     value: object,
 ) -> int:
-    """Validate and return a nonnegative integer."""
     if isinstance(value, bool) or not isinstance(value, int):
         raise TypeError(f"{name} must be an integer.")
 
@@ -34,7 +33,6 @@ def _validate_nonnegative_float(
     name: str,
     value: object,
 ) -> float:
-    """Validate and return a finite nonnegative float."""
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise TypeError(f"{name} must be a real number.")
 
@@ -66,7 +64,6 @@ class TransportArcCapacityState:
     bookable_residual_capacity: float
 
     def __post_init__(self) -> None:
-        """Validate the capacity-state partition."""
         if not isinstance(self.arc_id, str):
             raise TypeError("arc_id must be a string.")
 
@@ -217,14 +214,12 @@ class TransportArcCapacityState:
 
     @property
     def is_completed(self) -> bool:
-        """Return whether the service has arrived."""
         head_time = int(self.head[1])
         physical_time = int(self.physical_time)
         return bool(head_time <= physical_time)
 
     @property
     def is_in_transit(self) -> bool:
-        """Return whether the service has departed but not arrived."""
         tail_time = int(self.tail[1])
         head_time = int(self.head[1])
         physical_time = int(self.physical_time)
@@ -233,14 +228,12 @@ class TransportArcCapacityState:
 
     @property
     def is_bookable(self) -> bool:
-        """Return whether the service has not yet departed."""
         tail_time = int(self.tail[1])
         physical_time = int(self.physical_time)
         return bool(tail_time >= physical_time)
 
     @property
     def historical_unused_capacity(self) -> float:
-        """Return capacity that departed unused on a closed service."""
         if self.is_bookable:
             return 0.0
 
@@ -261,7 +254,6 @@ class TransportCapacitySnapshot:
     arc_states: tuple[TransportArcCapacityState, ...]
 
     def __post_init__(self) -> None:
-        """Validate snapshot consistency."""
         physical_time = _validate_nonnegative_integer(
             "physical_time",
             self.physical_time,
@@ -319,22 +311,18 @@ class TransportCapacitySnapshot:
 
     @property
     def completed_committed_volume(self) -> float:
-        """Return committed volume on completed services."""
         return float(sum(arc_state.completed_volume for arc_state in self.arc_states))
 
     @property
     def in_transit_committed_volume(self) -> float:
-        """Return committed volume currently in transit."""
         return float(sum(arc_state.in_transit_volume for arc_state in self.arc_states))
 
     @property
     def future_reserved_volume(self) -> float:
-        """Return committed volume on services not yet departed."""
         return float(sum(arc_state.future_reserved_volume for arc_state in self.arc_states))
 
     @property
     def total_bookable_residual_capacity(self) -> float:
-        """Return residual capacity across all future services."""
         return float(sum(arc_state.bookable_residual_capacity for arc_state in self.arc_states))
 
     def state_for(

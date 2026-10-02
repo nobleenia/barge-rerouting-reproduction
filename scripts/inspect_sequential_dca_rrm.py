@@ -23,7 +23,6 @@ from barge_rerouting.revenue_management.rrm_run import (
 
 
 def main() -> None:
-    """Run the controlled opportunity-cost example."""
     config = load_experiment_config(Path("tests/fixtures/rerouting_switch_experiment.yaml"))
     config = replace(
         config,

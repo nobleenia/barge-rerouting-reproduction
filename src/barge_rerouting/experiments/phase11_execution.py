@@ -1,8 +1,4 @@
-"""Phase 11 execution semantics for publication-facing experiments.
-
-This module contains experiment-layer interpretations that must not
-silently alter the validated core booking and rerouting mechanisms.
-"""
+"""Phase 11 handling of solved, infeasible, and failed booking events."""
 
 from __future__ import annotations
 
@@ -29,11 +25,10 @@ class Phase11EventDisposition(StrEnum):
 def is_proven_infeasible_status(
     solve_status: str,
 ) -> bool:
-    """Return whether a solver status explicitly certifies infeasibility.
+    """Check for an unambiguous infeasible solver status.
 
-    This deliberately excludes ambiguous states such as
-    'infeasible or unbounded', time limits, numerical failures,
-    and unknown termination statuses.
+    Time limits, numerical failures, and `infeasible or unbounded` do not
+    qualify.
     """
     if not isinstance(solve_status, str):
         raise TypeError("solve_status must be a string.")

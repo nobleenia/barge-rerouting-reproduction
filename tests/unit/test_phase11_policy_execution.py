@@ -1,5 +1,3 @@
-"""Regression tests for Phase 11 policy execution."""
-
 from barge_rerouting.experiments.phase11_execution import (
     Phase11EventDisposition,
 )

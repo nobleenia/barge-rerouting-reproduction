@@ -25,7 +25,6 @@ def make_forecast(
     forecast_id: str,
     destination: str,
 ) -> FutureDemandForecast:
-    """Build one controlled future forecast."""
     return FutureDemandForecast(
         forecast_id=forecast_id,
         origin="B",
@@ -42,7 +41,6 @@ def make_forecast(
 
 
 def main() -> None:
-    """Display explicit and A004-selected future sets."""
     config = load_experiment_config(Path("tests/fixtures/rerouting_switch_experiment.yaml"))
 
     current = Demand(

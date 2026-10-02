@@ -1,5 +1,3 @@
-"""Tests for the combined operational event timeline."""
-
 import pytest
 
 from barge_rerouting.config import (
@@ -125,7 +123,6 @@ def build_instance():
 
 
 def test_status_update_precedes_booking_at_same_time() -> None:
-    """Bookings must observe a status update at the same epoch."""
     instance = build_instance()
 
     timeline = build_operational_timeline(
@@ -157,7 +154,6 @@ def test_status_update_precedes_booking_at_same_time() -> None:
 
 
 def test_booking_sequence_is_not_changed() -> None:
-    """Operational events must preserve booking numbering."""
     instance = build_instance()
 
     timeline = build_operational_timeline(
@@ -181,7 +177,6 @@ def test_booking_sequence_is_not_changed() -> None:
 
 
 def test_operational_sequence_is_independent() -> None:
-    """Global event numbering includes both event families."""
     instance = build_instance()
 
     timeline = build_operational_timeline(
@@ -212,7 +207,6 @@ def test_operational_sequence_is_independent() -> None:
 
 
 def test_status_only_times_remain_in_timeline() -> None:
-    """Forecast updates need not coincide with bookings."""
     instance = build_instance()
 
     timeline = build_operational_timeline(
@@ -238,7 +232,6 @@ def test_status_only_times_remain_in_timeline() -> None:
 
 
 def test_known_status_updates_are_time_aware() -> None:
-    """Only already-published forecasts are visible."""
     instance = build_instance()
 
     timeline = build_operational_timeline(
@@ -274,7 +267,6 @@ def test_known_status_updates_are_time_aware() -> None:
 
 
 def test_status_sequences_must_be_chronological() -> None:
-    """Status numbering cannot run backwards in time."""
     instance = build_instance()
 
     with pytest.raises(

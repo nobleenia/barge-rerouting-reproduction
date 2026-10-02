@@ -1,5 +1,3 @@
-"""Tests for current allocation with future capacity protection."""
-
 from pathlib import Path
 
 import pytest
@@ -126,7 +124,6 @@ def solve_rm(
 
 
 def test_myopic_dca_accepts_low_fare_current_request() -> None:
-    """DCA without forecasts must use available capacity."""
     instance, state, event = build_example()
 
     artifacts = build_sequential_booking_model(
@@ -146,7 +143,6 @@ def test_myopic_dca_accepts_low_fare_current_request() -> None:
 
 
 def test_high_future_value_rejects_current_request() -> None:
-    """DCA-RM must protect capacity with higher expected value."""
     solution, report = solve_rm(future_forecast(probability_four=0.5))
 
     assert solution.is_solved
@@ -162,7 +158,6 @@ def test_high_future_value_rejects_current_request() -> None:
 
 
 def test_lower_future_probability_reverses_decision() -> None:
-    """Forecast error can reverse the capacity-protection choice."""
     solution, report = solve_rm(future_forecast(probability_four=0.05))
 
     assert report.is_valid
@@ -176,7 +171,6 @@ def test_lower_future_probability_reverses_decision() -> None:
 
 
 def test_selector_and_maxvol_linking() -> None:
-    """Exactly one selected y level must define maxvol."""
     solution, _ = solve_rm(future_forecast(probability_four=0.5))
 
     assert tuple(
@@ -187,7 +181,6 @@ def test_selector_and_maxvol_linking() -> None:
 
 
 def test_future_tentative_flow_equals_protected_volume() -> None:
-    """Protected volume must be routed through the future network."""
     solution, report = solve_rm(future_forecast(probability_four=0.5))
 
     assert report.is_valid
@@ -201,7 +194,6 @@ def test_future_tentative_flow_equals_protected_volume() -> None:
 
 
 def test_current_and_future_flow_share_capacity() -> None:
-    """Current and tentative flow must not exceed four TEU."""
     solution, report = solve_rm(future_forecast(probability_four=0.5))
 
     used = solution.current_flow_on("transport::1::S_BOTTLENECK") + solution.future_flow_on(
@@ -214,7 +206,6 @@ def test_current_and_future_flow_share_capacity() -> None:
 
 
 def test_no_future_set_reduces_to_current_dca() -> None:
-    """Empty K(current) must reproduce current-only allocation."""
     instance, state, event = build_example()
     future_set = select_explicit_future_set(
         instance,
@@ -246,7 +237,6 @@ def test_no_future_set_reduces_to_current_dca() -> None:
 
 
 def test_printed_and_capped_values_change_protection() -> None:
-    """The sensitivity interpretation can change the optimum."""
     forecast = FutureDemandForecast(
         forecast_id="FUTURE",
         origin="B",
@@ -289,7 +279,6 @@ def test_printed_and_capped_values_change_protection() -> None:
 
 
 def test_solution_is_deterministic() -> None:
-    """Identical model inputs must give identical extracted results."""
     forecast = future_forecast(probability_four=0.5)
 
     first, first_report = solve_rm(forecast)
@@ -301,7 +290,6 @@ def test_solution_is_deterministic() -> None:
 
 
 def test_highs_solution_matches_cplex_and_passes_validator() -> None:
-    """HiGHS must solve the same exported DCA-RM MILP correctly."""
     from barge_rerouting.optimization.highs_bridge import (
         solve_dca_rm_model_highs,
     )

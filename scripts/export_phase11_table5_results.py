@@ -29,9 +29,7 @@ LEGACY_WITHOUT_PREVALIDATION = {
     "service_family_1__capacity_10__pr",
 }
 
-# Literal values transcribed from the publication's Table 5.
-# The Service-1 / capacity-40 / PR AFR value is deliberately retained
-# as 855 exactly as printed.
+# Table 5 values as printed. The service-1, capacity-40 PR AFR remains 855.
 PUBLISHED_TABLE5: dict[
     tuple[int, int, str],
     dict[str, float | str],

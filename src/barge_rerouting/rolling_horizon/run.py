@@ -23,7 +23,6 @@ def _normalise_nonnegative_float(
     name: str,
     value: object,
 ) -> float:
-    """Validate and return a finite nonnegative floating-point value."""
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise TypeError(f"{name} must be a real number.")
 
@@ -47,7 +46,6 @@ class ArcCapacityTransition:
     residual_after: float
 
     def __post_init__(self) -> None:
-        """Validate and normalise the capacity transition."""
         if not isinstance(self.arc_id, str):
             raise TypeError("arc_id must be a string.")
 
@@ -95,7 +93,6 @@ class SequentialEventResult:
     capacity_transitions: tuple[ArcCapacityTransition, ...]
 
     def __post_init__(self) -> None:
-        """Validate the event-level result."""
         if not isinstance(self.event, BookingDecisionEvent):
             raise TypeError("event must be a BookingDecisionEvent.")
 
@@ -172,12 +169,10 @@ class SequentialEventResult:
 
     @property
     def demand_id(self) -> str:
-        """Return the processed demand identifier."""
         return str(self.event.demand_id)
 
     @property
     def accepted_volume(self) -> float:
-        """Return volume accepted at this event."""
         if self.acceptance_fraction is None:
             return 0.0
 
@@ -185,7 +180,6 @@ class SequentialEventResult:
 
     @property
     def is_accepted(self) -> bool:
-        """Return whether positive demand volume was accepted."""
         return (
             self.is_solved
             and self.acceptance_fraction is not None
@@ -194,7 +188,6 @@ class SequentialEventResult:
 
     @property
     def is_rejected(self) -> bool:
-        """Return whether the event was solved with zero acceptance."""
         return (
             self.is_solved
             and self.acceptance_fraction is not None
@@ -211,7 +204,6 @@ class SequentialDcaRun:
     final_state: RollingBookingState
 
     def __post_init__(self) -> None:
-        """Validate run ordering and state consistency."""
         if not isinstance(self.timeline, BookingTimeline):
             raise TypeError("timeline must be a BookingTimeline.")
 
@@ -249,24 +241,20 @@ class SequentialDcaRun:
 
     @property
     def completed(self) -> bool:
-        """Return whether every booking event was solved and recorded."""
         return len(self.results) == self.timeline.event_count and all(
             result.is_solved for result in self.results
         )
 
     @property
     def total_revenue(self) -> float:
-        """Return accumulated revenue from solved booking decisions."""
         return float(sum(result.objective_value or 0.0 for result in self.results))
 
     @property
     def accepted_volume(self) -> float:
-        """Return total positively accepted cargo volume."""
         return float(sum(result.accepted_volume for result in self.results))
 
     @property
     def failure_result(self) -> SequentialEventResult | None:
-        """Return the first unsolved booking event, when present."""
         for result in self.results:
             if not result.is_solved:
                 return result

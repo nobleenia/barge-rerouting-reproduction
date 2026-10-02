@@ -1,17 +1,7 @@
-"""Resumable Phase 11 Table 4 experimental campaign.
+"""Run and checkpoint the 120-policy Table 4 experiment matrix.
 
-This module executes the complete stable-capacity Table 4 matrix:
-
-    2 service families
-    x 3 capacities
-    x 5 paired demand sets
-    x 4 policies
-    = 120 policy runs.
-
-Raw policy results are checkpointed after every completed policy run.
-Derived paired improvement rates are generated only from complete
-four-policy cells. Paper-facing aggregates are generated only when the
-full 30-cell campaign is complete.
+Paired comparisons require a complete four-policy cell. Aggregates require
+all 30 cells.
 """
 
 from __future__ import annotations
@@ -169,7 +159,6 @@ def _execute_policy(
     inputs: Table4CellInputs,
     policy_key: str,
 ) -> Phase11PolicyRun:
-    """Execute one Phase 11 Table 4 policy."""
     instance = inputs.instance
     timeline = inputs.timeline
 
@@ -216,7 +205,6 @@ def _execute_policy(
 def _run_solver_status(
     run: Phase11PolicyRun,
 ) -> str:
-    """Return stable campaign-level solver status."""
     if run.completed:
         return "all_events_processed"
 
@@ -311,7 +299,6 @@ def _cell_slug(
 def _serialisable_record(
     record: Table4PolicyRunRecord,
 ) -> dict[str, object]:
-    """Serialize only constructor fields."""
     return {
         field.name: getattr(record, field.name)
         for field in fields(Table4PolicyRunRecord)
@@ -322,7 +309,6 @@ def _serialisable_record(
 def _restore_record(
     payload: dict[str, Any],
 ) -> Table4PolicyRunRecord:
-    """Restore one validated record from JSON checkpoint."""
     constructor_fields = {field.name for field in fields(Table4PolicyRunRecord) if field.init}
 
     kwargs: dict[str, Any] = {name: payload[name] for name in constructor_fields if name in payload}
@@ -341,7 +327,6 @@ def _atomic_json_write(
     payload: dict[str, object],
     path: Path,
 ) -> None:
-    """Atomically replace one JSON output."""
     path.parent.mkdir(
         parents=True,
         exist_ok=True,
@@ -437,7 +422,6 @@ def write_table4_campaign_checkpoint(
 def _ordered_records(
     records: list[Table4PolicyRunRecord],
 ) -> tuple[Table4PolicyRunRecord, ...]:
-    """Return records in canonical 120-run-plan order."""
     run_plan = build_default_table4_run_plan()
 
     order = {
@@ -462,7 +446,6 @@ def _ordered_records(
 def _validate_checkpoint_records(
     records: list[Table4PolicyRunRecord],
 ) -> None:
-    """Reject duplicate or foreign checkpoint records."""
     run_plan = build_default_table4_run_plan()
 
     expected_keys = {
@@ -497,7 +480,6 @@ def _write_partial_comparisons(
     ],
     output_path: Path,
 ) -> int:
-    """Write IR rows for complete four-policy cells."""
     grouped: dict[
         tuple[str, int, str, int],
         list[Table4PolicyRunRecord],
@@ -547,7 +529,6 @@ def _write_campaign_manifest(
         dict[str, object],
     ],
 ) -> Path:
-    """Write traceable current campaign status."""
     expected_run_count = len(build_default_table4_run_plan())
     expected_cell_count = len(build_default_table4_cells())
 

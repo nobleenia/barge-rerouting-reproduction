@@ -1,5 +1,3 @@
-"""Tests for accepted-demand states and unfinished cargo fragments."""
-
 import pytest
 
 from barge_rerouting.domain import (
@@ -31,7 +29,6 @@ def make_demand(
 
 
 def test_fragment_exposes_current_terminal_and_time() -> None:
-    """A fragment must expose its current terminal-time location."""
     fragment = DemandFragment(
         fragment_id="K001::fragment::0",
         demand_id="K001",
@@ -46,7 +43,6 @@ def test_fragment_exposes_current_terminal_and_time() -> None:
 
 
 def test_fragment_moves_immutably_along_matching_arc() -> None:
-    """Executing an arc creates a new fragment without changing the original."""
     fragment = DemandFragment(
         fragment_id="K001::fragment::0",
         demand_id="K001",
@@ -74,7 +70,6 @@ def test_fragment_moves_immutably_along_matching_arc() -> None:
 
 
 def test_fragment_rejects_arc_from_different_current_node() -> None:
-    """Cargo cannot execute an arc whose tail is elsewhere."""
     fragment = DemandFragment(
         fragment_id="K001::fragment::0",
         demand_id="K001",
@@ -102,7 +97,6 @@ def test_fragment_rejects_arc_from_different_current_node() -> None:
 def test_fragment_requires_positive_finite_volume(
     invalid_volume: float,
 ) -> None:
-    """Every unfinished fragment must contain positive finite volume."""
     with pytest.raises(ValueError):
         DemandFragment(
             fragment_id="K001::fragment::0",
@@ -113,7 +107,6 @@ def test_fragment_requires_positive_finite_volume(
 
 
 def test_new_acceptance_creates_one_fragment_at_origin() -> None:
-    """A newly accepted request begins at its origin and availability time."""
     demand = make_demand()
 
     state = AcceptedDemandState.at_origin(
@@ -132,7 +125,6 @@ def test_new_acceptance_creates_one_fragment_at_origin() -> None:
 
 
 def test_state_accepts_split_fragments_with_consistent_accounting() -> None:
-    """One accepted demand may contain several unfinished fragments."""
     demand = make_demand()
 
     state = AcceptedDemandState(
@@ -163,7 +155,6 @@ def test_state_accepts_split_fragments_with_consistent_accounting() -> None:
 
 
 def test_fully_delivered_state_has_no_fragments() -> None:
-    """A completed accepted demand may have an empty fragment tuple."""
     demand = make_demand()
 
     state = AcceptedDemandState(
@@ -180,7 +171,6 @@ def test_fully_delivered_state_has_no_fragments() -> None:
 
 
 def test_state_rejects_inconsistent_volume_accounting() -> None:
-    """Accepted volume must equal delivered plus remaining volume."""
     demand = make_demand()
 
     with pytest.raises(ValueError, match="accounting is inconsistent"):
@@ -200,7 +190,6 @@ def test_state_rejects_inconsistent_volume_accounting() -> None:
 
 
 def test_state_rejects_fragment_from_another_demand() -> None:
-    """Every fragment must belong to the associated original demand."""
     demand = make_demand()
 
     with pytest.raises(ValueError, match="demand identifier"):
@@ -219,7 +208,6 @@ def test_state_rejects_fragment_from_another_demand() -> None:
 
 
 def test_state_rejects_duplicate_fragment_identifiers() -> None:
-    """Every fragment requires a unique identifier."""
     demand = make_demand()
 
     with pytest.raises(ValueError, match="must be unique"):
@@ -244,7 +232,6 @@ def test_state_rejects_duplicate_fragment_identifiers() -> None:
 
 
 def test_fragment_cannot_precede_availability_time() -> None:
-    """Historical cargo state cannot occur before cargo was available."""
     demand = make_demand()
 
     with pytest.raises(ValueError, match="availability time"):
@@ -263,7 +250,6 @@ def test_fragment_cannot_precede_availability_time() -> None:
 
 
 def test_rejected_demand_does_not_create_accepted_state() -> None:
-    """A zero-acceptance decision is recorded as rejection, not commitment."""
     demand = make_demand(category=CustomerCategory.FULLY_SPOT)
 
     with pytest.raises(ValueError, match="rejected demand"):
@@ -274,7 +260,6 @@ def test_rejected_demand_does_not_create_accepted_state() -> None:
 
 
 def test_pending_truck_volume_remains_undelivered() -> None:
-    """Committed future truck transfer remains unfinished cargo."""
     demand = make_demand()
 
     state = AcceptedDemandState(
@@ -299,7 +284,6 @@ def test_pending_truck_volume_remains_undelivered() -> None:
 
 
 def test_pending_only_truck_state_is_not_complete() -> None:
-    """Cargo is incomplete until its truck-transfer time is reached."""
     demand = make_demand()
 
     state = AcceptedDemandState(
@@ -315,7 +299,6 @@ def test_pending_only_truck_state_is_not_complete() -> None:
 
 
 def test_state_accepts_solver_scale_volume_roundoff() -> None:
-    """Solver-scale mass residuals must not invalidate a valid state."""
     demand = Demand(
         demand_id="KROUND",
         volume=2.0,
@@ -346,7 +329,6 @@ def test_state_accepts_solver_scale_volume_roundoff() -> None:
 
 
 def test_state_still_rejects_material_volume_error() -> None:
-    """Scale-aware tolerance must not conceal genuine mass imbalance."""
     demand = Demand(
         demand_id="KMATERIAL",
         volume=2.0,
@@ -378,7 +360,6 @@ def test_state_still_rejects_material_volume_error() -> None:
 
 
 def test_state_accepts_one_teu_full_horizon_solver_residual() -> None:
-    """FR aggregate accounting tolerates observed 1-TEU solver residual."""
     demand = Demand(
         demand_id="KROUND1",
         volume=1.0,
@@ -408,7 +389,6 @@ def test_state_accepts_one_teu_full_horizon_solver_residual() -> None:
 
 
 def test_state_accounting_tolerance_does_not_hide_1e4_error() -> None:
-    """Aggregate solver tolerance must still reject material imbalance."""
     demand = Demand(
         demand_id="KROUNDFAIL",
         volume=1.0,

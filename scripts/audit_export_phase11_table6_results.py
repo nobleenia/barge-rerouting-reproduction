@@ -36,14 +36,8 @@ CAPACITY_TOLERANCE = 1.0e-5
 PREVALIDATION_TOLERANCE = 1.0e-9
 
 
-# Literal transcription of the paper's Table 6.
-#
-# Columns:
-# service, capacity, water, AFR, NFR, VT, VFB, VOB
-#
-# IMPORTANT:
-# Service 1 / capacity 40 / water 0.9 prints NFR = 8.
-# That value is intentionally preserved rather than corrected.
+# Table 6 values as printed: service, capacity, water, AFR, NFR, VT, VFB, VOB.
+# The reported NFR value of 8 for service 1, capacity 40, water 0.9 is retained.
 PUBLISHED_ROWS = (
     (1, 10, 1.0, 98, 98, 2, 35, 37),
     (1, 10, 0.9, 99, 89, 7, 31, 37),
@@ -1060,8 +1054,7 @@ def main() -> None:
             (
                 "Service 1 / capacity 40 / "
                 "water 0.9: Table 6 prints "
-                "NFR = 8. This value is retained "
-                "literally in comparison output."
+                "NFR = 8. The comparison output keeps the printed value."
             ),
             "",
             "=" * 110,

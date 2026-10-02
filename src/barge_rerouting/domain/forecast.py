@@ -28,7 +28,6 @@ class FutureProtectionValue:
 
 
 def _validate_nonnegative_integer(name: str, value: object) -> int:
-    """Validate and return a nonnegative integer."""
     if isinstance(value, bool) or not isinstance(value, int):
         raise TypeError(f"{name} must be an integer.")
 
@@ -42,7 +41,6 @@ def _validate_nonnegative_finite_number(
     name: str,
     value: object,
 ) -> float:
-    """Validate and return a nonnegative finite number."""
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise TypeError(f"{name} must be a real number.")
 
@@ -65,7 +63,6 @@ class VolumeProbability:
     probability: float
 
     def __post_init__(self) -> None:
-        """Validate and normalise the outcome."""
         volume = _validate_nonnegative_integer("volume", self.volume)
         probability = _validate_nonnegative_finite_number(
             "probability",
@@ -112,7 +109,6 @@ class FutureDemandForecast:
     outcomes: tuple[VolumeProbability, ...]
 
     def __post_init__(self) -> None:
-        """Validate and normalise the forecast."""
         if not isinstance(self.forecast_id, str):
             raise TypeError("forecast_id must be a string.")
         if not isinstance(self.origin, str):
@@ -198,17 +194,14 @@ class FutureDemandForecast:
 
     @property
     def support(self) -> tuple[int, ...]:
-        """Return possible future-volume values in ascending order."""
         return tuple(outcome.volume for outcome in self.outcomes)
 
     @property
     def maximum_volume(self) -> int:
-        """Return the largest possible future volume."""
         return int(self.outcomes[-1].volume)
 
     @property
     def candidate_protection_levels(self) -> tuple[int, ...]:
-        """Return candidate protection levels from zero to maximum volume."""
         return tuple(range(self.maximum_volume + 1))
 
     @property
@@ -223,7 +216,6 @@ class FutureDemandForecast:
 
     @property
     def expected_volume(self) -> float:
-        """Return the ordinary expected future volume E[X]."""
         expectation: float = 0.0
 
         for outcome in self.outcomes:
@@ -233,7 +225,6 @@ class FutureDemandForecast:
 
     @property
     def expected_full_revenue(self) -> float:
-        """Return expected revenue if all realised volume can be accepted."""
         return self.expected_volume * self.fare_per_teu
 
     def probability_of(self, volume: int) -> float:

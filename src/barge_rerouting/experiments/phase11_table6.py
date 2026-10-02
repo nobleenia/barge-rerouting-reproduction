@@ -32,8 +32,7 @@ TABLE6_WATER_FACTORS: Final[tuple[float, ...]] = (
     0.7,
 )
 
-# The standard-water 1.0 rows are reused from
-# the validated Table-5 PR campaign.
+# Water factor 1.0 comes from the Table 5 PR runs.
 TABLE6_NEW_WATER_FACTORS: Final[tuple[float, ...]] = (
     0.9,
     0.8,
@@ -83,7 +82,6 @@ def default_table6_experiment_spec() -> Table6ExperimentSpec:
 def _validated_water_factor(
     water_factor: float,
 ) -> float:
-    """Validate one frozen Table-6 water factor."""
     if isinstance(
         water_factor,
         bool,

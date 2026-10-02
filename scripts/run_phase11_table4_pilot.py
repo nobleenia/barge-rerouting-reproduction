@@ -9,7 +9,6 @@ from barge_rerouting.experiments import (
 
 
 def main() -> None:
-    """Execute, validate, persist and report the pilot."""
     print("Phase 11 Table 4 paired pilot")
     print("Cell: Service Family 1 / 10 TEU / demand_set_01")
     print()

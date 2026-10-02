@@ -37,7 +37,6 @@ DYNAMIC_FULL_REROUTE_TOLERANCE = 1e-6
 
 
 def _solver_name(*parts: object) -> str:
-    """Create a readable CPLEX-compatible identifier."""
     raw = "__".join(str(part) for part in parts)
     return re.sub(r"[^A-Za-z0-9_]", "_", raw)
 
@@ -46,7 +45,6 @@ def _positive_float(
     name: str,
     value: object,
 ) -> float:
-    """Validate a strictly positive finite number."""
     if isinstance(value, bool) or not isinstance(
         value,
         (int, float),
@@ -70,7 +68,6 @@ def _create_acceptance_variable(
     demand_id: str,
     category: CustomerCategory,
 ) -> Any:
-    """Create the current request acceptance variable."""
     name = _solver_name("xi", demand_id)
 
     if category is CustomerCategory.REGULAR:
@@ -98,7 +95,6 @@ def _normalise_penalties(
     fragment_networks: FragmentNetworkSnapshot,
     values: Mapping[str, float],
 ) -> dict[str, float]:
-    """Require one explicit truck penalty per affected demand."""
     if not isinstance(values, Mapping):
         raise TypeError("truck_penalty_per_teu_by_demand must be a mapping.")
 
@@ -221,7 +217,6 @@ class DynamicFullRerouteSolution:
 
     @property
     def current_truck_penalty(self) -> float:
-        """Return current-request truck penalty."""
         if self.current_truck_volume is None:
             return 0.0
 
@@ -229,17 +224,14 @@ class DynamicFullRerouteSolution:
 
     @property
     def prior_truck_volume(self) -> float:
-        """Return truck allocation across prior fragments."""
         return float(sum(allocation.volume for allocation in self.fragment_truck_allocations))
 
     @property
     def total_truck_volume(self) -> float:
-        """Return total truck volume in this solve."""
         return float((self.current_truck_volume or 0.0) + self.prior_truck_volume)
 
     @property
     def total_truck_penalty(self) -> float:
-        """Return all decision-dependent truck penalty."""
         return float(
             self.current_truck_penalty
             + sum(allocation.penalty_value for allocation in self.fragment_truck_allocations)
@@ -265,7 +257,6 @@ def _validate_inputs(
     recovery_capacity: RecoveryCapacitySnapshot,
     fragment_networks: FragmentNetworkSnapshot,
 ) -> None:
-    """Validate dynamic Full-Reroute inputs."""
     if not isinstance(instance, ExperimentInstance):
         raise TypeError("instance must be an ExperimentInstance.")
 

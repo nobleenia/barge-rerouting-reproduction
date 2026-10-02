@@ -1,5 +1,3 @@
-"""Tests for residual-capacity booking diagnostics."""
-
 from dataclasses import replace
 from pathlib import Path
 
@@ -33,7 +31,6 @@ def load_quiet_config():
 
 
 def test_diagnostic_detects_zero_capacity_shared_service() -> None:
-    """A full early commitment must block the later regular request."""
     instance = assemble_experiment_instance(
         load_quiet_config(),
         demands=(
@@ -89,7 +86,6 @@ def test_diagnostic_detects_zero_capacity_shared_service() -> None:
 
 
 def test_diagnostic_measures_partial_capacity_shortfall() -> None:
-    """The diagnostic must quantify volume exceeding residual capacity."""
     instance = assemble_experiment_instance(
         load_quiet_config(),
         demands=(
@@ -146,7 +142,6 @@ def test_diagnostic_measures_partial_capacity_shortfall() -> None:
 
 
 def test_canonical_failure_is_caused_by_s2_residual_capacity() -> None:
-    """The canonical K0011 failure must identify its exact cut arc."""
     instance = assemble_experiment_instance(load_quiet_config())
     run = run_sequential_dca(instance)
 

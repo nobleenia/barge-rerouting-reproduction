@@ -1,5 +1,3 @@
-"""Tests for persistent booking commitments and residual capacity."""
-
 from pathlib import Path
 
 import pytest
@@ -76,7 +74,6 @@ def transport_arc_id(instance: ExperimentInstance) -> str:
 
 
 def test_accepted_solution_creates_valid_persistent_commitment() -> None:
-    """A positive booking decision must preserve its complete flow plan."""
     instance, solution = build_controlled_solution()
     timeline = build_booking_timeline(instance)
     event = timeline.event_for_demand("P001")
@@ -107,7 +104,6 @@ def test_accepted_solution_creates_valid_persistent_commitment() -> None:
 
 
 def test_rejected_solution_creates_no_commitment() -> None:
-    """A zero acceptance decision is stored as rejection rather than commitment."""
     instance, solution = build_controlled_solution()
     timeline = build_booking_timeline(instance)
     event = timeline.event_for_demand("F001")
@@ -122,7 +118,6 @@ def test_rejected_solution_creates_no_commitment() -> None:
 
 
 def test_booking_state_records_decisions_immutably_in_sequence() -> None:
-    """Each advance must return a new persistent state."""
     instance, solution = build_controlled_solution()
     timeline = build_booking_timeline(instance)
 
@@ -148,7 +143,6 @@ def test_booking_state_records_decisions_immutably_in_sequence() -> None:
 
 
 def test_commitments_reserve_shared_transport_capacity() -> None:
-    """Accepted plans must reduce capacity available to later bookings."""
     instance, solution = build_controlled_solution()
     timeline = build_booking_timeline(instance)
     state = RollingBookingState.empty(instance)
@@ -178,7 +172,6 @@ def test_commitments_reserve_shared_transport_capacity() -> None:
 
 
 def test_same_time_booking_events_do_not_imply_execution() -> None:
-    """Sequential equal-time bookings create plans but do not move cargo."""
     instance, solution = build_controlled_solution()
     timeline = build_booking_timeline(instance)
     state = RollingBookingState.empty(instance)
@@ -202,7 +195,6 @@ def test_same_time_booking_events_do_not_imply_execution() -> None:
 
 
 def test_state_rejects_out_of_order_booking_event() -> None:
-    """Sequential state cannot skip earlier booking events."""
     instance, solution = build_controlled_solution()
     timeline = build_booking_timeline(instance)
     state = RollingBookingState.empty(instance)

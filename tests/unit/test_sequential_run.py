@@ -1,5 +1,3 @@
-"""Tests for complete event-by-event sequential DCA runs."""
-
 from pathlib import Path
 
 import pytest
@@ -16,7 +14,6 @@ def load_config():
 
 
 def test_controlled_sequential_run_completes() -> None:
-    """The known regular-partial-binary example must complete."""
     instance = assemble_experiment_instance(
         load_config(),
         demands=(
@@ -70,7 +67,6 @@ def test_controlled_sequential_run_completes() -> None:
 
 
 def test_capacity_transitions_match_persistent_commitments() -> None:
-    """Each event must report the capacity consumed by its commitment."""
     instance = assemble_experiment_instance(
         load_config(),
         demands=(
@@ -125,7 +121,6 @@ def test_capacity_transitions_match_persistent_commitments() -> None:
 
 
 def test_run_stops_when_later_regular_demand_is_infeasible() -> None:
-    """An early spot commitment may block a later mandatory request."""
     instance = assemble_experiment_instance(
         load_config(),
         demands=(

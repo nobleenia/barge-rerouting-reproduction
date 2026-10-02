@@ -1,5 +1,3 @@
-"""Tests for detection of actual-capacity overload."""
-
 from barge_rerouting.config import (
     CustomerMix,
     DemandGenerationConfig,
@@ -123,7 +121,6 @@ def transport_arc(
 
 
 def test_nominal_profile_keeps_plan_feasible() -> None:
-    """The original ten-TEU plan fits nominal capacity."""
     instance = build_instance()
     state = committed_state(instance)
     execution = build_execution_snapshot(
@@ -149,7 +146,6 @@ def test_nominal_profile_keeps_plan_feasible() -> None:
 
 
 def test_forced_reduction_detects_three_teu_overload() -> None:
-    """A 0.7 factor makes the ten-TEU plan infeasible."""
     instance = build_instance()
     state = committed_state(instance)
     execution = build_execution_snapshot(
@@ -194,7 +190,6 @@ def test_forced_reduction_detects_three_teu_overload() -> None:
 
 
 def test_overload_is_not_summed_as_truck_volume() -> None:
-    """One path may overload several service legs."""
     instance = build_instance()
     state = committed_state(instance)
     execution = build_execution_snapshot(
@@ -232,7 +227,6 @@ def test_overload_is_not_summed_as_truck_volume() -> None:
 
 
 def test_completed_leg_is_not_reassessed() -> None:
-    """A completed first leg remains historically fixed."""
     instance = build_instance()
     state = committed_state(instance)
     execution = build_execution_snapshot(
@@ -275,7 +269,6 @@ def test_completed_leg_is_not_reassessed() -> None:
 
 
 def test_profile_and_execution_times_must_match() -> None:
-    """Capacity and execution snapshots require one epoch."""
     import pytest
 
     instance = build_instance()

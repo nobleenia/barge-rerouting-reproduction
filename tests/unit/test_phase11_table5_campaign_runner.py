@@ -1,5 +1,3 @@
-"""Tests for the resumable Phase-11 Table-5 campaign driver."""
-
 from __future__ import annotations
 
 import json

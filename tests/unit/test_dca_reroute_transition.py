@@ -1,5 +1,3 @@
-"""Tests for persistence of solved DCA-Reroute decisions."""
-
 from pathlib import Path
 
 import pytest
@@ -194,7 +192,6 @@ def commitment_for(state, demand_id: str):
 
 
 def test_transition_records_current_event_once() -> None:
-    """Persistence must append exactly one current booking record."""
     example = build_transition_example()
 
     before = example["state_before"]
@@ -210,7 +207,6 @@ def test_transition_records_current_event_once() -> None:
 
 
 def test_prior_booking_metadata_is_preserved() -> None:
-    """Rerouting changes the route, not the original booking decision."""
     example = build_transition_example()
 
     old_before = commitment_for(
@@ -230,7 +226,6 @@ def test_prior_booking_metadata_is_preserved() -> None:
 
 
 def test_old_commitment_stores_new_complete_route() -> None:
-    """The executed prefix and new alternative suffix must coexist."""
     example = build_transition_example()
 
     instance = example["instance"]
@@ -255,7 +250,6 @@ def test_old_commitment_stores_new_complete_route() -> None:
 
 
 def test_current_commitment_uses_released_service() -> None:
-    """The new request must persist its bottleneck route."""
     example = build_transition_example()
 
     instance = example["instance"]
@@ -275,7 +269,6 @@ def test_current_commitment_uses_released_service() -> None:
 
 
 def test_rebuilt_execution_preserves_completed_prefix() -> None:
-    """The historical S_PREFIX movement must remain executed."""
     example = build_transition_example()
 
     execution = example["execution_after"]
@@ -293,7 +286,6 @@ def test_rebuilt_execution_preserves_completed_prefix() -> None:
 
 
 def test_capacity_snapshot_reflects_new_owners() -> None:
-    """Future reservations must match the persisted rerouted plans."""
     example = build_transition_example()
 
     capacity = example["capacity_after"]
@@ -312,7 +304,6 @@ def test_capacity_snapshot_reflects_new_owners() -> None:
 
 
 def test_transition_is_deterministic() -> None:
-    """Applying the same solved decision gives the same new state."""
     first = build_transition_example()
     second = build_transition_example()
 

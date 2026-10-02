@@ -1,5 +1,3 @@
-"""Tests for Table-5 campaign policy dispatch without optimisation."""
-
 from types import SimpleNamespace
 
 import pytest
@@ -334,7 +332,6 @@ def test_prevalidation_artifact_survives_strict_validation_failure(
     tmp_path,
     monkeypatch,
 ) -> None:
-    """Completed expensive evidence must survive later record rejection."""
     import json
 
     inputs = _inputs()

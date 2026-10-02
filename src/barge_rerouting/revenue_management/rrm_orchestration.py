@@ -81,7 +81,6 @@ class DcaRrmArcCapacityTransition:
     residual_after: float
 
     def __post_init__(self) -> None:
-        """Validate and normalise one arc transition."""
         if not isinstance(self.arc_id, str):
             raise TypeError("arc_id must be a string.")
 
@@ -137,19 +136,16 @@ class DcaRrmArcCapacityTransition:
 
     @property
     def newly_reserved_volume(self) -> float:
-        """Return the positive newly reserved component."""
         return float(max(0.0, self.reserved_volume_change))
 
     @property
     def released_volume(self) -> float:
-        """Return the positive released-capacity component."""
         return float(max(0.0, -self.reserved_volume_change))
 
 
 def _validate_lookahead(
     lookahead_periods: int | None,
 ) -> None:
-    """Validate the optional look-ahead duration."""
     if lookahead_periods is None:
         return
 
@@ -171,7 +167,6 @@ def _select_future_set(
     selection_mode: FutureDemandSelectionMode,
     lookahead_periods: int | None,
 ) -> FutureDemandSet:
-    """Construct the event's future-demand set."""
     if selection_mode is FutureDemandSelectionMode.EXPLICIT:
         return select_explicit_future_set(
             instance,
@@ -218,7 +213,6 @@ class DcaRrmEventResult:
     ]
 
     def __post_init__(self) -> None:
-        """Validate event, state, and snapshot consistency."""
         if not isinstance(
             self.event,
             BookingDecisionEvent,
@@ -391,12 +385,10 @@ class DcaRrmEventResult:
 
     @property
     def event_was_processed(self) -> bool:
-        """Return whether the event produced a transition."""
         return self.transition is not None
 
     @property
     def acceptance_fraction(self) -> float | None:
-        """Return the current acceptance decision."""
         value = self.solution.acceptance_fraction
 
         if value is None:
@@ -406,7 +398,6 @@ class DcaRrmEventResult:
 
     @property
     def accepted_volume(self) -> float:
-        """Return realised accepted current volume."""
         if self.solution.acceptance_fraction is None:
             return 0.0
 
@@ -414,7 +405,6 @@ class DcaRrmEventResult:
 
     @property
     def current_was_accepted(self) -> bool:
-        """Return whether positive current volume was accepted."""
         return bool(
             self.event_was_processed
             and self.acceptance_fraction is not None
@@ -423,27 +413,22 @@ class DcaRrmEventResult:
 
     @property
     def current_realised_revenue(self) -> float:
-        """Return realised revenue from the current request."""
         return float(self.solution.current_revenue or 0.0)
 
     @property
     def optimisation_objective(self) -> float:
-        """Return the event optimisation objective."""
         return float(self.solution.objective_value or 0.0)
 
     @property
     def future_expected_revenue(self) -> float:
-        """Return the expected future contribution."""
         return float(self.solution.future_expected_revenue or 0.0)
 
     @property
     def forecast_ids(self) -> tuple[str, ...]:
-        """Return selected future forecast identifiers."""
         return tuple(str(forecast_id) for forecast_id in self.future_set.forecast_ids)
 
     @property
     def protected_forecast_ids(self) -> tuple[str, ...]:
-        """Return forecasts with positive selected protection."""
         return tuple(
             protection.forecast_id
             for protection in self.solution.protections
@@ -452,12 +437,10 @@ class DcaRrmEventResult:
 
     @property
     def selected_protection_volume(self) -> float:
-        """Return total event-level selected future volume."""
         return float(sum(protection.protected_volume for protection in self.solution.protections))
 
     @property
     def discarded_tentative_future_volume(self) -> float:
-        """Return future protection discarded after solving."""
         if self.transition is None:
             return 0.0
 
@@ -465,7 +448,6 @@ class DcaRrmEventResult:
 
     @property
     def rerouted_demand_ids(self) -> tuple[str, ...]:
-        """Return prior demands rebuilt by this event."""
         if self.transition is None:
             return ()
 
@@ -473,7 +455,6 @@ class DcaRrmEventResult:
 
     @property
     def released_arc_ids(self) -> tuple[str, ...]:
-        """Return arcs whose prior reservations were released."""
         return tuple(
             arc_id
             for arc_id in self.rerouting_capacity.available_arc_ids
@@ -482,7 +463,6 @@ class DcaRrmEventResult:
 
     @property
     def released_reservation_volume(self) -> float:
-        """Return cumulative released volume across arcs."""
         return float(self.rerouting_capacity.total_released_volume)
 
     def protection_for(

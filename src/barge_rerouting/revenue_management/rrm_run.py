@@ -50,7 +50,6 @@ class TimeAwareDcaRrmRun:
     lookahead_periods: int | None
 
     def __post_init__(self) -> None:
-        """Validate event order, state chaining, and termination."""
         if not isinstance(
             self.timeline,
             BookingTimeline,
@@ -146,12 +145,10 @@ class TimeAwareDcaRrmRun:
 
     @property
     def results(self) -> tuple[DcaRrmEventResult, ...]:
-        """Return event results in booking order."""
         return self.event_results
 
     @property
     def completed(self) -> bool:
-        """Return whether every event was processed."""
         return bool(
             len(self.event_results) == self.timeline.event_count
             and all(result.event_was_processed for result in self.event_results)
@@ -159,12 +156,10 @@ class TimeAwareDcaRrmRun:
 
     @property
     def processed_event_count(self) -> int:
-        """Return successfully processed event count."""
         return sum(1 for result in self.event_results if result.event_was_processed)
 
     @property
     def total_realised_revenue(self) -> float:
-        """Return revenue from realised current decisions."""
         return float(
             sum(
                 result.current_realised_revenue
@@ -190,7 +185,6 @@ class TimeAwareDcaRrmRun:
 
     @property
     def total_expected_future_contribution(self) -> float:
-        """Return summed expected future contributions."""
         return float(
             sum(
                 result.future_expected_revenue
@@ -201,7 +195,6 @@ class TimeAwareDcaRrmRun:
 
     @property
     def accepted_volume(self) -> float:
-        """Return realised accepted current volume."""
         return float(
             sum(
                 result.accepted_volume
@@ -212,12 +205,10 @@ class TimeAwareDcaRrmRun:
 
     @property
     def events_with_prior_reoptimization(self) -> int:
-        """Return events rebuilding prior commitments."""
         return sum(1 for result in self.event_results if result.rerouted_demand_ids)
 
     @property
     def cumulative_selected_protection_volume(self) -> float:
-        """Return event-level selected protection summed over solves."""
         return float(
             sum(
                 result.selected_protection_volume
@@ -228,7 +219,6 @@ class TimeAwareDcaRrmRun:
 
     @property
     def cumulative_discarded_future_volume(self) -> float:
-        """Return tentative protection discarded after decisions."""
         return float(
             sum(
                 result.discarded_tentative_future_volume
@@ -239,7 +229,6 @@ class TimeAwareDcaRrmRun:
 
     @property
     def failure_result(self) -> DcaRrmEventResult | None:
-        """Return the first event that could not be processed."""
         for result in self.event_results:
             if not result.event_was_processed:
                 return result

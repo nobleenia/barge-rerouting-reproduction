@@ -19,7 +19,6 @@ from barge_rerouting.rolling_horizon import (
 
 
 def main() -> None:
-    """Solve the static benchmark and canonical sequential process."""
     config = load_experiment_config("configs/toy_experiment.yaml")
 
     quiet_config = replace(

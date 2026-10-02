@@ -22,7 +22,6 @@ def _validate_nonnegative_integer(
     name: str,
     value: object,
 ) -> int:
-    """Validate and return a non-negative integer."""
     if isinstance(value, bool) or not isinstance(value, int):
         raise TypeError(f"{name} must be an integer.")
 
@@ -36,7 +35,6 @@ def _validate_nonnegative_float(
     name: str,
     value: object,
 ) -> float:
-    """Validate and return a finite non-negative float."""
     if isinstance(value, bool) or not isinstance(
         value,
         (int, float),
@@ -57,7 +55,6 @@ def _validate_nonnegative_float(
 def _validate_factor(
     value: object,
 ) -> float:
-    """Validate a water-level capacity factor."""
     if isinstance(value, bool) or not isinstance(
         value,
         (int, float),
@@ -90,7 +87,6 @@ class ActualTransportArcCapacity:
     source_update_event_id: str | None = None
 
     def __post_init__(self) -> None:
-        """Validate the actual-capacity identity."""
         if not isinstance(self.arc_id, str):
             raise TypeError("arc_id must be a string.")
 
@@ -182,12 +178,10 @@ class ActualTransportArcCapacity:
 
     @property
     def is_future(self) -> bool:
-        """Return whether the service has not departed."""
         return bool(self.tail[1] >= self.physical_time)
 
     @property
     def capacity_reduction(self) -> float:
-        """Return nominal capacity lost to the status update."""
         return float(self.nominal_capacity - self.actual_capacity)
 
 
@@ -200,7 +194,6 @@ class ActualCapacityProfile:
     arc_states: tuple[ActualTransportArcCapacity, ...]
 
     def __post_init__(self) -> None:
-        """Validate profile identity and arc uniqueness."""
         physical_time = _validate_nonnegative_integer(
             "physical_time",
             self.physical_time,
@@ -291,7 +284,6 @@ class ActualCapacityProfile:
 
     @property
     def affected_arc_ids(self) -> tuple[str, ...]:
-        """Return arcs whose actual capacity is below nominal."""
         return tuple(
             state.arc_id
             for state in self.arc_states
@@ -302,7 +294,6 @@ class ActualCapacityProfile:
 def _validate_status_updates(
     updates: Sequence[ServiceStatusUpdateEvent],
 ) -> tuple[ServiceStatusUpdateEvent, ...]:
-    """Validate and deterministically order status updates."""
     if isinstance(updates, (str, bytes)):
         raise TypeError("status_updates must be a sequence of events.")
 
@@ -338,7 +329,6 @@ def _latest_applicable_update(
     physical_time: int,
     updates: tuple[ServiceStatusUpdateEvent, ...],
 ) -> ServiceStatusUpdateEvent | None:
-    """Select the latest known update covering one departure."""
     if departure_time < physical_time:
         return None
 

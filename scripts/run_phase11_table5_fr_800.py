@@ -50,9 +50,7 @@ timeline = build_operational_timeline(
     status_updates=(),
 )
 
-# ---------------------------------------------------------------------
-# Frozen experiment guards
-# ---------------------------------------------------------------------
+# Fixed pilot dimensions.
 
 assert len(inputs.instance.demands) == 800
 assert timeline.booking_event_count == 800
@@ -78,9 +76,7 @@ print("=" * 96)
 print(flush=True)
 
 
-# ---------------------------------------------------------------------
-# Initialise exactly like run_phase11_table5_fr()
-# ---------------------------------------------------------------------
+# Match the standard Full-Reroute runner state.
 
 state = table5.RecoveryOperationalState.empty(table5.RollingBookingState.empty(inputs.instance))
 
@@ -94,9 +90,7 @@ start = perf_counter()
 previous_milestone_elapsed = 0.0
 
 
-# ---------------------------------------------------------------------
-# Shared heartbeat state
-# ---------------------------------------------------------------------
+# State shared with the heartbeat thread.
 
 heartbeat_stop = Event()
 heartbeat_lock = Lock()
@@ -115,7 +109,6 @@ def write_progress(
     status: str,
     latest: dict[str, object] | None = None,
 ) -> None:
-    """Persist lightweight progress without modifying experiment state."""
     payload = {
         "status": status,
         "target_bookings": TARGET_BOOKINGS,
@@ -141,7 +134,6 @@ def write_progress(
 
 
 def heartbeat() -> None:
-    """Print proof-of-life while one FR solve is running."""
     while not heartbeat_stop.wait(HEARTBEAT_SECONDS):
         now = perf_counter()
 
@@ -189,9 +181,7 @@ heartbeat_thread = Thread(
 heartbeat_thread.start()
 
 
-# ---------------------------------------------------------------------
-# Execute the exact FR event loop with instrumentation around it
-# ---------------------------------------------------------------------
+# Full-Reroute event loop with progress timing.
 
 try:
     for entry in timeline.entries:
@@ -216,9 +206,7 @@ try:
             heartbeat_state["current_physical_time"] = entry.physical_time
             heartbeat_state["current_event_started"] = event_start
 
-        # -------------------------------------------------------------
-        # This block is the committed FR runner logic.
-        # -------------------------------------------------------------
+        # Core Full-Reroute step.
 
         if entry.is_status_update:
             status_event = entry.status_update
@@ -260,9 +248,7 @@ try:
 
         results.append(wrapped)
 
-        # -------------------------------------------------------------
-        # Instrumentation resumes here.
-        # -------------------------------------------------------------
+        # Progress measurements.
 
         event_seconds = perf_counter() - event_start
 
@@ -386,9 +372,7 @@ finally:
     heartbeat_thread.join(timeout=2.0)
 
 
-# ---------------------------------------------------------------------
-# Construct the same validated result contract
-# ---------------------------------------------------------------------
+# Build the standard run result.
 
 run = table5.Table5OperationalPolicyRun(
     policy_key="fr",
@@ -446,9 +430,7 @@ write_progress(
 )
 
 
-# ---------------------------------------------------------------------
-# Final report
-# ---------------------------------------------------------------------
+# Final report.
 
 print()
 print("=" * 96)

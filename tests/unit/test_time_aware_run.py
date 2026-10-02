@@ -1,5 +1,3 @@
-"""Tests for physical-time-aware sequential DCA runs."""
-
 from dataclasses import replace
 from pathlib import Path
 
@@ -32,7 +30,6 @@ def service_arc_id(instance, service_id: str) -> str:
 
 
 def test_two_time_epoch_run_advances_execution() -> None:
-    """A time-one event must see the time-zero service as completed."""
     instance = assemble_experiment_instance(
         quiet_config(),
         demands=(
@@ -78,7 +75,6 @@ def test_two_time_epoch_run_advances_execution() -> None:
 
 
 def test_time_one_capacity_closes_s1_and_keeps_s2_open() -> None:
-    """Past capacity cannot be reused while the current service remains open."""
     instance = assemble_experiment_instance(
         quiet_config(),
         demands=(
@@ -125,7 +121,6 @@ def test_time_one_capacity_closes_s1_and_keeps_s2_open() -> None:
 
 
 def test_canonical_time_aware_run_preserves_known_failure() -> None:
-    """Physical-time orchestration must reproduce the time-zero bottleneck."""
     instance = assemble_experiment_instance(quiet_config())
 
     run = run_time_aware_sequential_dca(instance)

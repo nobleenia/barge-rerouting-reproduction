@@ -30,7 +30,6 @@ from barge_rerouting.rolling_horizon.state import (
 
 
 def _validate_tolerance(value: object) -> float:
-    """Validate and return a finite positive tolerance."""
     if isinstance(value, bool) or not isinstance(
         value,
         (int, float),
@@ -55,7 +54,6 @@ def _add_flow(
     *,
     tolerance: float,
 ) -> None:
-    """Add one positive arc flow to an aggregate flow plan."""
     if not isinstance(arc_id, str):
         raise TypeError("arc_id must be a string.")
 
@@ -84,7 +82,6 @@ def _normalise_acceptance_fraction(
     *,
     tolerance: float,
 ) -> float:
-    """Validate and normalise the current acceptance decision."""
     if solution.acceptance_fraction is None:
         raise ValueError("A solved DCA-Reroute solution requires an acceptance fraction.")
 
@@ -102,7 +99,6 @@ def _validate_solution_indexes(
     artifacts: DcaRerouteModelArtifacts,
     solution: DcaRerouteSolution,
 ) -> None:
-    """Ensure the extracted solution covers every model variable."""
     current_arc_ids = tuple(result.arc_id for result in solution.current_flows)
 
     if len(set(current_arc_ids)) != len(current_arc_ids):
@@ -132,7 +128,6 @@ def _validate_solution(
     *,
     tolerance: float,
 ) -> float:
-    """Validate one solved result against its model artifacts."""
     if not isinstance(
         artifacts,
         DcaRerouteModelArtifacts,
@@ -178,7 +173,6 @@ def _original_delivery_arc_id(
     demand_id: str,
     destination_node: TimeSpaceNode,
 ) -> str:
-    """Map a fragment delivery node to the original demand sink arc."""
     network_index = instance.network_index_for(demand_id)
 
     matching_arc_ids = tuple(
@@ -204,7 +198,6 @@ def _current_commitment_from_solution(
     acceptance_fraction: float,
     tolerance: float,
 ) -> DemandCommitment | None:
-    """Build the current request's persistent commitment."""
     if acceptance_fraction <= tolerance:
         if any(abs(float(result.volume)) > tolerance for result in solution.current_flows):
             raise ValueError("A rejected current demand cannot retain positive flow.")
@@ -254,7 +247,6 @@ def _current_commitment_from_solution(
 def _indexes_by_demand(
     artifacts: DcaRerouteModelArtifacts,
 ) -> dict[str, tuple[FragmentNetworkIndex, ...]]:
-    """Group fragment networks by original demand."""
     grouped: dict[str, list[FragmentNetworkIndex]] = {}
 
     for index in artifacts.fragment_networks.indexes:
@@ -282,7 +274,6 @@ def _rebuild_prior_commitment(
     *,
     tolerance: float,
 ) -> DemandCommitment:
-    """Replace only the reroutable paths of one prior commitment."""
     if not indexes:
         raise ValueError("A rerouted commitment requires fragment indexes.")
 
@@ -305,8 +296,7 @@ def _rebuild_prior_commitment(
         index = index_by_fragment_id.get(old_path.path_id)
 
         if index is None:
-            # This path was already delivered or otherwise excluded.
-            # Its complete original flow remains unchanged.
+            # Non-rerouted paths keep their original flow.
             for arc_id in old_path.all_arc_ids:
                 _add_flow(
                     flow_by_arc,
@@ -330,7 +320,7 @@ def _rebuild_prior_commitment(
         if abs(index.volume - old_path.volume) > tolerance:
             raise ValueError("Fragment volume differs from its old decomposed path volume.")
 
-        # Preserve completed and currently in-transit movements.
+        # Keep completed and in-transit flow.
         for arc_id in decision_state.immutable_arc_ids:
             _add_flow(
                 flow_by_arc,
@@ -339,7 +329,7 @@ def _rebuild_prior_commitment(
                 tolerance=tolerance,
             )
 
-        # Add the newly optimised future physical flow.
+        # Add the new future flow.
         for arc_id in index.feasible_arc_ids:
             _add_flow(
                 flow_by_arc,
@@ -351,8 +341,7 @@ def _rebuild_prior_commitment(
                 tolerance=tolerance,
             )
 
-        # Convert fragment-specific sink arcs back into the
-        # original demand's delivery arcs.
+        # Map fragment sinks to the original demand.
         for sink_arc in index.sink_arcs:
             solved_volume = solution.fragment_flow_on(
                 index.fragment_id,
@@ -411,7 +400,6 @@ def _validate_global_capacity(
     *,
     tolerance: float,
 ) -> None:
-    """Validate aggregate capacity across all stored commitments."""
     for arc in instance.arcs:
         if not arc.is_transport:
             continue
@@ -442,7 +430,6 @@ class DcaRerouteTransitionResult:
     rerouted_commitments: tuple[DemandCommitment, ...]
 
     def __post_init__(self) -> None:
-        """Validate transition ordering and commitment identity."""
         if not isinstance(
             self.state_before,
             RollingBookingState,
@@ -501,12 +488,10 @@ class DcaRerouteTransitionResult:
 
     @property
     def current_was_accepted(self) -> bool:
-        """Return whether the current event created a commitment."""
         return self.current_commitment is not None
 
     @property
     def rerouted_demand_ids(self) -> tuple[str, ...]:
-        """Return prior demands whose stored routes changed."""
         return tuple(commitment.demand_id for commitment in self.rerouted_commitments)
 
 

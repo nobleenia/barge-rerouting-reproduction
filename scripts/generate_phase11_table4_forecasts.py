@@ -10,7 +10,6 @@ from barge_rerouting.experiments import (
 
 
 def main() -> None:
-    """Generate every ex-ante Table 4 forecast catalogue."""
     output_directory = Path("results/phase11/table4/forecasts")
 
     print("Phase 11 Table 4 forecast catalogues")

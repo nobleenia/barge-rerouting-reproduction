@@ -51,7 +51,6 @@ class Table5VolumeLedger:
     net_value: float
 
     def __post_init__(self) -> None:
-        """Validate ledger conservation."""
         if self.requested_request_count < 0:
             raise ValueError("requested_request_count cannot be negative.")
 
@@ -155,12 +154,10 @@ class Table5VolumeLedger:
 
     @property
     def rejected_request_count(self) -> int:
-        """Return requests with effectively zero final booking acceptance."""
         return self.requested_request_count - self.accepted_request_count
 
     @property
     def accepted_volume_rate_candidate(self) -> float:
-        """Return raw accepted-volume/requested-volume percentage."""
         if self.requested_volume <= LEDGER_TOLERANCE:
             return 0.0
 
@@ -168,7 +165,6 @@ class Table5VolumeLedger:
 
     @property
     def accepted_request_rate_candidate(self) -> float:
-        """Return raw accepted-request/request-count percentage."""
         if self.requested_request_count == 0:
             return 0.0
 
@@ -176,7 +172,6 @@ class Table5VolumeLedger:
 
     @property
     def truck_volume_rate_candidate(self) -> float:
-        """Return truck/requested-volume percentage candidate."""
         if self.requested_volume <= LEDGER_TOLERANCE:
             return 0.0
 
@@ -184,7 +179,6 @@ class Table5VolumeLedger:
 
     @property
     def final_barge_rate_candidate(self) -> float:
-        """Return final-barge/requested-volume percentage candidate."""
         if self.requested_volume <= LEDGER_TOLERANCE:
             return 0.0
 

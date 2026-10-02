@@ -32,7 +32,6 @@ def _validate_table6_fill_identity(
     record: Table5CampaignPolicyRecord,
     water_factor: float,
 ) -> None:
-    """Enforce NFR = lambda * AFR for all retained candidates."""
     fill = record.indicator_snapshot.fill_rate_candidates
 
     pairs = (

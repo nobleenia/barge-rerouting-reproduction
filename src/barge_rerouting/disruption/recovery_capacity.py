@@ -22,7 +22,6 @@ def _nonnegative(
     name: str,
     value: object,
 ) -> float:
-    """Validate a finite non-negative number."""
     if isinstance(value, bool) or not isinstance(
         value,
         (int, float),
@@ -56,7 +55,6 @@ class RecoveryTransportArcCapacity:
     released_fragment_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
-        """Validate recovery-capacity identities."""
         if not isinstance(self.arc_id, str):
             raise TypeError("arc_id must be a string.")
 
@@ -190,7 +188,6 @@ class RecoveryTransportArcCapacity:
 
     @property
     def has_fixed_overload(self) -> bool:
-        """Return whether non-released reservations exceed actual capacity."""
         return bool(self.fixed_overload_volume > ACTUAL_CAPACITY_TOLERANCE)
 
 
@@ -204,7 +201,6 @@ class RecoveryCapacitySnapshot:
     arc_states: tuple[RecoveryTransportArcCapacity, ...]
 
     def __post_init__(self) -> None:
-        """Validate snapshot identity."""
         if not isinstance(self.event_id, str):
             raise TypeError("event_id must be a string.")
 
@@ -264,12 +260,10 @@ class RecoveryCapacitySnapshot:
 
     @property
     def available_arc_ids(self) -> tuple[str, ...]:
-        """Return future transport arcs in the recovery epoch."""
         return tuple(state.arc_id for state in self.arc_states)
 
     @property
     def fixed_overload_arc_ids(self) -> tuple[str, ...]:
-        """Return capacity failures that were not released."""
         return tuple(state.arc_id for state in self.arc_states if state.has_fixed_overload)
 
     def state_for(

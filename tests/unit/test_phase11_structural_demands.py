@@ -1,5 +1,3 @@
-"""Tests for the Phase 11 structural demand process."""
-
 from collections import Counter
 
 import pytest
@@ -51,7 +49,6 @@ def _spec() -> Table4DemandProcessSpec:
 
 
 def test_corridor_contains_twenty_ordered_od_pairs() -> None:
-    """Five terminals produce 5 x 4 ordered OD pairs."""
     assert len(TABLE4_ORDERED_OD_PAIRS) == 20
     assert len(set(TABLE4_ORDERED_OD_PAIRS)) == 20
 
@@ -61,7 +58,6 @@ def test_corridor_contains_twenty_ordered_od_pairs() -> None:
 
 
 def test_corridor_distance_is_number_of_adjacent_legs() -> None:
-    """OD distance follows the five-terminal corridor."""
     assert corridor_distance("A", "B") == 1
     assert corridor_distance("A", "C") == 2
     assert corridor_distance("A", "D") == 3
@@ -70,7 +66,6 @@ def test_corridor_distance_is_number_of_adjacent_legs() -> None:
 
 
 def test_process_generates_ten_requests_per_half_day() -> None:
-    """Published demand density is preserved exactly."""
     templates = generate_table4_request_templates(
         _spec(),
         seed=11001,
@@ -88,7 +83,6 @@ def test_process_generates_ten_requests_per_half_day() -> None:
 
 
 def test_structural_generation_is_deterministic() -> None:
-    """The same controlled seed gives the identical request stream."""
     first = generate_table4_request_templates(
         _spec(),
         seed=11001,
@@ -109,7 +103,6 @@ def test_structural_generation_is_deterministic() -> None:
 
 
 def test_categories_are_drawn_only_from_uniform_category_domain() -> None:
-    """Every realised category belongs to R/P/F."""
     templates = generate_table4_request_templates(
         _spec(),
         seed=11003,
@@ -121,7 +114,6 @@ def test_categories_are_drawn_only_from_uniform_category_domain() -> None:
 
 
 def test_timing_draw_uses_the_od_distance_pool() -> None:
-    """Every anticipation/deadline draw belongs to its distance pool."""
     spec = _spec()
 
     templates = generate_table4_request_templates(
@@ -141,7 +133,6 @@ def test_timing_draw_uses_the_od_distance_pool() -> None:
 
 
 def test_request_identifiers_and_sequence_are_stable() -> None:
-    """Structural rows retain deterministic booking order."""
     templates = generate_table4_request_templates(
         _spec(),
         seed=11005,
@@ -154,7 +145,6 @@ def test_request_identifiers_and_sequence_are_stable() -> None:
 
 
 def test_spec_rejects_horizon_that_would_bias_late_draws() -> None:
-    """The generator never silently truncates timing pools."""
     with pytest.raises(
         ValueError,
         match="extend beyond horizon_end",

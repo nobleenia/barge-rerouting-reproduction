@@ -44,9 +44,7 @@ assert set(run_keys) == set(EXPECTED_KEYS)
 print("unique run keys: PASS")
 print("8 structural cells x 3 policies: PASS")
 
-# ------------------------------------------------------------------
-# Prevalidation coverage
-# ------------------------------------------------------------------
+# Prevalidation coverage.
 
 prevalidation_keys = {path.stem for path in PREVALIDATION.glob("*.json")}
 
@@ -68,9 +66,7 @@ assert not unexpected_prevalidation
 
 print("coverage: PASS (22 current-schema artifacts + 2 documented legacy runs)")
 
-# ------------------------------------------------------------------
-# Record-level validation
-# ------------------------------------------------------------------
+# Record validation.
 
 rows = []
 
@@ -111,23 +107,23 @@ for record in records:
     assert service.standard_water
     assert service.max_final_actual_capacity_violation <= 1.0e-5
 
-    # Standard water: actual and nominal fill coincide.
+    # Actual and nominal fill coincide at standard water.
     assert abs(fill.mean_arc_actual_pct - fill.mean_arc_nominal_pct) <= 1.0e-9
 
     assert abs(fill.capacity_weighted_actual_pct - fill.capacity_weighted_nominal_pct) <= 1.0e-9
 
     assert abs(fill.mean_sailing_peak_actual_pct - fill.mean_sailing_peak_nominal_pct) <= 1.0e-9
 
-    # VOB = VFB + VTR
+    # VOB = VFB + VTR.
     assert abs(volume.vob_conservation_residual_pct) <= 1.0e-9
 
-    # PR gets the frozen 20 status updates.
+    # PR uses 20 fixed status updates.
     if policy == "pr":
         assert record.processed_status_count == 20
     else:
         assert record.processed_status_count == 0
 
-    # DCA and PR have no truck recourse here.
+    # DCA and PR do not use truck recourse in this experiment.
     if policy in {"dca", "pr"}:
         assert abs(ledger.truck_volume) <= 1.0e-5
         assert abs(ledger.truck_penalty) <= 1.0e-5
@@ -138,11 +134,11 @@ for record in records:
 
         assert abs(volume.vob_requested_volume_pct - volume.vfb_requested_volume_pct) <= 1.0e-9
 
-    # Controlled FR convention.
+    # FR has no feasibility rejections.
     if policy == "fr":
         assert record.feasibility_rejection_count == 0
 
-    # Every request resolves exactly once.
+    # Each request has one outcome.
     assert (
         ledger.accepted_request_count
         + record.feasibility_rejection_count
@@ -178,9 +174,7 @@ for record in records:
 print()
 print("record-level contracts: PASS")
 
-# ------------------------------------------------------------------
-# Canonical results table
-# ------------------------------------------------------------------
+# Results table.
 
 rows.sort(
     key=lambda row: (
@@ -237,9 +231,7 @@ for row in rows:
         f"{row['runtime']:>11.3f}"
     )
 
-# ------------------------------------------------------------------
-# Runtime summary
-# ------------------------------------------------------------------
+# Runtime summary.
 
 print()
 print("=" * 100)

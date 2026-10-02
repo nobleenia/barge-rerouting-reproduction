@@ -1,11 +1,6 @@
-"""Paired experimental infrastructure for Phase 11 Table 4.
+"""Schemas and aggregation for paired Table 4 experiments.
 
-This module defines experiment identity, traceability, paired
-DCA-relative comparison, aggregation, and raw-result schemas.
-
-It deliberately does not define the unpublished Table 4 demand
-generation or future-demand forecast parameters. Those remain explicit
-controlled substitute inputs until separately documented.
+Demand-generation and forecast values are supplied separately.
 """
 
 from __future__ import annotations
@@ -66,7 +61,6 @@ def _normalise_nonempty_string(
     name: str,
     value: object,
 ) -> str:
-    """Validate and normalise a non-empty string."""
     if not isinstance(value, str):
         raise TypeError(f"{name} must be a string.")
 
@@ -79,7 +73,6 @@ def _normalise_nonempty_string(
 
 
 def _validate_seed(value: object) -> int:
-    """Validate one deterministic non-negative seed."""
     if isinstance(value, bool) or not isinstance(value, int):
         raise TypeError("seed must be an integer.")
 
@@ -90,7 +83,6 @@ def _validate_seed(value: object) -> int:
 
 
 def _validate_capacity(value: object) -> int:
-    """Validate one published Table 4 nominal capacity."""
     if isinstance(value, bool) or not isinstance(value, int):
         raise TypeError("capacity_teu must be an integer.")
 
@@ -101,7 +93,6 @@ def _validate_capacity(value: object) -> int:
 
 
 def _validate_service_family(value: object) -> str:
-    """Validate one Table 4 service-family key."""
     family = _normalise_nonempty_string(
         "service_family",
         value,
@@ -114,7 +105,6 @@ def _validate_service_family(value: object) -> str:
 
 
 def _validate_policy(value: object) -> str:
-    """Validate one Table 4 policy key."""
     policy = _normalise_nonempty_string(
         "policy_key",
         value,
@@ -127,7 +117,6 @@ def _validate_policy(value: object) -> str:
 
 
 def _validate_reproduction_class(value: object) -> str:
-    """Validate experiment-classification metadata."""
     classification = _normalise_nonempty_string(
         "reproduction_class",
         value,
@@ -143,7 +132,6 @@ def _validate_fingerprint(
     name: str,
     value: object,
 ) -> str:
-    """Validate one SHA-256 hexadecimal fingerprint."""
     fingerprint = _normalise_nonempty_string(
         name,
         value,
@@ -162,7 +150,6 @@ def _validate_nonnegative_float(
     name: str,
     value: object,
 ) -> float:
-    """Validate one finite non-negative reporting value."""
     if isinstance(value, bool) or not isinstance(
         value,
         (int, float),
@@ -184,7 +171,6 @@ def _validate_optional_nonnegative_float(
     name: str,
     value: object | None,
 ) -> float | None:
-    """Validate optional non-negative reporting metadata."""
     if value is None:
         return None
 
@@ -195,7 +181,6 @@ def _validate_optional_nonnegative_int(
     name: str,
     value: object | None,
 ) -> int | None:
-    """Validate optional non-negative integer metadata."""
     if value is None:
         return None
 
@@ -234,7 +219,6 @@ class Table4DemandSetSpec:
     reproduction_class: str = CONTROLLED_SUBSTITUTE_INPUT
 
     def __post_init__(self) -> None:
-        """Validate demand-set identity."""
         object.__setattr__(
             self,
             "demand_set_id",
@@ -266,7 +250,6 @@ class Table4CellSpec:
     reproduction_class: str
 
     def __post_init__(self) -> None:
-        """Validate the paired experimental cell."""
         object.__setattr__(
             self,
             "service_family",
@@ -298,7 +281,6 @@ class Table4CellSpec:
 
     @property
     def cell_key(self) -> tuple[str, int, str, int]:
-        """Return deterministic paired-cell identity."""
         return (
             self.service_family,
             self.capacity_teu,
@@ -319,7 +301,6 @@ class Table4RunSpec:
     reproduction_class: str
 
     def __post_init__(self) -> None:
-        """Validate one planned policy run."""
         object.__setattr__(
             self,
             "service_family",
@@ -356,7 +337,6 @@ class Table4RunSpec:
 
     @property
     def cell_key(self) -> tuple[str, int, str, int]:
-        """Return paired-cell identity."""
         return (
             self.service_family,
             self.capacity_teu,
@@ -399,7 +379,6 @@ class Table4PolicyRunRecord:
     revenue_per_accepted_teu: float | None = field(init=False)
 
     def __post_init__(self) -> None:
-        """Validate one raw run record."""
         object.__setattr__(
             self,
             "service_family",
@@ -599,7 +578,6 @@ class Table4PolicyRunRecord:
 
     @property
     def cell_key(self) -> tuple[str, int, str, int]:
-        """Return paired-cell identity."""
         return (
             self.service_family,
             self.capacity_teu,
@@ -624,7 +602,6 @@ class Table4PairedComparison:
     volume_ir_percent: float
 
     def __post_init__(self) -> None:
-        """Validate paired comparison identity and values."""
         object.__setattr__(
             self,
             "service_family",
@@ -718,7 +695,6 @@ class Table4Aggregate:
     volume_ir_max: float
 
     def __post_init__(self) -> None:
-        """Validate aggregate reporting values."""
         object.__setattr__(
             self,
             "service_family",
@@ -834,7 +810,6 @@ def _improvement_rate(
     *,
     metric_name: str,
 ) -> float:
-    """Return percentage improvement relative to DCA."""
     if baseline <= TABLE4_TOLERANCE:
         raise ValueError(
             f"DCA baseline {metric_name} must be strictly positive for IR calculation."
@@ -1010,7 +985,6 @@ def aggregate_table4_comparisons(
 def _normalise_csv_row(
     row: dict[str, object],
 ) -> dict[str, object]:
-    """Convert optional values to stable CSV representation."""
     return {key: "" if value is None else value for key, value in row.items()}
 
 

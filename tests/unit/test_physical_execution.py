@@ -1,5 +1,3 @@
-"""Tests for physical-time execution of accepted commitments."""
-
 from dataclasses import replace
 from pathlib import Path
 
@@ -80,7 +78,6 @@ def service_arc_id(instance, service_id: str) -> str:
 
 
 def test_commitment_decomposes_into_one_two_leg_path() -> None:
-    """The controlled flow must produce one deterministic path."""
     instance, _, commitment = build_two_leg_commitment()
 
     paths = decompose_commitment_paths(
@@ -101,7 +98,6 @@ def test_commitment_decomposes_into_one_two_leg_path() -> None:
 
 
 def test_time_zero_keeps_fragment_at_origin() -> None:
-    """No arc arriving after time zero has executed yet."""
     instance, _, commitment = build_two_leg_commitment()
 
     demand_state, _ = accepted_demand_state_at_time(
@@ -121,7 +117,6 @@ def test_time_zero_keeps_fragment_at_origin() -> None:
 
 
 def test_time_one_executes_first_service_and_moves_fragment() -> None:
-    """S1 has arrived by time one while S2 remains future."""
     instance, _, commitment = build_two_leg_commitment()
 
     demand_state, _ = accepted_demand_state_at_time(
@@ -140,7 +135,6 @@ def test_time_one_executes_first_service_and_moves_fragment() -> None:
 
 
 def test_time_two_completes_barge_delivery() -> None:
-    """The destination delivery arc completes when C at time two is reached."""
     instance, _, commitment = build_two_leg_commitment()
 
     demand_state, _ = accepted_demand_state_at_time(
@@ -156,7 +150,6 @@ def test_time_two_completes_barge_delivery() -> None:
 
 
 def test_snapshot_separates_executed_and_unexecuted_transport_volume() -> None:
-    """Time advancement must move reservation volume between categories."""
     instance, booking_state, _ = build_two_leg_commitment()
 
     s1 = service_arc_id(instance, "S1")
@@ -223,7 +216,6 @@ def test_snapshot_separates_executed_and_unexecuted_transport_volume() -> None:
 
 
 def test_equal_time_booking_does_not_execute_future_service() -> None:
-    """Booking at time zero reserves routes but does not move cargo."""
     instance, booking_state, _ = build_two_leg_commitment()
 
     snapshot = build_execution_snapshot(
@@ -245,7 +237,6 @@ def test_equal_time_booking_does_not_execute_future_service() -> None:
 
 
 def test_volume_accounting_holds_at_every_physical_time() -> None:
-    """Accepted volume must remain fully accounted for during execution."""
     instance, booking_state, commitment = build_two_leg_commitment()
 
     for physical_time in (0, 1, 2):

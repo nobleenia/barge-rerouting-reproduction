@@ -1,5 +1,3 @@
-"""Tests for raw Table-5 transport load/capacity evidence."""
-
 import pytest
 
 from barge_rerouting.disruption.recovery_transition import (
@@ -176,7 +174,6 @@ def test_duplicate_arc_ids_are_rejected() -> None:
 
 
 def test_historical_reduced_water_preserves_departure_capacity() -> None:
-    """Reduced-water reporting must not revert past arcs to nominal capacity."""
     from dataclasses import replace
 
     spec = default_table5_experiment_spec()

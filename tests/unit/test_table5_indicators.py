@@ -1,5 +1,3 @@
-"""Tests for the complete Table-5 candidate indicator snapshot."""
-
 import pytest
 
 from barge_rerouting.reporting.table5_indicators import (

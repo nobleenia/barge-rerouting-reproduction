@@ -24,7 +24,6 @@ from barge_rerouting.rolling_horizon import (
 
 
 def main() -> None:
-    """Build a fragment network after its first service executes."""
     config = load_experiment_config(Path("configs/toy_experiment.yaml"))
     config = replace(
         config,

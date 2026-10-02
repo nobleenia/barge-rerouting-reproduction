@@ -17,7 +17,6 @@ COMMITMENT_TOLERANCE = 1e-6
 
 
 def _validate_positive_integer(name: str, value: object) -> int:
-    """Validate and return a strictly positive integer."""
     if isinstance(value, bool) or not isinstance(value, int):
         raise TypeError(f"{name} must be an integer.")
 
@@ -28,7 +27,6 @@ def _validate_positive_integer(name: str, value: object) -> int:
 
 
 def _validate_nonnegative_integer(name: str, value: object) -> int:
-    """Validate and return a nonnegative integer."""
     if isinstance(value, bool) or not isinstance(value, int):
         raise TypeError(f"{name} must be an integer.")
 
@@ -39,7 +37,6 @@ def _validate_nonnegative_integer(name: str, value: object) -> int:
 
 
 def _validate_tolerance(value: object) -> float:
-    """Validate and return a strictly positive numerical tolerance."""
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise TypeError("tolerance must be a real number.")
 
@@ -62,7 +59,6 @@ class PlannedArcFlow:
     volume: float
 
     def __post_init__(self) -> None:
-        """Validate and normalise the planned flow."""
         if not isinstance(self.arc_id, str):
             raise TypeError("arc_id must be a string.")
 
@@ -100,7 +96,6 @@ class DemandCommitment:
     planned_arc_flows: tuple[PlannedArcFlow, ...]
 
     def __post_init__(self) -> None:
-        """Validate and normalise the accepted commitment."""
         decision_sequence = _validate_positive_integer(
             "decision_sequence",
             self.decision_sequence,
@@ -162,22 +157,18 @@ class DemandCommitment:
 
     @property
     def event_id(self) -> str:
-        """Return the booking event that created this commitment."""
         return f"booking::{self.decision_sequence:04d}::{self.demand.demand_id}"
 
     @property
     def demand_id(self) -> str:
-        """Return the committed demand identifier."""
         return str(self.demand.demand_id)
 
     @property
     def accepted_volume(self) -> float:
-        """Return the positively committed cargo volume."""
         return float(self.demand.volume) * float(self.acceptance_fraction)
 
     @property
     def planned_arc_ids(self) -> tuple[str, ...]:
-        """Return all arcs used by the stored future plan."""
         return tuple(planned_flow.arc_id for planned_flow in self.planned_arc_flows)
 
     def planned_volume_on(self, arc_id: str) -> float:

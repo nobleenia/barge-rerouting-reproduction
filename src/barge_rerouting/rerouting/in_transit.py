@@ -22,7 +22,6 @@ def _validate_nonnegative_integer(
     name: str,
     value: object,
 ) -> int:
-    """Validate and return a nonnegative integer."""
     if isinstance(value, bool) or not isinstance(value, int):
         raise TypeError(f"{name} must be an integer.")
 
@@ -37,7 +36,6 @@ def _normalise_arc_ids(
     *,
     field_name: str,
 ) -> tuple[str, ...]:
-    """Validate arc identifiers while preserving route order."""
     if not isinstance(value, tuple):
         raise TypeError(f"{field_name} must be a tuple.")
 
@@ -78,7 +76,6 @@ class ReroutingFragmentDecisionState:
     releasable_future_transport_arc_ids: tuple[str, ...]
 
     def __post_init__(self) -> None:
-        """Validate locked movement and effective rerouting source."""
         if not isinstance(
             self.fragment_state,
             ReroutableFragmentState,
@@ -150,27 +147,22 @@ class ReroutingFragmentDecisionState:
 
     @property
     def fragment_id(self) -> str:
-        """Return the fragment identifier."""
         return str(self.fragment_state.fragment_id)
 
     @property
     def demand_id(self) -> str:
-        """Return the parent demand identifier."""
         return str(self.fragment_state.demand_id)
 
     @property
     def volume(self) -> float:
-        """Return the fixed unfinished volume."""
         return float(self.fragment_state.volume)
 
     @property
     def completed_arc_ids(self) -> tuple[str, ...]:
-        """Return movements completed before the decision time."""
         return tuple(str(arc_id) for arc_id in self.fragment_state.executed_arc_ids)
 
     @property
     def immutable_arc_ids(self) -> tuple[str, ...]:
-        """Return completed and locked transport movements."""
         if self.locked_in_transit_arc_id is None:
             return self.completed_arc_ids
 
@@ -181,7 +173,6 @@ class ReroutingFragmentDecisionState:
 
     @property
     def has_locked_in_transit_movement(self) -> bool:
-        """Return whether cargo is currently onboard a service."""
         return self.locked_in_transit_arc_id is not None
 
 
@@ -195,7 +186,6 @@ class ReroutingDecisionSnapshot:
     fragments: tuple[ReroutingFragmentDecisionState, ...]
 
     def __post_init__(self) -> None:
-        """Validate event and fragment-state consistency."""
         if not isinstance(self.current_event_id, str):
             raise TypeError("current_event_id must be a string.")
 
@@ -268,7 +258,6 @@ class ReroutingDecisionSnapshot:
 
     @property
     def locked_fragment_ids(self) -> tuple[str, ...]:
-        """Return fragments currently locked in transport."""
         return tuple(
             fragment.fragment_id
             for fragment in self.fragments

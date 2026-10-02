@@ -12,7 +12,6 @@ from barge_rerouting.rerouting import (
 
 
 def main() -> None:
-    """Evaluate the canonical seeded experiment twice."""
     config = load_experiment_config(Path("configs/toy_experiment.yaml"))
     config = replace(
         config,

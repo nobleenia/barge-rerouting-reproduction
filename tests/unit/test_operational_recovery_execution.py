@@ -1,5 +1,3 @@
-"""Tests for execution after persisted truck/barge recovery."""
-
 import pytest
 from test_truck_recourse_model import (
     build_recovery_example,
@@ -34,7 +32,6 @@ def build_transition(
 
 
 def test_legacy_execution_remains_unchanged() -> None:
-    """The original booking view still contains ten barge TEU."""
     example, _ = build_transition()
 
     try:
@@ -53,7 +50,6 @@ def test_legacy_execution_remains_unchanged() -> None:
 
 
 def test_operational_time_zero_is_seven_barge_three_truck() -> None:
-    """Recovered execution removes trucked cargo from barge."""
     example, transition = build_transition()
 
     try:
@@ -78,7 +74,6 @@ def test_operational_time_zero_is_seven_barge_three_truck() -> None:
 
 
 def test_operational_future_reservation_is_seven() -> None:
-    """Future barge capacity follows the recovered plan."""
     example, transition = build_transition()
 
     try:
@@ -103,7 +98,6 @@ def test_operational_future_reservation_is_seven() -> None:
 
 
 def test_first_recovered_leg_executes_normally() -> None:
-    """Seven TEU move to B when the first service arrives."""
     example, transition = build_transition()
 
     try:
@@ -142,7 +136,6 @@ def test_first_recovered_leg_executes_normally() -> None:
 
 
 def test_final_accounting_is_seven_barge_three_truck() -> None:
-    """All ten accepted TEU remain accounted for at completion."""
     example, transition = build_transition()
 
     try:
@@ -169,7 +162,6 @@ def test_final_accounting_is_seven_barge_three_truck() -> None:
 
 
 def test_nominal_recovery_remains_ten_barge_zero_truck() -> None:
-    """The overlay is neutral when water capacity is unchanged."""
     example, transition = build_transition(1.0)
 
     try:

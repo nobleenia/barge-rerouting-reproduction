@@ -25,7 +25,6 @@ from barge_rerouting.rolling_horizon import (
 
 
 def build_instance():
-    """Build the controlled two-event instance."""
     config = load_experiment_config(Path("tests/fixtures/rerouting_switch_experiment.yaml"))
 
     return assemble_experiment_instance(
@@ -58,7 +57,6 @@ def build_instance():
 
 
 def provider(probability_four: float):
-    """Provide one forecast before the future arrival."""
     forecast = FutureDemandForecast(
         forecast_id="FUTURE",
         origin="B",
@@ -87,7 +85,6 @@ def provider(probability_four: float):
 
 
 def run_rm(probability: float):
-    """Run one probability case."""
     return run_time_aware_dca_rm(
         build_instance(),
         provider(probability),
@@ -97,7 +94,6 @@ def run_rm(probability: float):
 
 
 def main() -> None:
-    """Display the complete opportunity-cost gate."""
     baseline = run_time_aware_sequential_dca(build_instance())
     high = run_rm(0.50)
     low = run_rm(0.05)

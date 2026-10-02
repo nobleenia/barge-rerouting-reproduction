@@ -1,5 +1,3 @@
-"""Tests for Phase 11 experiment-layer execution semantics."""
-
 import pytest
 
 from barge_rerouting.experiments.phase11_execution import (
@@ -50,9 +48,7 @@ def test_regular_feasibility_rejection_advances_without_commitment() -> None:
 
     event = next(event for event in inputs.timeline.events if event.demand.category.value == "R")
 
-    # A fresh state expects sequence 1, so construct the
-    # state immediately preceding the selected Regular event
-    # using zero-commitment records for earlier events.
+    # Advance to the selected Regular event with no earlier commitments.
     state = RollingBookingState.empty(inputs.instance)
 
     for earlier_event in inputs.timeline.events:

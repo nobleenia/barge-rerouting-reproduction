@@ -24,7 +24,6 @@ class CustomerCategory(StrEnum):
 
     @property
     def acceptance_variable_type(self) -> AcceptanceVariableType:
-        """Return the required mathematical acceptance-variable type."""
         mapping = {
             CustomerCategory.REGULAR: AcceptanceVariableType.FIXED,
             CustomerCategory.PARTIALLY_SPOT: AcceptanceVariableType.CONTINUOUS,
@@ -34,22 +33,18 @@ class CustomerCategory(StrEnum):
 
     @property
     def requires_full_acceptance(self) -> bool:
-        """Return whether every requested TEU must be accepted."""
         return self is CustomerCategory.REGULAR
 
     @property
     def allows_partial_acceptance(self) -> bool:
-        """Return whether a fractional acceptance decision is permitted."""
         return self is CustomerCategory.PARTIALLY_SPOT
 
     @property
     def requires_binary_acceptance(self) -> bool:
-        """Return whether acceptance must be zero or one."""
         return self is CustomerCategory.FULLY_SPOT
 
 
 def _validate_nonnegative_integer(name: str, value: object) -> int:
-    """Validate and return a nonnegative integer."""
     if isinstance(value, bool) or not isinstance(value, int):
         raise TypeError(f"{name} must be an integer.")
 
@@ -65,7 +60,6 @@ def _validate_finite_number(
     *,
     strictly_positive: bool = False,
 ) -> float:
-    """Validate and return a finite floating-point number."""
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise TypeError(f"{name} must be a real number.")
 
@@ -119,7 +113,6 @@ class Demand:
     fare_per_teu: float
 
     def __post_init__(self) -> None:
-        """Validate and normalise all demand attributes."""
         if not isinstance(self.demand_id, str):
             raise TypeError("demand_id must be a string.")
         if not isinstance(self.origin, str):
@@ -182,7 +175,6 @@ class Demand:
 
     @property
     def maximum_revenue(self) -> float:
-        """Return revenue obtained if the full request is accepted."""
         return self.volume * self.fare_per_teu
 
     def normalize_acceptance_fraction(

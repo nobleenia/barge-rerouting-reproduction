@@ -1,5 +1,3 @@
-"""Tests for future-demand distributions and value functions."""
-
 import pytest
 
 from barge_rerouting.domain import (
@@ -29,7 +27,6 @@ def build_forecast() -> FutureDemandForecast:
 
 
 def test_probability_outcomes_are_sorted() -> None:
-    """Forecast outcomes must have deterministic volume order."""
     forecast = build_forecast()
 
     assert forecast.support == (0, 2, 4)
@@ -50,7 +47,6 @@ def test_probability_outcomes_are_sorted() -> None:
 
 
 def test_sparse_support_has_zero_probability_between_outcomes() -> None:
-    """Missing integer outcomes represent zero probability mass."""
     forecast = build_forecast()
 
     assert forecast.probability_of(0) == pytest.approx(0.25)
@@ -61,7 +57,6 @@ def test_sparse_support_has_zero_probability_between_outcomes() -> None:
 
 
 def test_expected_volume_and_full_revenue() -> None:
-    """Ordinary expectation must use the complete distribution."""
     forecast = build_forecast()
 
     assert forecast.expected_volume == pytest.approx(2.5)
@@ -69,7 +64,6 @@ def test_expected_volume_and_full_revenue() -> None:
 
 
 def test_printed_prefix_expression() -> None:
-    """Outcomes above j contribute nothing to the printed term."""
     forecast = build_forecast()
 
     assert forecast.paper_prefix_expected_volume(0) == pytest.approx(0.0)
@@ -82,7 +76,6 @@ def test_printed_prefix_expression() -> None:
 
 
 def test_capped_expected_volume() -> None:
-    """The capped sensitivity must credit min(X, j)."""
     forecast = build_forecast()
 
     assert forecast.expected_capped_volume(0) == pytest.approx(0.0)
@@ -101,7 +94,6 @@ def test_capped_expected_volume() -> None:
 def test_capped_value_matches_prefix_plus_tail_identity(
     protection_level: int,
 ) -> None:
-    """Verify E[min(X,j)] = prefix(j) + j P(X>j)."""
     forecast = build_forecast()
 
     expected = forecast.paper_prefix_expected_volume(
@@ -112,7 +104,6 @@ def test_capped_value_matches_prefix_plus_tail_identity(
 
 
 def test_interpretation_selects_the_correct_value_function() -> None:
-    """Printed and capped interpretations must remain distinct."""
     forecast = build_forecast()
 
     printed = forecast.protected_expected_volume(
@@ -130,7 +121,6 @@ def test_interpretation_selects_the_correct_value_function() -> None:
 
 
 def test_protected_expected_revenue_uses_fare_per_teu() -> None:
-    """Future revenue equals credited volume multiplied by fare."""
     forecast = build_forecast()
 
     assert forecast.protected_expected_revenue(
@@ -145,7 +135,6 @@ def test_protected_expected_revenue_uses_fare_per_teu() -> None:
 
 
 def test_value_table_is_piecewise_and_deterministic() -> None:
-    """The model coefficient table must cover every candidate level."""
     forecast = build_forecast()
 
     printed = forecast.protection_value_table(interpretation=FutureValueInterpretation.PRINTED)
@@ -167,7 +156,6 @@ def test_value_table_is_piecewise_and_deterministic() -> None:
 
 
 def test_invalid_probability_mass_is_rejected() -> None:
-    """A future distribution must have total probability one."""
     with pytest.raises(
         ValueError,
         match="probabilities must sum to one",
@@ -188,7 +176,6 @@ def test_invalid_probability_mass_is_rejected() -> None:
 
 
 def test_duplicate_volume_outcomes_are_rejected() -> None:
-    """Each possible volume must occur at most once."""
     with pytest.raises(
         ValueError,
         match="unique volumes",
@@ -210,7 +197,6 @@ def test_duplicate_volume_outcomes_are_rejected() -> None:
 
 
 def test_interpretation_type_is_validated() -> None:
-    """Value construction must not silently accept arbitrary strings."""
     forecast = build_forecast()
 
     with pytest.raises(

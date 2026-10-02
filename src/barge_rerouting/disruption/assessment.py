@@ -19,7 +19,6 @@ def _validate_nonnegative_integer(
     name: str,
     value: object,
 ) -> int:
-    """Validate and return a non-negative integer."""
     if isinstance(value, bool) or not isinstance(value, int):
         raise TypeError(f"{name} must be an integer.")
 
@@ -33,7 +32,6 @@ def _validate_nonnegative_float(
     name: str,
     value: object,
 ) -> float:
-    """Validate and return a finite non-negative float."""
     if isinstance(value, bool) or not isinstance(
         value,
         (int, float),
@@ -56,7 +54,6 @@ def _normalise_identifiers(
     *,
     field_name: str,
 ) -> tuple[str, ...]:
-    """Validate and sort a unique identifier tuple."""
     if not isinstance(value, tuple):
         raise TypeError(f"{field_name} must be a tuple.")
 
@@ -94,7 +91,6 @@ class FutureArcDisruption:
     affected_demand_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
-        """Validate future-arc capacity accounting."""
         if not isinstance(self.arc_id, str):
             raise TypeError("arc_id must be a string.")
 
@@ -211,12 +207,10 @@ class FutureArcDisruption:
 
     @property
     def is_overloaded(self) -> bool:
-        """Return whether commitments exceed actual capacity."""
         return bool(self.overload_volume > ACTUAL_CAPACITY_TOLERANCE)
 
     @property
     def capacity_loss(self) -> float:
-        """Return capacity removed relative to nominal."""
         return float(self.nominal_capacity - self.actual_capacity)
 
 
@@ -229,7 +223,6 @@ class DisruptionAssessment:
     arc_states: tuple[FutureArcDisruption, ...]
 
     def __post_init__(self) -> None:
-        """Validate assessment identity and arc uniqueness."""
         physical_time = _validate_nonnegative_integer(
             "physical_time",
             self.physical_time,
@@ -281,17 +274,14 @@ class DisruptionAssessment:
 
     @property
     def is_feasible(self) -> bool:
-        """Return whether every future commitment remains feasible."""
         return not any(state.is_overloaded for state in self.arc_states)
 
     @property
     def disrupted_arc_ids(self) -> tuple[str, ...]:
-        """Return future arcs exceeding actual capacity."""
         return tuple(state.arc_id for state in self.arc_states if state.is_overloaded)
 
     @property
     def affected_demand_ids(self) -> tuple[str, ...]:
-        """Return demands using at least one overloaded arc."""
         return tuple(
             sorted(
                 {
@@ -305,7 +295,6 @@ class DisruptionAssessment:
 
     @property
     def affected_path_ids(self) -> tuple[str, ...]:
-        """Return paths using at least one overloaded arc."""
         return tuple(
             sorted(
                 {
@@ -319,7 +308,6 @@ class DisruptionAssessment:
 
     @property
     def maximum_arc_overload(self) -> float:
-        """Return the largest overload on one service leg."""
         return float(
             max(
                 (state.overload_volume for state in self.arc_states),

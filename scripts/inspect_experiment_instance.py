@@ -13,7 +13,6 @@ from barge_rerouting.instance import (
 
 
 def parse_arguments() -> argparse.Namespace:
-    """Parse command-line arguments."""
     parser = argparse.ArgumentParser(
         description="Inspect an assembled barge optimisation instance."
     )
@@ -31,7 +30,6 @@ def parse_arguments() -> argparse.Namespace:
 
 
 def main() -> None:
-    """Assemble and summarise one experiment instance."""
     arguments = parse_arguments()
     config = load_experiment_config(arguments.config_path)
     instance = assemble_experiment_instance(config)

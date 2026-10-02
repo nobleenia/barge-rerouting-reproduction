@@ -1,5 +1,3 @@
-"""Tests for Phase 11 Table 4 paired experiment infrastructure."""
-
 from dataclasses import replace
 from pathlib import Path
 
@@ -55,7 +53,6 @@ def _record(
 
 
 def test_default_table4_demand_registry_has_five_fixed_seeds() -> None:
-    """Table 4 uses five explicit controlled substitute seeds."""
     demand_sets = default_table4_demand_sets()
 
     assert len(demand_sets) == 5
@@ -64,7 +61,6 @@ def test_default_table4_demand_registry_has_five_fixed_seeds() -> None:
 
 
 def test_default_table4_design_has_thirty_paired_cells() -> None:
-    """2 families x 3 capacities x 5 demand sets = 30 cells."""
     cells = build_default_table4_cells()
 
     assert len(cells) == 30
@@ -72,7 +68,6 @@ def test_default_table4_design_has_thirty_paired_cells() -> None:
 
 
 def test_default_table4_plan_has_120_policy_runs() -> None:
-    """Every paired cell contains exactly four policies."""
     run_plan = build_default_table4_run_plan()
 
     assert len(run_plan) == 120
@@ -95,7 +90,6 @@ def test_default_table4_plan_has_120_policy_runs() -> None:
 
 
 def test_experiment_config_fingerprint_is_deterministic() -> None:
-    """Configuration identity changes only when config changes."""
     config = load_experiment_config(Path("configs/toy_experiment.yaml"))
 
     first = experiment_config_fingerprint(config)
@@ -114,7 +108,6 @@ def test_experiment_config_fingerprint_is_deterministic() -> None:
 
 
 def test_raw_record_derives_revenue_per_accepted_teu() -> None:
-    """Revenue/TEU is derived rather than independently entered."""
     record = _record(
         policy_key="dca",
         revenue=125.0,
@@ -125,7 +118,6 @@ def test_raw_record_derives_revenue_per_accepted_teu() -> None:
 
 
 def test_paired_comparisons_use_dca_denominator() -> None:
-    """IR is calculated only after the four paired runs exist."""
     records = (
         _record(
             policy_key="dca",
@@ -163,7 +155,6 @@ def test_paired_comparisons_use_dca_denominator() -> None:
 
 
 def test_paired_comparison_rejects_demand_fingerprint_mismatch() -> None:
-    """Policies cannot be compared on different realised demands."""
     records = (
         _record(
             policy_key="dca",
@@ -196,7 +187,6 @@ def test_paired_comparison_rejects_demand_fingerprint_mismatch() -> None:
 
 
 def test_table4_aggregate_uses_exactly_five_paired_sets() -> None:
-    """Avg/min/max are calculated over five paired demand sets."""
     revenue_values = (
         0.0,
         10.0,
@@ -253,7 +243,6 @@ def test_table4_aggregate_uses_exactly_five_paired_sets() -> None:
 def test_table4_plan_manifest_is_machine_readable(
     tmp_path: Path,
 ) -> None:
-    """The unsolved 120-run plan has an automatic JSON manifest."""
     path = write_table4_run_plan_json(tmp_path / "plan.json")
 
     text = path.read_text(encoding="utf-8")

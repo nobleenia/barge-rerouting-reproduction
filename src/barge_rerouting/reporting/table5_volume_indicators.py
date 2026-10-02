@@ -1,12 +1,4 @@
-"""Candidate Table-5 demand-volume indicator reconstructions.
-
-The publication defines VTR, VFB, VOB and VOA verbally but does not
-provide their complete mathematical equations or denominators.
-
-This module therefore exposes explicitly named candidate definitions.
-The candidates are reporting interpretations, not claims that the
-publication used exactly these formulas.
-"""
+"""Candidate VTR, VFB, VOB, and VOA calculations for Table 5."""
 
 from __future__ import annotations
 
@@ -22,7 +14,6 @@ def _percentage(
     numerator: float,
     denominator: float,
 ) -> float:
-    """Return one percentage with explicit zero-denominator handling."""
     if denominator <= LEDGER_TOLERANCE:
         return 0.0
 
@@ -50,7 +41,6 @@ class Table5VolumeIndicatorCandidates:
 
     @property
     def vob_conservation_residual_pct(self) -> float:
-        """Return VOB - VFB - VTR under the shared-volume candidate."""
         return float(
             self.vob_requested_volume_pct
             - self.vfb_requested_volume_pct
@@ -59,7 +49,6 @@ class Table5VolumeIndicatorCandidates:
 
     @property
     def accepted_volume_conservation_residual(self) -> float:
-        """Return accepted - final-barge - truck in raw TEU."""
         return float(self.accepted_volume - self.final_barge_volume - self.truck_volume)
 
 
@@ -105,10 +94,7 @@ def build_table5_volume_indicator_candidates(
         float(requested_count),
     )
 
-    # This candidate is intentionally retained even though it is
-    # numerically identical to the current VOB requested-volume
-    # candidate. Its presence documents the unresolved publication
-    # ambiguity rather than silently choosing one interpretation.
+    # Retain both names until the publication's denominator is confirmed.
     voa_volume = _percentage(
         accepted_volume,
         requested_volume,

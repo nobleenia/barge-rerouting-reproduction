@@ -9,7 +9,6 @@ from barge_rerouting.experiments import (
 
 
 def main() -> None:
-    """Print service slots and departure epochs."""
     periods = tuple(range(0, 29))
 
     print("Phase 11 Table 4 service-family inspection")

@@ -1,5 +1,3 @@
-"""Tests for time-aware transport-capacity accounting."""
-
 from dataclasses import replace
 from pathlib import Path
 
@@ -85,7 +83,6 @@ def capacity_at_time(instance, state, physical_time: int):
 
 
 def test_time_zero_classifies_both_services_as_future_reserved() -> None:
-    """Before departure, reservations reduce bookable capacity."""
     instance, state = build_capacity_example()
     snapshot = capacity_at_time(
         instance,
@@ -105,7 +102,6 @@ def test_time_zero_classifies_both_services_as_future_reserved() -> None:
 
 
 def test_time_one_closes_s1_but_keeps_s2_bookable() -> None:
-    """An arrived service is closed while a same-time departure remains open."""
     instance, state = build_capacity_example()
     snapshot = capacity_at_time(
         instance,
@@ -129,7 +125,6 @@ def test_time_one_closes_s1_but_keeps_s2_bookable() -> None:
 
 
 def test_time_two_closes_both_services() -> None:
-    """Completed services cannot offer capacity to later bookings."""
     instance, state = build_capacity_example()
     snapshot = capacity_at_time(
         instance,
@@ -149,7 +144,6 @@ def test_time_two_closes_both_services() -> None:
 
 
 def test_unused_past_capacity_is_not_reopened() -> None:
-    """A departed service remains unavailable even with no committed cargo."""
     instance, _ = build_capacity_example()
     empty_state = RollingBookingState.empty(instance)
 
@@ -166,7 +160,6 @@ def test_unused_past_capacity_is_not_reopened() -> None:
 
 
 def test_committed_volume_is_not_double_counted() -> None:
-    """Each arc's committed volume belongs to exactly one timing category."""
     instance, state = build_capacity_example()
 
     for physical_time in (0, 1, 2):
@@ -188,7 +181,6 @@ def test_committed_volume_is_not_double_counted() -> None:
 
 
 def test_future_unreserved_service_retains_full_capacity() -> None:
-    """A future service unused by the demand remains fully bookable."""
     instance, state = build_capacity_example()
     snapshot = capacity_at_time(
         instance,

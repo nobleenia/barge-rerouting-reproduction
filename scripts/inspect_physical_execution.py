@@ -18,7 +18,6 @@ from barge_rerouting.rolling_horizon import (
 
 
 def main() -> None:
-    """Book one A-C demand and inspect execution at times zero, one, and two."""
     config = load_experiment_config("configs/toy_experiment.yaml")
     quiet_config = replace(
         config,

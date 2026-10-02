@@ -25,7 +25,6 @@ TRUCK_RECOURSE_TOLERANCE = 1e-6
 
 
 def _solver_name(*parts: object) -> str:
-    """Create a readable CPLEX-compatible identifier."""
     raw_name = "__".join(str(part) for part in parts)
     return re.sub(r"[^A-Za-z0-9_]", "_", raw_name)
 
@@ -34,7 +33,6 @@ def _positive_float(
     name: str,
     value: object,
 ) -> float:
-    """Validate a strictly positive finite number."""
     if isinstance(value, bool) or not isinstance(
         value,
         (int, float),
@@ -56,7 +54,6 @@ def _normalise_penalties(
     recovery_fragments: RecoveryFragmentSnapshot,
     values: Mapping[str, float],
 ) -> dict[str, float]:
-    """Validate one truck penalty per affected demand."""
     if not isinstance(values, Mapping):
         raise TypeError("truck_penalty_per_teu_by_demand must be a mapping.")
 
@@ -114,7 +111,6 @@ class TruckAllocationResult:
 
     @property
     def penalty_value(self) -> float:
-        """Return truck penalty incurred by this allocation."""
         return float(self.volume * self.penalty_per_teu)
 
 
@@ -154,12 +150,10 @@ class TruckRecourseSolution:
 
     @property
     def total_truck_volume(self) -> float:
-        """Return total volume transferred to trucks."""
         return float(sum(allocation.volume for allocation in self.truck_allocations))
 
     @property
     def total_truck_penalty(self) -> float:
-        """Return total incurred truck penalty."""
         return float(sum(allocation.penalty_value for allocation in self.truck_allocations))
 
 
@@ -199,7 +193,6 @@ def _validate_inputs(
     recovery_capacity: RecoveryCapacitySnapshot,
     fragment_networks: FragmentNetworkSnapshot,
 ) -> None:
-    """Validate status-recovery model inputs."""
     if not isinstance(instance, ExperimentInstance):
         raise TypeError("instance must be an ExperimentInstance.")
 

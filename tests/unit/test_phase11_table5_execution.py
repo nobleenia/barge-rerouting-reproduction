@@ -1,5 +1,3 @@
-"""Tests for Phase 11 Table 5 PR/FR execution semantics."""
-
 from barge_rerouting.disruption.recovery_transition import (
     RecoveryOperationalState,
 )
@@ -113,7 +111,6 @@ def test_table5_a036_rejects_ambiguous_solver_status() -> None:
 
 
 def test_fr_prefix_25_handles_pending_truck_state() -> None:
-    """Booking 25 must process while earlier truck cargo is pending."""
     import pytest
 
     from barge_rerouting.disruption.operational_execution import (
@@ -185,7 +182,7 @@ def test_fr_prefix_25_handles_pending_truck_state() -> None:
         if transfer.transfer_time > physical_time
     )
 
-    # This is the exact state that previously raised.
+    # Regression state for the original failure.
     assert pending_transfers
 
     snapshot = build_operational_execution_snapshot(
@@ -257,14 +254,12 @@ def test_fr_prefix_25_handles_pending_truck_state() -> None:
 
     assert transferred_state.delivered_truck_volume == pytest.approx(expected_delivered_at_transfer)
 
-    # Persisted truck allocations are not cancelled
-    # merely because another FR booking is processed.
+    # A later FR booking keeps earlier truck allocations.
     for transfer in pending_transfers:
         assert transfer in (run.final_state.truck_transfer_history)
 
 
 def test_fr_prefix_42_preserves_recovery_lineage_accounting() -> None:
-    """Repeated FR must preserve accepted-volume accounting."""
     from barge_rerouting.disruption.operational_execution import (
         build_operational_execution_snapshot,
     )

@@ -15,7 +15,6 @@ from barge_rerouting.optimization import (
 
 
 def main() -> None:
-    """Build, export, solve, validate, and summarise the canonical DCA model."""
     config = load_experiment_config("configs/toy_experiment.yaml")
     instance = assemble_experiment_instance(config)
     artifacts = build_dca_model(instance)

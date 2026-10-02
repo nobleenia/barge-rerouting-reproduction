@@ -44,7 +44,6 @@ PHASE9_EVALUATION_TOLERANCE = 1e-6
 def _validate_maximum_volume(
     value: object,
 ) -> int:
-    """Validate a positive integer forecast-volume maximum."""
     if isinstance(value, bool) or not isinstance(value, int):
         raise TypeError("maximum_volume must be an integer.")
 
@@ -57,7 +56,6 @@ def _validate_maximum_volume(
 def _validate_lookahead(
     value: int | None,
 ) -> int | None:
-    """Validate an optional non-negative look-ahead."""
     if value is None:
         return None
 
@@ -73,7 +71,6 @@ def _validate_lookahead(
 def _optional_float(
     value: object | None,
 ) -> float | None:
-    """Return a finite optional float."""
     if value is None:
         return None
 
@@ -167,7 +164,6 @@ class Phase9CanonicalEvaluation:
     events: tuple[Phase9EventRecord, ...]
 
     def __post_init__(self) -> None:
-        """Validate evaluation shape and policy uniqueness."""
         if len(self.instance_fingerprint) != 64:
             raise ValueError("instance_fingerprint must be a SHA-256 value.")
 
@@ -223,7 +219,6 @@ def _not_run_record(
     policy_label: str,
     mechanism: str,
 ) -> Phase9EventRecord:
-    """Build one unattempted event row."""
     return Phase9EventRecord(
         policy_key=policy_key,
         policy_label=policy_label,
@@ -255,7 +250,6 @@ def _dca_event_records(
     timeline: BookingTimeline,
     run: TimeAwareSequentialDcaRun,
 ) -> tuple[Phase9EventRecord, ...]:
-    """Build complete Sequential DCA event rows."""
     by_event_id = {result.event.event_id: result for result in run.results}
     records: list[Phase9EventRecord] = []
 
@@ -340,7 +334,6 @@ def _reroute_event_records(
     timeline: BookingTimeline,
     run: FullRerouteRun,
 ) -> tuple[Phase9EventRecord, ...]:
-    """Build complete DCA-R event rows."""
     by_event_id = {result.event.event_id: result for result in run.results}
     records: list[Phase9EventRecord] = []
 
@@ -431,7 +424,6 @@ def _rm_event_records(
     regime: ForecastSensitivityRegime,
     run: TimeAwareDcaRmRun,
 ) -> tuple[Phase9EventRecord, ...]:
-    """Build complete DCA-RM event rows."""
     by_event_id = {result.event.event_id: result for result in run.results}
     records: list[Phase9EventRecord] = []
 
@@ -523,7 +515,6 @@ def _rm_event_records(
 def _rrm_key(
     regime: ForecastSensitivityRegime,
 ) -> str:
-    """Return the matching DCA-RRM policy key."""
     if regime.key.startswith("rm_"):
         return f"rrm_{regime.key[3:]}"
 
@@ -533,7 +524,6 @@ def _rrm_key(
 def _rrm_label(
     regime: ForecastSensitivityRegime,
 ) -> str:
-    """Return the matching DCA-RRM policy label."""
     return f"DCA-RRM {regime.value_interpretation.value} p={regime.occurrence_probability:.2f}"
 
 
@@ -542,7 +532,6 @@ def _rrm_event_records(
     regime: ForecastSensitivityRegime,
     run: TimeAwareDcaRrmRun,
 ) -> tuple[Phase9EventRecord, ...]:
-    """Build complete DCA-RRM event rows."""
     policy_key = _rrm_key(regime)
     policy_label = _rrm_label(regime)
     by_event_id = {result.event.event_id: result for result in run.results}
@@ -653,7 +642,6 @@ def _summary(
     baseline_realised_revenue: float,
     baseline_records: tuple[Phase9EventRecord, ...],
 ) -> Phase9PolicySummary:
-    """Build one policy summary against Sequential DCA."""
     common_prefix_length = min(
         baseline_processed_events,
         processed_events,
@@ -976,7 +964,6 @@ class Phase9EvaluationPaths:
 def _csv_optional_float(
     value: float | None,
 ) -> str:
-    """Format an optional floating-point CSV value."""
     if value is None:
         return ""
 
@@ -986,7 +973,6 @@ def _csv_optional_float(
 def _csv_optional_int(
     value: int | None,
 ) -> str:
-    """Format an optional integer CSV value."""
     if value is None:
         return ""
 
@@ -996,7 +982,6 @@ def _csv_optional_int(
 def _markdown_optional_float(
     value: float | None,
 ) -> str:
-    """Format an optional floating-point Markdown value."""
     if value is None:
         return "—"
 
@@ -1006,7 +991,6 @@ def _markdown_optional_float(
 def _markdown_optional_int(
     value: int | None,
 ) -> str:
-    """Format an optional integer Markdown value."""
     if value is None:
         return "—"
 
@@ -1016,7 +1000,6 @@ def _markdown_optional_int(
 def _phase9_markdown_report(
     evaluation: Phase9CanonicalEvaluation,
 ) -> str:
-    """Render the canonical four-mechanism report."""
     lines = [
         "# Phase 9 Canonical DCA-RRM Evaluation",
         "",

@@ -1,5 +1,3 @@
-"""Tests for deterministic Phase-11 Table-5 campaign construction."""
-
 import pytest
 
 from barge_rerouting.experiments.phase11_services import (

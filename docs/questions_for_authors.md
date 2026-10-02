@@ -1,10 +1,9 @@
-# Questions for the Authors and Interview Panel
+# Questions for the Authors
 
 ## 1. Purpose
 
-This document records clarifications that would improve the accuracy of the
-reproduction and research questions that demonstrate careful study of the
-paper.
+This document records source details needed for a more exact reproduction and
+related research questions.
 
 The questions are divided into four groups:
 
@@ -13,9 +12,8 @@ The questions are divided into four groups:
 3. experimental and numerical questions;
 4. broader research questions.
 
-Lack of an answer will not stop the reproduction. Where clarification is
-unavailable, the implementation will follow the documented baseline decision
-in `assumptions_register.md`.
+Unresolved points use the baseline interpretation recorded in
+`assumptions_register.md`.
 
 ---
 
@@ -326,7 +324,7 @@ If not, what values were used for:
 
 ---
 
-# 5. Research-level interview questions
+# 5. Further research questions
 
 ## Q023 — Rerouting trigger as a decision
 
@@ -427,7 +425,7 @@ Possible data include:
 - service schedules;
 - realised water levels;
 - cancellations;
-- truck-recouse costs;
+- truck-recourse costs;
 - delay records.
 
 ---

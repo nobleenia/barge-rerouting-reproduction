@@ -63,7 +63,6 @@ def _normalise_optional_float(
     name: str,
     value: float | None,
 ) -> float | None:
-    """Validate and normalise an optional finite number."""
     if value is None:
         return None
 
@@ -96,7 +95,6 @@ class DcaRmEventResult:
     ]
 
     def __post_init__(self) -> None:
-        """Validate one event-level result."""
         if not isinstance(
             self.event,
             BookingDecisionEvent,
@@ -259,12 +257,10 @@ class DcaRmEventResult:
 
     @property
     def demand_id(self) -> str:
-        """Return the current demand identifier."""
         return str(self.event.demand_id)
 
     @property
     def accepted_volume(self) -> float:
-        """Return realised accepted current volume."""
         if self.acceptance_fraction is None:
             return 0.0
 
@@ -272,7 +268,6 @@ class DcaRmEventResult:
 
     @property
     def is_accepted(self) -> bool:
-        """Return whether positive current volume was accepted."""
         return bool(
             self.is_solved
             and self.acceptance_fraction is not None
@@ -314,7 +309,6 @@ class DcaRmEpochResult:
     capacity_after: TransportCapacitySnapshot
 
     def __post_init__(self) -> None:
-        """Validate epoch timing and event membership."""
         if isinstance(self.physical_time, bool) or not isinstance(
             self.physical_time,
             int,
@@ -354,7 +348,6 @@ class DcaRmEpochResult:
 
     @property
     def has_failure(self) -> bool:
-        """Return whether this epoch ended unsolved."""
         return any(not result.is_solved for result in self.event_results)
 
 
@@ -369,7 +362,6 @@ class TimeAwareDcaRmRun:
     selection_mode: FutureDemandSelectionMode
 
     def __post_init__(self) -> None:
-        """Validate ordering and state consistency."""
         if not isinstance(
             self.timeline,
             BookingTimeline,
@@ -395,12 +387,10 @@ class TimeAwareDcaRmRun:
 
     @property
     def results(self) -> tuple[DcaRmEventResult, ...]:
-        """Return all event results in timeline order."""
         return tuple(result for epoch in self.epochs for result in epoch.event_results)
 
     @property
     def completed(self) -> bool:
-        """Return whether every event was solved."""
         return bool(
             len(self.results) == self.timeline.event_count
             and all(result.is_solved for result in self.results)
@@ -408,7 +398,6 @@ class TimeAwareDcaRmRun:
 
     @property
     def total_realised_revenue(self) -> float:
-        """Return revenue from realised current acceptances."""
         return float(sum(result.current_realised_revenue or 0.0 for result in self.results))
 
     @property
@@ -422,17 +411,14 @@ class TimeAwareDcaRmRun:
 
     @property
     def total_expected_future_contribution(self) -> float:
-        """Return the diagnostic sum of future-value terms."""
         return float(sum(result.future_expected_revenue or 0.0 for result in self.results))
 
     @property
     def accepted_volume(self) -> float:
-        """Return realised accepted current volume."""
         return float(sum(result.accepted_volume for result in self.results))
 
     @property
     def failure_result(self) -> DcaRmEventResult | None:
-        """Return the first unsolved result."""
         for result in self.results:
             if not result.is_solved:
                 return result
@@ -448,7 +434,6 @@ def _build_snapshots(
     ExecutionSnapshot,
     TransportCapacitySnapshot,
 ]:
-    """Build consistent execution and capacity snapshots."""
     execution = build_execution_snapshot(
         instance,
         state,
@@ -470,7 +455,6 @@ def _select_future_set(
     selection_mode: FutureDemandSelectionMode,
     lookahead_periods: int | None,
 ) -> FutureDemandSet:
-    """Construct K(current) using the selected rule."""
     if selection_mode is FutureDemandSelectionMode.EXPLICIT:
         return select_explicit_future_set(
             instance,
@@ -502,7 +486,6 @@ def _event_result_from_solution(
     forecast_ids: tuple[str, ...],
     transitions: tuple[ArcCapacityTransition, ...],
 ) -> DcaRmEventResult:
-    """Build one solved event result."""
     return DcaRmEventResult(
         event=event,
         is_solved=True,

@@ -9,7 +9,6 @@ from barge_rerouting.instance import ExperimentInstance
 
 
 def _validate_positive_integer(name: str, value: object) -> int:
-    """Validate and return a strictly positive integer."""
     if isinstance(value, bool) or not isinstance(value, int):
         raise TypeError(f"{name} must be an integer.")
 
@@ -20,7 +19,6 @@ def _validate_positive_integer(name: str, value: object) -> int:
 
 
 def _validate_nonnegative_integer(name: str, value: object) -> int:
-    """Validate and return a nonnegative integer."""
     if isinstance(value, bool) or not isinstance(value, int):
         raise TypeError(f"{name} must be an integer.")
 
@@ -39,7 +37,6 @@ class BookingDecisionEvent:
     demand: Demand
 
     def __post_init__(self) -> None:
-        """Validate the booking event."""
         sequence_number = _validate_positive_integer(
             "sequence_number",
             self.sequence_number,
@@ -68,12 +65,10 @@ class BookingDecisionEvent:
 
     @property
     def event_id(self) -> str:
-        """Return a deterministic booking-event identifier."""
         return f"booking::{self.sequence_number:04d}::{self.demand.demand_id}"
 
     @property
     def demand_id(self) -> str:
-        """Return the arriving demand identifier."""
         return str(self.demand.demand_id)
 
 
@@ -84,7 +79,6 @@ class BookingTimeline:
     events: tuple[BookingDecisionEvent, ...]
 
     def __post_init__(self) -> None:
-        """Validate event ordering and demand uniqueness."""
         if not isinstance(self.events, tuple):
             raise TypeError("events must be a tuple.")
 
@@ -124,12 +118,10 @@ class BookingTimeline:
 
     @property
     def event_count(self) -> int:
-        """Return the number of booking decisions."""
         return len(self.events)
 
     @property
     def decision_times(self) -> tuple[int, ...]:
-        """Return distinct booking times in ascending order."""
         return tuple(sorted({event.decision_time for event in self.events}))
 
     def event_at_sequence(

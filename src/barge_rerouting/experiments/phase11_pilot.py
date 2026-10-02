@@ -1,16 +1,7 @@
-"""First paired four-policy Table 4 pilot for Phase 11.
+"""Four-policy Table 4 pilot.
 
-The pilot cell is fixed as:
-
-- Service Family 1;
-- nominal capacity 10 TEU;
-- controlled demand set 01 / seed 11001;
-- stable capacity;
-- truck recourse disabled;
-- DCA-RM and DCA-RRM share one ex-ante forecast catalogue.
-
-This module deliberately reuses the validated Phase 6--9 policy runners
-rather than implementing separate experimental optimisation models.
+The pilot uses service family 1, capacity 10, demand seed 11001, stable
+capacity, and no truck recourse.
 """
 
 from __future__ import annotations
@@ -113,7 +104,6 @@ class Table4PilotResult:
 
     @property
     def all_policies_completed(self) -> bool:
-        """Return whether all four policy runs completed."""
         return all(record.completed for record in self.records)
 
 
@@ -216,7 +206,6 @@ def _record(
     run: Phase11PolicyRun,
     elapsed_seconds: float,
 ) -> Table4PolicyRunRecord:
-    """Build one raw stable-capacity pilot record."""
     failure = run.failure_event
 
     if run.completed:
@@ -237,9 +226,7 @@ def _record(
         demand_fingerprint=(inputs.demand_fingerprint),
         completed=run.completed,
         total_revenue=run.total_revenue,
-        # Stable Table 4 contains no truck recourse.
-        # Every accepted commitment is therefore a
-        # barge-transport commitment.
+        # Table 4 uses barge transport only.
         transported_volume=run.accepted_volume,
         accepted_volume=run.accepted_volume,
         solver_status=solver_status,
@@ -351,7 +338,6 @@ def _scientific_signature(
         ...,
     ],
 ) -> tuple[tuple[object, ...], ...]:
-    """Return deterministic scientific fields excluding timing."""
     return tuple(
         (
             record.policy_key,

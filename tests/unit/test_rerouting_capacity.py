@@ -1,5 +1,3 @@
-"""Tests for released capacity used by demand rerouting."""
-
 from dataclasses import replace
 from pathlib import Path
 
@@ -134,7 +132,6 @@ def service_arc_id(instance, service_id: str) -> str:
 
 
 def test_releases_old_future_reservation_on_s2() -> None:
-    """K001's old S2 reservation must become jointly usable."""
     (
         instance,
         _,
@@ -158,7 +155,6 @@ def test_releases_old_future_reservation_on_s2() -> None:
 
 
 def test_completed_service_is_not_reopened() -> None:
-    """Historical unused S1 capacity must remain unavailable."""
     (
         instance,
         _,
@@ -180,7 +176,6 @@ def test_completed_service_is_not_reopened() -> None:
 
 
 def test_release_identity_prevents_double_subtraction() -> None:
-    """Ordinary capacity plus old reservation gives rerouting capacity."""
     (
         instance,
         _,
@@ -203,7 +198,6 @@ def test_release_identity_prevents_double_subtraction() -> None:
 
 
 def test_same_time_event_releases_both_future_services() -> None:
-    """At time zero, both S1 and S2 remain releasable."""
     instance = assemble_experiment_instance(
         quiet_config(),
         demands=(
@@ -281,7 +275,6 @@ def test_same_time_event_releases_both_future_services() -> None:
 
 
 def test_capacity_release_is_deterministic() -> None:
-    """Repeated construction must return an identical snapshot."""
     (
         instance,
         _,

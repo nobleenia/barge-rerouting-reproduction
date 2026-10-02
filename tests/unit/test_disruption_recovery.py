@@ -1,5 +1,3 @@
-"""Tests for status-triggered recovery preparation."""
-
 import pytest
 
 from barge_rerouting.config import (
@@ -113,7 +111,6 @@ def committed_state(instance):
 
 
 def test_status_recovery_releases_future_commitment() -> None:
-    """The full unfinished reservation becomes recoverable."""
     instance = build_instance()
     state = committed_state(instance)
 
@@ -155,7 +152,6 @@ def test_status_recovery_releases_future_commitment() -> None:
 
 
 def test_actual_recovery_capacity_is_seven() -> None:
-    """A 0.7 water factor exposes seven TEU on each leg."""
     instance = build_instance()
     state = committed_state(instance)
 
@@ -210,7 +206,6 @@ def test_actual_recovery_capacity_is_seven() -> None:
 
 
 def test_same_time_departure_remains_recoverable() -> None:
-    """A leg departing at the update epoch has not been locked yet."""
     instance = build_instance()
     state = committed_state(instance)
 
@@ -248,14 +243,10 @@ def test_same_time_departure_remains_recoverable() -> None:
 
 
 def test_in_transit_movement_is_immutable() -> None:
-    """A departed leg cannot be undone by a later forecast."""
     instance = build_instance()
     state = committed_state(instance)
 
-    # There is no integer physical time strictly between 1 and 2
-    # in this toy service. Instead verify the post-arrival state at 2:
-    # the first movement is historical and only the second remains
-    # recoverable.
+    # At time 2 the first movement is complete; only the second is recoverable.
     execution = build_execution_snapshot(
         instance,
         state,

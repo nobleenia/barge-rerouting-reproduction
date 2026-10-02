@@ -1,9 +1,4 @@
-"""Execute one Phase-11 Table-5 campaign policy run.
-
-The live policy result is converted immediately into rich reporting
-evidence so expensive optimisation does not have to be repeated merely
-to reconstruct reporting quantities later.
-"""
+"""Run one Table 5 policy and store its reporting data."""
 
 from __future__ import annotations
 

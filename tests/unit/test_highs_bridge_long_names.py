@@ -1,5 +1,3 @@
-"""Regression tests for lossless HiGHS variable-name bridging."""
-
 import pytest
 from docplex.mp.model import Model
 
@@ -10,7 +8,6 @@ from barge_rerouting.optimization.highs_bridge import (
 
 
 def test_highs_round_trip_with_very_long_variable_names() -> None:
-    """HiGHS extraction must not depend on LP long-name preservation."""
     model = Model(name="highs_long_name_regression")
 
     common = "fragment_v__" + "__recovery__booking__".join(f"{index:04d}" for index in range(300))
@@ -52,8 +49,7 @@ def test_highs_round_trip_with_very_long_variable_names() -> None:
         y,
     ) == pytest.approx(2.0)
 
-    # The temporary aliasing must not mutate the
-    # model retained by the calling code.
+    # Temporary aliases do not change the caller's model.
     assert x.name == x_name
     assert y.name == y_name
 

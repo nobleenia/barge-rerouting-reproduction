@@ -1,5 +1,3 @@
-"""Tests for execution-aware fragment-specific rerouting networks."""
-
 from dataclasses import replace
 from pathlib import Path
 
@@ -220,7 +218,6 @@ def build_in_transit_example():
 
 
 def test_completed_arc_is_absent_from_fragment_network() -> None:
-    """S1 is historical and the fragment starts from B at time one."""
     instance, decision, _, networks = build_completed_prefix_example()
 
     fragment_id = decision.fragments[0].fragment_id
@@ -232,7 +229,6 @@ def test_completed_arc_is_absent_from_fragment_network() -> None:
 
 
 def test_future_reachable_service_is_present() -> None:
-    """S2 remains a feasible decision arc from B at time one."""
     instance, decision, released_capacity, networks = build_completed_prefix_example()
 
     fragment_id = decision.fragments[0].fragment_id
@@ -246,7 +242,6 @@ def test_future_reachable_service_is_present() -> None:
 
 
 def test_late_service_is_removed_by_deadline() -> None:
-    """S4 cannot serve a fragment whose due time is two."""
     instance, decision, _, networks = build_completed_prefix_example()
 
     index = networks.index_for(decision.fragments[0].fragment_id)
@@ -255,7 +250,6 @@ def test_late_service_is_removed_by_deadline() -> None:
 
 
 def test_in_transit_fragment_network_starts_after_arrival() -> None:
-    """Locked S_LONG is absent and rerouting begins from B at time two."""
     instance, decision, networks = build_in_transit_example()
 
     fragment = decision.fragments[0]
@@ -267,7 +261,6 @@ def test_in_transit_fragment_network_starts_after_arrival() -> None:
 
 
 def test_fragment_network_construction_is_deterministic() -> None:
-    """Repeated construction must produce identical indexes."""
     instance, decision, released_capacity, first = build_completed_prefix_example()
 
     second = build_fragment_network_snapshot(

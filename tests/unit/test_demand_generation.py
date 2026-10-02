@@ -1,5 +1,3 @@
-"""Tests for deterministic synthetic-demand generation."""
-
 from dataclasses import replace
 from pathlib import Path
 
@@ -24,7 +22,6 @@ def load_toy_config():
 
 
 def test_same_configuration_and_seed_produce_identical_demands() -> None:
-    """Repeated generation with one seed must be exactly reproducible."""
     config = load_toy_config()
 
     first = generate_demands(config)
@@ -35,7 +32,6 @@ def test_same_configuration_and_seed_produce_identical_demands() -> None:
 
 
 def test_different_seed_changes_generated_instance() -> None:
-    """A controlled seed change should produce a different instance."""
     config = load_toy_config()
 
     baseline = generate_demands(config)
@@ -49,7 +45,6 @@ def test_different_seed_changes_generated_instance() -> None:
 
 
 def test_generator_creates_requested_count_and_unique_identifiers() -> None:
-    """Generated demand IDs must be unique and deterministically ordered."""
     config = load_toy_config()
     demands = generate_demands(config)
 
@@ -63,7 +58,6 @@ def test_generator_creates_requested_count_and_unique_identifiers() -> None:
 
 
 def test_generated_values_respect_configured_ranges() -> None:
-    """Every generated value must satisfy the configured generation ranges."""
     config = load_toy_config()
     generation = config.demand_generation
     demands = generate_demands(config)
@@ -95,7 +89,6 @@ def test_generated_values_respect_configured_ranges() -> None:
 
 
 def test_every_generated_demand_has_a_time_feasible_route() -> None:
-    """The generator must not create structurally infeasible demands."""
     config = load_toy_config()
     demands = generate_demands(config)
 
@@ -119,7 +112,6 @@ def test_every_generated_demand_has_a_time_feasible_route() -> None:
 
 
 def test_feasible_template_enumeration_is_deterministic() -> None:
-    """Candidate templates must have stable content and ordering."""
     config = load_toy_config()
 
     first = enumerate_feasible_demand_templates(config)
@@ -130,7 +122,6 @@ def test_feasible_template_enumeration_is_deterministic() -> None:
 
 
 def test_generator_rejects_network_without_feasible_templates() -> None:
-    """A network without transport movements cannot generate OD demands."""
     config = load_toy_config()
 
     empty_network = replace(
@@ -149,7 +140,6 @@ def test_generator_rejects_network_without_feasible_templates() -> None:
 def test_generated_csv_contains_header_and_all_demands(
     tmp_path: Path,
 ) -> None:
-    """CSV output must contain one header and one row per demand."""
     config = load_toy_config()
     demands = generate_demands(config)
 
@@ -165,7 +155,6 @@ def test_generated_csv_contains_header_and_all_demands(
 
 
 def test_fingerprint_is_a_sha256_hexadecimal_string() -> None:
-    """The instance fingerprint must be a 64-character SHA-256 value."""
     config = load_toy_config()
     fingerprint = demand_fingerprint(generate_demands(config))
 

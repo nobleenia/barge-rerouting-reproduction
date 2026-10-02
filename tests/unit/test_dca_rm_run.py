@@ -1,5 +1,3 @@
-"""Tests for complete time-aware sequential DCA-RM."""
-
 from pathlib import Path
 
 import pytest
@@ -103,7 +101,6 @@ def run_rm(probability_four: float):
 
 
 def test_myopic_dca_accepts_current_and_loses_future() -> None:
-    """Baseline commits the shared bottleneck too early."""
     baseline = run_time_aware_sequential_dca(build_instance())
 
     assert baseline.completed
@@ -113,7 +110,6 @@ def test_myopic_dca_accepts_current_and_loses_future() -> None:
 
 
 def test_high_probability_protection_improves_realised_revenue() -> None:
-    """DCA-RM protects capacity and later accepts FUTURE."""
     run = run_rm(0.50)
 
     assert run.completed
@@ -124,7 +120,6 @@ def test_high_probability_protection_improves_realised_revenue() -> None:
 
 
 def test_low_probability_reverses_full_timeline_decision() -> None:
-    """Low forecast value reproduces the myopic outcome."""
     run = run_rm(0.05)
 
     assert run.completed
@@ -134,7 +129,6 @@ def test_low_probability_reverses_full_timeline_decision() -> None:
 
 
 def test_tentative_protection_does_not_reduce_persisted_capacity() -> None:
-    """Event-one protection is discarded before event two."""
     run = run_rm(0.50)
     first = run.results[0]
 
@@ -147,7 +141,6 @@ def test_tentative_protection_does_not_reduce_persisted_capacity() -> None:
 
 
 def test_objective_sum_is_not_reported_as_realised_revenue() -> None:
-    """Expected and realised values must remain separate."""
     run = run_rm(0.50)
 
     assert run.summed_event_objectives == pytest.approx(600.0)
@@ -156,7 +149,6 @@ def test_objective_sum_is_not_reported_as_realised_revenue() -> None:
 
 
 def test_time_aware_dca_rm_run_is_deterministic() -> None:
-    """Identical inputs must reproduce the same run."""
     first = run_rm(0.50)
     second = run_rm(0.50)
 

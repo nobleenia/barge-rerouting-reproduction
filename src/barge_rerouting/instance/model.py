@@ -21,7 +21,6 @@ def _normalise_arc_ids(
     *,
     field_name: str,
 ) -> tuple[str, ...]:
-    """Validate, normalise, and deterministically sort arc identifiers."""
     if not isinstance(value, tuple):
         raise TypeError(f"{field_name} must be a tuple.")
 
@@ -53,7 +52,6 @@ class NodeFlowIndex:
     outgoing_arc_ids: tuple[str, ...]
 
     def __post_init__(self) -> None:
-        """Validate and normalise the node-level flow index."""
         node = validate_time_space_node(
             self.node,
             field_name="node",
@@ -88,7 +86,6 @@ class NodeFlowIndex:
 
     @property
     def degree(self) -> int:
-        """Return the total feasible incident-arc count."""
         return len(self.incoming_arc_ids) + len(self.outgoing_arc_ids)
 
 
@@ -107,7 +104,6 @@ class DemandNetworkIndex:
     original_arc_count: int
 
     def __post_init__(self) -> None:
-        """Validate demand-network consistency."""
         if not isinstance(self.demand, Demand):
             raise TypeError("demand must be a Demand object.")
 
@@ -321,27 +317,22 @@ class DemandNetworkIndex:
 
     @property
     def demand_id(self) -> str:
-        """Return the indexed demand identifier."""
         return str(self.demand.demand_id)
 
     @property
     def feasible_node_count(self) -> int:
-        """Return the number of nodes retained for this demand."""
         return len(self.node_flow_indexes)
 
     @property
     def feasible_arc_count(self) -> int:
-        """Return the number of arcs retained for this demand."""
         return len(self.feasible_arc_ids)
 
     @property
     def removed_node_count(self) -> int:
-        """Return the number of full-network nodes removed."""
         return self.original_node_count - self.feasible_node_count
 
     @property
     def removed_arc_count(self) -> int:
-        """Return the number of full-network arcs removed."""
         return self.original_arc_count - self.feasible_arc_count
 
     def flow_index_for(
@@ -362,12 +353,10 @@ class DemandNetworkIndex:
 
     @property
     def sink_arc_ids(self) -> tuple[str, ...]:
-        """Return all demand-specific auxiliary delivery arc IDs."""
         return tuple(sink_arc.arc_id for sink_arc in self.sink_arcs)
 
     @property
     def all_flow_arc_ids(self) -> tuple[str, ...]:
-        """Return physical, holding, and auxiliary delivery arc IDs."""
         return tuple(
             sorted(
                 (
@@ -440,7 +429,6 @@ class ExperimentInstance:
     demand_network_indexes: tuple[DemandNetworkIndex, ...]
 
     def __post_init__(self) -> None:
-        """Validate global experiment-instance consistency."""
         if not isinstance(self.config, ExperimentConfig):
             raise TypeError("config must be an ExperimentConfig.")
 
@@ -547,22 +535,18 @@ class ExperimentInstance:
 
     @property
     def node_count(self) -> int:
-        """Return the full time-space-network node count."""
         return int(self.graph.number_of_nodes())
 
     @property
     def arc_count(self) -> int:
-        """Return the full time-space-network arc count."""
         return len(self.arcs)
 
     @property
     def demand_count(self) -> int:
-        """Return the number of realised demands."""
         return len(self.demands)
 
     @property
     def total_feasible_demand_arcs(self) -> int:
-        """Return total demand-arc combinations after pruning."""
         total: int = 0
 
         for network_index in self.demand_network_indexes:

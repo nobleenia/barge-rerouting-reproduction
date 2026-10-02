@@ -57,7 +57,6 @@ TABLE5_VOLUME_CONDITIONING: Final = "positive_volume_q_gt_0"
 
 
 def _validate_seed(value: object) -> int:
-    """Validate one non-negative deterministic seed."""
     if isinstance(value, bool) or not isinstance(
         value,
         int,
@@ -74,7 +73,6 @@ def _draw_positive_volume(
     random_generator: Random,
     economic_spec: Table4EconomicInputSpec,
 ) -> int:
-    """Draw from A032 conditional on strictly positive volume."""
     while True:
         volume = _draw_volume(
             random_generator,
@@ -152,7 +150,6 @@ class Table5ControlledDemandSet:
     ]
 
     def __post_init__(self) -> None:
-        """Validate frozen demand-set consistency."""
         if self.request_count != TABLE5_DEMAND_COUNT:
             raise ValueError(f"Table 5 demand set must contain {TABLE5_DEMAND_COUNT} requests.")
 

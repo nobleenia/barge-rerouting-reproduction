@@ -10,7 +10,6 @@ from barge_rerouting.experiments import (
 
 
 def main() -> None:
-    """Generate and persist every registered controlled demand set."""
     output_directory = Path("results/phase11/table4/demand_sets")
 
     print("Phase 11 controlled Table 4 demand sets")

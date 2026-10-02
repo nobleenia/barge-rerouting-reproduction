@@ -15,7 +15,6 @@ from barge_rerouting.rolling_horizon import (
 
 
 def main() -> None:
-    """Solve three bookings sequentially under one shared capacity."""
     config = load_experiment_config("configs/toy_experiment.yaml")
 
     instance = assemble_experiment_instance(

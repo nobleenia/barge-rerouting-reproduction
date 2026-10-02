@@ -1,5 +1,3 @@
-"""Tests for canonical synthetic DCA-RM evaluation."""
-
 import csv
 import json
 from dataclasses import replace
@@ -76,7 +74,6 @@ def build_instance(
 
 
 def test_default_regimes_cover_printed_and_capped() -> None:
-    """Three probabilities must be evaluated twice."""
     regimes = default_sensitivity_regimes()
 
     assert len(regimes) == 6
@@ -90,7 +87,6 @@ def test_default_regimes_cover_printed_and_capped() -> None:
 
 
 def test_forecast_does_not_use_realised_future_volume() -> None:
-    """Changing realised volume must not change the forecast."""
     first_instance = build_instance(future_volume=2)
     second_instance = build_instance(future_volume=4)
 
@@ -126,7 +122,6 @@ def test_forecast_does_not_use_realised_future_volume() -> None:
 
 
 def test_evaluation_contains_baseline_and_all_regimes() -> None:
-    """The evaluation must include one DCA and six RM rows."""
     evaluation = evaluate_phase8_canonical(
         build_instance(),
         maximum_volume=10,
@@ -140,7 +135,6 @@ def test_evaluation_contains_baseline_and_all_regimes() -> None:
 
 
 def test_high_printed_probability_can_protect_capacity() -> None:
-    """High probability should reject CURRENT and accept FUTURE."""
     regimes = (
         ForecastSensitivityRegime(
             key="printed_low",
@@ -178,7 +172,6 @@ def test_high_printed_probability_can_protect_capacity() -> None:
 
 
 def test_event_rows_separate_objective_and_revenue() -> None:
-    """Expected contribution must not be reported as earned."""
     regime = ForecastSensitivityRegime(
         key="printed_high",
         label="Printed high",
@@ -207,7 +200,6 @@ def test_event_rows_separate_objective_and_revenue() -> None:
 
 
 def test_phase8_evaluation_is_deterministic() -> None:
-    """Repeated evaluation must be identical."""
     regimes = (
         ForecastSensitivityRegime(
             key="printed_high",
@@ -241,7 +233,6 @@ def test_phase8_evaluation_is_deterministic() -> None:
 def test_phase8_export_is_complete(
     tmp_path,
 ) -> None:
-    """CSV, JSON, and Markdown outputs must be complete."""
     regime = ForecastSensitivityRegime(
         key="printed_high",
         label="Printed high",
@@ -293,7 +284,6 @@ def test_phase8_export_is_complete(
 def test_phase8_report_discloses_scientific_boundary(
     tmp_path,
 ) -> None:
-    """Generated report must not overclaim reproduction."""
     regime = ForecastSensitivityRegime(
         key="capped_high",
         label="Capped high",

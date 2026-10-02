@@ -16,7 +16,6 @@ def _validate_integer(
     *,
     minimum: int = 0,
 ) -> int:
-    """Validate and return an integer with a lower bound."""
     if isinstance(value, bool) or not isinstance(value, int):
         raise TypeError(f"{name} must be an integer.")
 
@@ -32,7 +31,6 @@ def _validate_number(
     *,
     minimum: float = 0.0,
 ) -> float:
-    """Validate and return a finite number with a lower bound."""
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise TypeError(f"{name} must be a real number.")
 
@@ -56,7 +54,6 @@ class CustomerMix:
     fully_spot_probability: float
 
     def __post_init__(self) -> None:
-        """Validate and normalise category probabilities."""
         regular = _validate_number(
             "regular_probability",
             self.regular_probability,
@@ -119,7 +116,6 @@ class NetworkConfig:
     add_holding_arcs: bool = True
 
     def __post_init__(self) -> None:
-        """Validate the configured network."""
         if not isinstance(self.terminals, tuple):
             raise TypeError("terminals must be a tuple.")
 
@@ -186,12 +182,10 @@ class NetworkConfig:
 
     @property
     def horizon_start(self) -> int:
-        """Return the first configured time point."""
         return int(self.time_periods[0])
 
     @property
     def horizon_end(self) -> int:
-        """Return the final configured time point."""
         return int(self.time_periods[-1])
 
 
@@ -213,7 +207,6 @@ class DemandGenerationConfig:
     customer_mix: CustomerMix
 
     def __post_init__(self) -> None:
-        """Validate all demand-generation ranges."""
         number_of_demands = _validate_integer(
             "number_of_demands",
             self.number_of_demands,
@@ -328,7 +321,6 @@ class SolverConfig:
     log_output: bool
 
     def __post_init__(self) -> None:
-        """Validate solver controls."""
         time_limit = _validate_number(
             "time_limit_seconds",
             self.time_limit_seconds,
@@ -360,7 +352,6 @@ class ExperimentConfig:
     solver: SolverConfig
 
     def __post_init__(self) -> None:
-        """Validate experiment-level and cross-section consistency."""
         if not isinstance(self.experiment_name, str):
             raise TypeError("experiment_name must be a string.")
 

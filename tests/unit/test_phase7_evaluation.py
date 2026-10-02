@@ -1,5 +1,3 @@
-"""Tests for canonical Full-Reroute comparison exports."""
-
 import csv
 import json
 from dataclasses import replace
@@ -80,7 +78,6 @@ def equal_evaluation():
 def test_summary_deltas_match_run_totals(
     equal_evaluation,
 ) -> None:
-    """Single-route mechanisms must produce equal totals."""
     summary = equal_evaluation.summary
 
     assert summary.ordinary_revenue == pytest.approx(160.0)
@@ -95,7 +92,6 @@ def test_summary_deltas_match_run_totals(
 def test_event_rows_cover_complete_timeline(
     equal_evaluation,
 ) -> None:
-    """Exports must include every request in timeline order."""
     assert len(equal_evaluation.events) == 3
 
     assert tuple(event.sequence_number for event in equal_evaluation.events) == (1, 2, 3)
@@ -106,7 +102,6 @@ def test_event_rows_cover_complete_timeline(
 def test_event_rows_preserve_acceptance_results(
     equal_evaluation,
 ) -> None:
-    """Event comparison must retain both mechanisms."""
     assert tuple(event.ordinary_acceptance for event in equal_evaluation.events) == pytest.approx(
         (1.0, 0.75, 0.0)
     )
@@ -117,7 +112,6 @@ def test_event_rows_preserve_acceptance_results(
 
 
 def test_later_events_are_marked_not_run_after_failure() -> None:
-    """Rows after terminal infeasibility must remain explicit."""
     instance = assemble_experiment_instance(
         quiet_config(),
         demands=(
@@ -170,7 +164,6 @@ def test_evaluation_export_is_complete(
     equal_evaluation,
     tmp_path,
 ) -> None:
-    """CSV, JSON, and Markdown outputs must be readable."""
     paths = write_phase7_evaluation(
         equal_evaluation,
         output_directory=tmp_path / "results",
@@ -203,7 +196,6 @@ def test_evaluation_export_is_complete(
 
 
 def test_evaluation_is_deterministic() -> None:
-    """Repeated evaluations must be exactly identical."""
     instance = build_equal_mechanism_instance()
 
     first = evaluate_full_reroute_against_sequential(instance)
@@ -213,7 +205,6 @@ def test_evaluation_is_deterministic() -> None:
 
 
 def test_canonical_failure_recovery_metrics_are_explicit() -> None:
-    """Canonical gains must be identified as continuation gains."""
     instance = assemble_experiment_instance(quiet_config())
 
     evaluation = evaluate_full_reroute_against_sequential(instance)

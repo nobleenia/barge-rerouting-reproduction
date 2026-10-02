@@ -26,7 +26,6 @@ def _validate_nonnegative_integer(
     name: str,
     value: object,
 ) -> int:
-    """Validate and return a nonnegative integer."""
     if isinstance(value, bool) or not isinstance(value, int):
         raise TypeError(f"{name} must be an integer.")
 
@@ -40,7 +39,6 @@ def _validate_positive_finite_float(
     name: str,
     value: object,
 ) -> float:
-    """Validate and return a strictly positive finite float."""
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise TypeError(f"{name} must be a real number.")
 
@@ -66,7 +64,6 @@ class PlannedDemandPath:
     delivery_arc_id: str
 
     def __post_init__(self) -> None:
-        """Validate and normalise the decomposed path."""
         if not isinstance(self.path_id, str):
             raise TypeError("path_id must be a string.")
 
@@ -132,7 +129,6 @@ class PlannedDemandPath:
 
     @property
     def all_arc_ids(self) -> tuple[str, ...]:
-        """Return physical arcs followed by the logical delivery arc."""
         return (
             *self.physical_arc_ids,
             self.delivery_arc_id,
@@ -149,7 +145,6 @@ class ExecutionSnapshot:
     planned_paths: tuple[PlannedDemandPath, ...]
 
     def __post_init__(self) -> None:
-        """Validate snapshot consistency."""
         physical_time = _validate_nonnegative_integer(
             "physical_time",
             self.physical_time,
@@ -228,19 +223,16 @@ class ExecutionSnapshot:
 
     @property
     def active_fragment_count(self) -> int:
-        """Return the number of unfinished cargo fragments."""
         return sum(len(demand_state.fragments) for demand_state in self.demand_states)
 
     @property
     def delivered_barge_volume(self) -> float:
-        """Return total volume delivered by barge by this time."""
         return float(
             sum(demand_state.delivered_barge_volume for demand_state in self.demand_states)
         )
 
     @property
     def remaining_volume(self) -> float:
-        """Return total accepted but undelivered volume."""
         return float(sum(demand_state.remaining_volume for demand_state in self.demand_states))
 
     def demand_state_for(
@@ -302,7 +294,6 @@ def _validate_snapshot_instance(
     snapshot: ExecutionSnapshot,
     instance: ExperimentInstance,
 ) -> None:
-    """Validate that a snapshot belongs to the supplied instance."""
     if not isinstance(instance, ExperimentInstance):
         raise TypeError("instance must be an ExperimentInstance.")
 

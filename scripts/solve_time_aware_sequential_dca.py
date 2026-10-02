@@ -14,7 +14,6 @@ from barge_rerouting.rolling_horizon import (
 
 
 def main() -> None:
-    """Run a controlled two-time case and the canonical diagnostic."""
     config = load_experiment_config("configs/toy_experiment.yaml")
     quiet_config = replace(
         config,

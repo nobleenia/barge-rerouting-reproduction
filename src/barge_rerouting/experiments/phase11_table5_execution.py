@@ -73,7 +73,6 @@ class Table5PolicyEventResult:
     solve_status: str | None = None
 
     def __post_init__(self) -> None:
-        """Validate wrapper consistency."""
         if self.policy_key not in (
             "pr",
             "fr",
@@ -163,7 +162,6 @@ class Table5PolicyEventResult:
 
     @property
     def accepted_volume(self) -> float:
-        """Return newly accepted volume."""
         if (
             self.disposition is not Table5EventDisposition.CORE_PROCESSED
             or self.core_result is None
@@ -174,7 +172,6 @@ class Table5PolicyEventResult:
 
     @property
     def realised_revenue(self) -> float:
-        """Return realised booking revenue."""
         if (
             self.disposition is not Table5EventDisposition.CORE_PROCESSED
             or self.core_result is None
@@ -198,7 +195,6 @@ class Table5OperationalPolicyRun:
     final_state: RecoveryOperationalState
 
     def __post_init__(self) -> None:
-        """Validate event order and state chaining."""
         if self.policy_key not in (
             "pr",
             "fr",
@@ -243,14 +239,12 @@ class Table5OperationalPolicyRun:
 
     @property
     def completed(self) -> bool:
-        """Return whether the full operational timeline completed."""
         return (
             len(self.event_results) == self.timeline.event_count and self.solver_failure_count == 0
         )
 
     @property
     def feasibility_rejection_count(self) -> int:
-        """Return A036 continuation count."""
         return sum(
             result.disposition is Table5EventDisposition.REGULAR_FEASIBILITY_REJECTION
             for result in self.event_results
@@ -260,7 +254,6 @@ class Table5OperationalPolicyRun:
     def feasibility_rejection_ids(
         self,
     ) -> tuple[str, ...]:
-        """Return demand IDs rejected through A036."""
         demand_ids: list[str] = []
 
         for result in self.event_results:
@@ -278,7 +271,6 @@ class Table5OperationalPolicyRun:
 
     @property
     def solver_failure_count(self) -> int:
-        """Return non-A036 unprocessed solver events."""
         return sum(
             result.disposition is Table5EventDisposition.SOLVER_FAILURE
             for result in self.event_results
@@ -286,7 +278,6 @@ class Table5OperationalPolicyRun:
 
     @property
     def processed_booking_count(self) -> int:
-        """Return bookings consumed from the contractual timeline."""
         return sum(
             result.entry.is_booking
             and result.disposition is not Table5EventDisposition.SOLVER_FAILURE
@@ -295,7 +286,6 @@ class Table5OperationalPolicyRun:
 
     @property
     def processed_status_count(self) -> int:
-        """Return successfully processed forecast/status events."""
         return sum(
             result.entry.is_status_update
             and result.disposition is Table5EventDisposition.CORE_PROCESSED
@@ -304,32 +294,26 @@ class Table5OperationalPolicyRun:
 
     @property
     def accepted_volume(self) -> float:
-        """Return newly accepted booking volume."""
         return float(sum(result.accepted_volume for result in self.event_results))
 
     @property
     def total_revenue(self) -> float:
-        """Return realised booking revenue before truck penalties."""
         return float(sum(result.realised_revenue for result in self.event_results))
 
     @property
     def total_truck_volume(self) -> float:
-        """Return cumulative terminal truck volume."""
         return float(self.final_state.total_truck_volume)
 
     @property
     def total_truck_penalty(self) -> float:
-        """Return cumulative truck penalty."""
         return float(self.final_state.total_truck_penalty)
 
     @property
     def net_realised_value(self) -> float:
-        """Return booking revenue less truck penalty."""
         return float(self.total_revenue - self.total_truck_penalty)
 
     @property
     def ordinary_rejection_count(self) -> int:
-        """Return solved bookings accepting effectively zero volume."""
         return sum(
             result.entry.is_booking
             and result.disposition is Table5EventDisposition.CORE_PROCESSED
@@ -341,7 +325,6 @@ class Table5OperationalPolicyRun:
 def _solution_status(
     result: CoreTable5EventResult,
 ) -> str | None:
-    """Return the solver status retained by one core event result."""
     value: object | None = None
 
     if result.entry.is_booking:
@@ -385,7 +368,6 @@ def _solution_status(
 def _can_apply_a036(
     result: CoreTable5EventResult,
 ) -> bool:
-    """Return whether one failed core booking qualifies for A036."""
     if not result.entry.is_booking:
         return False
 
@@ -412,7 +394,6 @@ def _advance_a036_operational_state(
     *,
     solve_status: str,
 ) -> RecoveryOperationalState:
-    """Apply A036 while preserving the recovery overlay."""
     event = entry.booking_event
 
     if event is None:
@@ -439,7 +420,6 @@ def _wrapped_result(
     RecoveryOperationalState,
     bool,
 ]:
-    """Interpret one Phase-10 core result under Phase-11 semantics."""
     if core_result.event_was_processed:
         wrapped = Table5PolicyEventResult(
             policy_key=policy_key,

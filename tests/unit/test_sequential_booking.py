@@ -1,5 +1,3 @@
-"""Tests for actual sequential DCA booking decisions."""
-
 from pathlib import Path
 
 import pytest
@@ -69,7 +67,6 @@ def s6_arc_id(instance) -> str:
 
 
 def test_first_booking_uses_full_nominal_capacity() -> None:
-    """No capacity is reserved before the first booking event."""
     instance = build_sequential_instance()
     timeline = build_booking_timeline(instance)
     state = RollingBookingState.empty(instance)
@@ -84,7 +81,6 @@ def test_first_booking_uses_full_nominal_capacity() -> None:
 
 
 def test_sequential_decisions_use_prior_residual_capacity() -> None:
-    """Each accepted request reduces the next request's capacity."""
     instance = build_sequential_instance()
     timeline = build_booking_timeline(instance)
     state = RollingBookingState.empty(instance)
@@ -123,7 +119,6 @@ def test_sequential_decisions_use_prior_residual_capacity() -> None:
 
 
 def test_partially_spot_commitment_stores_accepted_volume() -> None:
-    """A fractional acceptance must persist only the accepted volume."""
     instance = build_sequential_instance()
     timeline = build_booking_timeline(instance)
     state = RollingBookingState.empty(instance)
@@ -157,7 +152,6 @@ def test_partially_spot_commitment_stores_accepted_volume() -> None:
 
 
 def test_fully_spot_request_is_rejected_when_it_cannot_fit() -> None:
-    """Binary demand cannot use the zero residual capacity fractionally."""
     instance = build_sequential_instance()
     timeline = build_booking_timeline(instance)
     state = RollingBookingState.empty(instance)
@@ -193,7 +187,6 @@ def test_fully_spot_request_is_rejected_when_it_cannot_fit() -> None:
 
 
 def test_model_rejects_out_of_order_event() -> None:
-    """The sequential solver cannot skip an earlier request."""
     instance = build_sequential_instance()
     timeline = build_booking_timeline(instance)
     state = RollingBookingState.empty(instance)

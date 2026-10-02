@@ -90,7 +90,6 @@ class TimeSpaceArc:
     direction: str | None = None
 
     def __post_init__(self) -> None:
-        """Validate and normalise the arc."""
         if not isinstance(self.arc_id, str):
             raise TypeError("arc_id must be a string.")
 
@@ -159,15 +158,12 @@ class TimeSpaceArc:
 
     @property
     def duration(self) -> int:
-        """Return the number of time periods traversed by the arc."""
         return self.head[1] - self.tail[1]
 
     @property
     def is_holding(self) -> bool:
-        """Return whether the arc represents waiting."""
         return self.arc_type is ArcType.HOLDING
 
     @property
     def is_transport(self) -> bool:
-        """Return whether the arc represents a scheduled service movement."""
         return self.arc_type is ArcType.TRANSPORT

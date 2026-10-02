@@ -1,5 +1,3 @@
-"""Tests for the pre-registered Phase 11 controlled baseline."""
-
 import pytest
 
 from barge_rerouting.experiments import (
@@ -17,7 +15,6 @@ from barge_rerouting.experiments import (
 
 
 def test_controlled_volume_baseline_is_pre_registered() -> None:
-    """VMAX and probability mass remain explicit constants."""
     assert TABLE4_CONTROLLED_VMAX == 2
 
     assert TABLE4_CONTROLLED_VOLUME_PROBABILITIES == (
@@ -33,7 +30,6 @@ def test_controlled_volume_baseline_is_pre_registered() -> None:
 
 
 def test_controlled_fare_rates_are_fixed_before_solving() -> None:
-    """Premium rates are explicit rather than tuned in model code."""
     spec = default_table4_controlled_economic_spec()
 
     assert TABLE4_CONTROLLED_PREMIUM_RATE == pytest.approx(1.25)
@@ -45,7 +41,6 @@ def test_controlled_fare_rates_are_fixed_before_solving() -> None:
 
 
 def test_controlled_timing_pools_are_monotone_by_distance() -> None:
-    """Timing pools preserve an explicit distance relationship."""
     pools = default_table4_controlled_timing_pools()
 
     assert len(pools) == 4
@@ -67,7 +62,6 @@ def test_controlled_timing_pools_are_monotone_by_distance() -> None:
 
 
 def test_pilot_has_140_opportunities_and_delivery_tail() -> None:
-    """One arrival week contains 14 x 10 opportunities."""
     spec = default_table4_controlled_demand_process()
 
     assert TABLE4_CONTROLLED_REQUEST_PERIODS == tuple(range(14))
@@ -77,13 +71,11 @@ def test_pilot_has_140_opportunities_and_delivery_tail() -> None:
 
 
 def test_economic_random_stream_is_separate() -> None:
-    """Economic draws use a deterministic independent sub-stream."""
     assert table4_economic_seed(11001) == 1011001
     assert table4_economic_seed(11005) == 1011005
 
 
 def test_controlled_demand_set_is_deterministic() -> None:
-    """The same registered seed reproduces the exact demand set."""
     first = build_table4_controlled_demand_set(seed=11001)
     second = build_table4_controlled_demand_set(seed=11001)
 
@@ -93,7 +85,6 @@ def test_controlled_demand_set_is_deterministic() -> None:
 
 
 def test_zero_and_positive_volume_counts_reconcile() -> None:
-    """Zero-volume opportunities remain explicitly accounted for."""
     demand_set = build_table4_controlled_demand_set(seed=11002)
 
     assert demand_set.opportunity_count == 140
@@ -105,14 +96,12 @@ def test_zero_and_positive_volume_counts_reconcile() -> None:
 
 
 def test_positive_realised_demands_use_only_supported_volumes() -> None:
-    """Only volumes 1 and 2 become optimisation requests."""
     demand_set = build_table4_controlled_demand_set(seed=11003)
 
     assert {float(demand.volume) for demand in demand_set.demands}.issubset({1.0, 2.0})
 
 
 def test_distinct_registered_seeds_produce_distinct_instances() -> None:
-    """Five demand sets are genuine independent controlled realisations."""
     first = build_table4_controlled_demand_set(seed=11004)
     second = build_table4_controlled_demand_set(seed=11005)
 

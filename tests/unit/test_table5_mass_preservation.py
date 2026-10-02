@@ -1,5 +1,3 @@
-"""Regression tests for mass-preserving Table-5 reporting."""
-
 import pytest
 
 from barge_rerouting.reporting.table5_allocations import (
@@ -31,7 +29,6 @@ def _tiny_barge_demand(
 
 
 def test_positive_sub_tolerance_mass_is_not_deleted() -> None:
-    """Positive physical mass must survive reporting normalization."""
     demand = _tiny_barge_demand("K0001")
 
     assert demand.final_barge_volume == pytest.approx(
@@ -44,7 +41,6 @@ def test_positive_sub_tolerance_mass_is_not_deleted() -> None:
 
 
 def test_sub_tolerance_mass_aggregates_consistently() -> None:
-    """Per-demand evidence and aggregate ledger must retain same mass."""
     snapshot = Table5AllocationSnapshot(
         demands=(
             _tiny_barge_demand("K0001"),
@@ -76,7 +72,6 @@ def test_sub_tolerance_mass_aggregates_consistently() -> None:
 
 
 def test_tiny_negative_numerical_noise_is_still_clamped() -> None:
-    """The tolerance remains available for harmless negative noise."""
     ledger = Table5VolumeLedger(
         requested_request_count=0,
         accepted_request_count=0,
